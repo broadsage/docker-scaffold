@@ -1,0 +1,177 @@
+name: Feature Request
+description: Suggest an idea or enhancement for docker-scaffold
+title: "[FEATURE] "
+labels: ["enhancement", "triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Thanks for suggesting a new feature!
+        
+        We appreciate your ideas to improve docker-scaffold. Please provide as much detail as possible to help us understand and evaluate your proposal.
+
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Prerequisites
+      description: Please confirm you have completed the following steps before submitting this request.
+      options:
+        - label: I have searched the [existing issues](https://github.com/broadsage/docker-scaffold/issues) and this feature has not been requested before
+          required: true
+        - label: I have checked the [documentation](https://github.com/broadsage/docker-scaffold/blob/main/README.md) and this feature doesn't already exist
+          required: true
+        - label: This feature is related to docker-scaffold's core functionality
+          required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: |
+        Describe the problem or pain point you're experiencing that this feature would solve.
+        Start with "I'm frustrated when..." or "It would be helpful if..."
+      placeholder: |
+        I'm frustrated when I need to manually configure...
+        Currently, there's no way to...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed Solution
+      description: |
+        Describe the solution you'd like to see implemented.
+        Be as specific as possible about what you want to happen.
+      placeholder: |
+        I would like docker-scaffold to...
+        The scaffold should be able to...
+        
+        For example:
+        - Add a new Ansible role that...
+        - Support for configuration option...
+        - CLI flag to enable...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: |
+        Describe any alternative solutions or features you've considered.
+        Have you found workarounds? Are there other tools that solve this differently?
+      placeholder: |
+        I've tried using... but it doesn't work because...
+        Alternative approach could be... but...
+        Tool XYZ does this by... however...
+    validations:
+      required: false
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case / User Story
+      description: |
+        Describe the specific use case or scenario where this feature would be valuable.
+        Use the format: "As a [type of user], I want [feature] so that [benefit]"
+      placeholder: |
+        As a DevOps engineer, I want to automatically generate CI/CD pipelines so that I can quickly deploy my Docker images.
+        
+        As a developer working on multiple projects, I want to save scaffold templates so that I can reuse configurations.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: feature-type
+    attributes:
+      label: Feature Type
+      description: What type of feature is this?
+      options:
+        - New Ansible role
+        - Enhancement to existing role
+        - CLI improvement
+        - Documentation
+        - Container image improvement
+        - Configuration option
+        - Integration with external tool
+        - Performance optimization
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature to you?
+      options:
+        - Critical - Blocking my workflow
+        - High - Significantly improves productivity
+        - Medium - Nice to have
+        - Low - Minor convenience
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: |
+        Add any other context, screenshots, mockups, or examples about the feature request here.
+        
+        Examples:
+        - Screenshots or mockups of desired behavior
+        - Links to similar features in other projects
+        - Code snippets showing desired usage
+        - Documentation from related tools
+      placeholder: |
+        Here's how another tool implements this:...
+        I've created a mockup showing:...
+        Similar to what project X does:...
+    validations:
+      required: false
+
+  - type: textarea
+    id: implementation-ideas
+    attributes:
+      label: Implementation Ideas
+      description: |
+        If you have technical ideas about how this could be implemented, share them here.
+        This helps us evaluate feasibility and complexity.
+      placeholder: |
+        This could be implemented by...
+        The Ansible role might look like...
+        Required dependencies: ...
+        Potential challenges: ...
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      description: Would you be willing to help implement this feature?
+      options:
+        - label: I am willing to submit a pull request for this feature
+          required: false
+        - label: I can help with testing this feature
+          required: false
+        - label: I can help with documentation for this feature
+          required: false
+
+  - type: textarea
+    id: breaking-changes
+    attributes:
+      label: Breaking Changes
+      description: |
+        Would this feature introduce any breaking changes?
+        List any backwards compatibility concerns.
+      placeholder: |
+        This feature would require...
+        Existing users would need to...
+        Migration path: ...
+    validations:
+      required: false

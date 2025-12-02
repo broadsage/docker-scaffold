@@ -1,0 +1,152 @@
+name: Documentation Issue
+description: Report missing, unclear, or incorrect documentation
+title: "[DOCS] "
+labels: ["documentation", "triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Help us improve our documentation!
+        
+        Good documentation is crucial for project success. Thank you for taking the time to report issues with our docs.
+
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Prerequisites
+      description: Please confirm before submitting this issue.
+      options:
+        - label: I have searched the [existing issues](https://github.com/broadsage/docker-scaffold/issues) and this documentation issue hasn't been reported
+          required: true
+        - label: I have checked the [current documentation](https://github.com/broadsage/docker-scaffold/blob/main/README.md)
+          required: true
+
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: Documentation Issue Type
+      description: What type of documentation issue is this?
+      options:
+        - Missing documentation
+        - Incorrect or outdated information
+        - Unclear or confusing explanation
+        - Broken links or references
+        - Typo or grammatical error
+        - Missing code examples
+        - Installation instructions unclear
+        - API documentation incomplete
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: location
+    attributes:
+      label: Documentation Location
+      description: |
+        Where is the problematic documentation located?
+        Provide file path, URL, or section heading.
+      placeholder: |
+        - File: README.md, line 45
+        - Section: "Getting Started > Installation"
+        - URL: https://github.com/broadsage/docker-scaffold#usage
+        - Ansible role: roles/repository/README.md
+      value: |
+        - Location: 
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-documentation
+    attributes:
+      label: Current Documentation
+      description: |
+        Quote or describe the current documentation that is problematic.
+      placeholder: |
+        The documentation currently says:
+        "Run the container with..."
+        
+        OR
+        
+        There is no documentation about how to...
+      render: markdown
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue-description
+    attributes:
+      label: Issue Description
+      description: |
+        Explain what is wrong, missing, or unclear about the current documentation.
+        How did this affect your experience?
+      placeholder: |
+        The instructions are unclear because...
+        This section is missing information about...
+        The example doesn't work because...
+        I expected to find documentation about... but couldn't locate it.
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggested-improvement
+    attributes:
+      label: Suggested Improvement
+      description: |
+        How would you improve this documentation?
+        Provide suggested text, examples, or outline what should be included.
+      placeholder: |
+        The documentation should explain...
+        
+        Suggested text:
+        ```markdown
+        ## Installation
+        
+        To install docker-scaffold:
+        1. Pull the image: `docker pull ghcr.io/broadsage/scaffold:latest`
+        2. Run the container: `docker run ...`
+        ```
+        
+        Or should include:
+        - Example of how to configure...
+        - Step-by-step guide for...
+      render: markdown
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: |
+        Any other context, screenshots, or references that would help us improve the documentation.
+      placeholder: |
+        Screenshots showing the issue:...
+        Related to this discussion:...
+        Similar to how Project X documents this:...
+    validations:
+      required: false
+
+  - type: dropdown
+    id: target-audience
+    attributes:
+      label: Target Audience
+      description: Who would benefit most from this documentation improvement?
+      options:
+        - New users / Beginners
+        - Intermediate users
+        - Advanced users / Contributors
+        - All users
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      description: Would you be willing to help improve this documentation?
+      options:
+        - label: I am willing to submit a pull request to fix this documentation issue
+          required: false
