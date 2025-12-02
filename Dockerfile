@@ -28,4 +28,4 @@ RUN chmod +x /entrypoint.sh
 
 WORKDIR /app
 
-ENTRYPOINT ["/sbin/catatonit", "--", "/entrypoint.sh"]
+ENTRYPOINT ["/usr/bin/catatonit", "--", "/entrypoint.sh"]
