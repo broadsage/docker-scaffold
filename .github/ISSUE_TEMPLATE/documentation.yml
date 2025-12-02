@@ -3,6 +3,7 @@ description: Report missing, unclear, or incorrect documentation
 title: "[DOCS] "
 labels: ["documentation", "triage"]
 projects: ["broadsage/6"]
+type: documentation
 assignees: []
 
 body:
