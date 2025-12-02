@@ -1,17 +1,17 @@
 blank_issues_enabled: false
 contact_links:
-  - name: 💬 Discussions
+  - name: 💭 Discussions
     url: https://github.com/broadsage/docker-scaffold/discussions
     about: Ask questions, share ideas, and discuss with the community
   
-  - name: 📖 Documentation
+  - name: 📚 Documentation
     url: https://github.com/broadsage/docker-scaffold/blob/main/README.md
     about: Read the project documentation and guides
   
-  - name: 🔒 Security Vulnerability
+  - name: 🛡️ Security Vulnerability
     url: https://github.com/broadsage/docker-scaffold/security/advisories/new
     about: Report a security vulnerability privately
   
-  - name: ❓ Support
+  - name: 🆘 Support
     url: https://github.com/broadsage/docker-scaffold/discussions/categories/q-a
     about: Get help and support from the community
