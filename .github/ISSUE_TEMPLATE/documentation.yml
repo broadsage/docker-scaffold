@@ -18,11 +18,11 @@ body:
     id: prerequisites
     attributes:
       label: Prerequisites
-      description: Please confirm before submitting this issue.
+      description: Please confirm you have completed the following steps.
       options:
-        - label: I have searched the [existing issues](https://github.com/broadsage/docker-scaffold/issues) and this documentation issue hasn't been reported
+        - label: I have searched the [existing issues](https://github.com/broadsage/docker-scaffold/issues) and this hasn't been reported
           required: true
-        - label: I have checked the [current documentation](https://github.com/broadsage/docker-scaffold/blob/main/README.md)
+        - label: I have read the [documentation](https://github.com/broadsage/docker-scaffold/blob/main/README.md)
           required: true
 
   - type: dropdown

@@ -93,12 +93,11 @@ body:
     attributes:
       label: Environment (if relevant)
       description: |
-        If your question is environment-specific, provide details.
-      value: |
-        - **OS**: 
-        - **Docker Version**: 
-        - **Container Runtime**: 
-        - **Ansible Version**: 
+        If your question is environment-specific, provide details (OS, Docker version, etc.).
+      placeholder: |
+        OS: Ubuntu 22.04
+        Docker: 24.0.7
+        Runtime: Docker
       render: markdown
     validations:
       required: false
