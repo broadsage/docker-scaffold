@@ -1,0 +1,137 @@
+name: Question / Support
+description: Ask for help or clarification about docker-scaffold
+title: "[QUESTION] "
+labels: ["question", "support"]
+projects: ["broadsage/6"]
+type: question
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Need help with docker-scaffold?
+        
+        Before asking, please check:
+        - 📖 [Documentation](https://github.com/broadsage/docker-scaffold/blob/main/README.md)
+        - 💬 [Existing discussions](https://github.com/broadsage/docker-scaffold/discussions)
+        - 🔍 [Existing issues](https://github.com/broadsage/docker-scaffold/issues)
+
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Prerequisites
+      description: Please confirm you have done the following.
+      options:
+        - label: I have searched the existing issues and discussions
+          required: true
+        - label: I have read the documentation
+          required: true
+        - label: This is a question, not a bug report or feature request
+          required: true
+
+  - type: dropdown
+    id: question-category
+    attributes:
+      label: Question category
+      description: What is your question about?
+      options:
+        - Installation and setup
+        - Docker image usage
+        - Ansible roles and playbooks
+        - Configuration (project.yml)
+        - GitHub Actions / CI/CD
+        - Multi-architecture builds
+        - Best practices
+        - Use case / Implementation advice
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+      description: What would you like to know? Be as specific as possible.
+      placeholder: |
+        I'm trying to...
+        How do I...?
+        What is the recommended way to...?
+        Can docker-scaffold support...?
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: |
+        Provide context about what you're trying to achieve.
+        Include any relevant details about your setup or use case.
+      placeholder: |
+        I'm working on a project that...
+        My goal is to...
+        I'm using docker-scaffold to...
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-tried
+    attributes:
+      label: What have you tried?
+      description: |
+        Have you attempted any solutions? What were the results?
+      placeholder: |
+        I tried...
+        I looked at...
+        I attempted to configure...
+    validations:
+      required: false
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment (if relevant)
+      description: |
+        If your question is environment-specific, provide details.
+      value: |
+        - **OS**: 
+        - **Docker Version**: 
+        - **Container Runtime**: 
+        - **Ansible Version**: 
+      render: markdown
+    validations:
+      required: false
+
+  - type: textarea
+    id: configuration
+    attributes:
+      label: Configuration / Commands
+      description: |
+        Share relevant configuration files, commands, or code snippets.
+      placeholder: |
+        docker run command:
+        ```bash
+        docker run ...
+        ```
+        
+        project.yml snippet:
+        ```yaml
+        ...
+        ```
+      render: bash
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: Additional information
+      description: |
+        Any other information that might be helpful.
+      placeholder: |
+        Related links:...
+        Screenshots:...
+        Similar projects:...
+    validations:
+      required: false
