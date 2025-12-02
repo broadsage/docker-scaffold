@@ -1,3 +1,3 @@
-# container-templates
+# docker-scaffold
 
-Template system for automated generation and maintenance of docker image repositories
+Ansible-powered scaffolding tool for Docker image repositories
