@@ -1,6 +1,6 @@
 name: Bug Report
 description: Create a report to help us improve docker-scaffold
-title: "[BUG] "
+title: "[BUG]"
 labels: ["bug", "triage"]
 projects: ["broadsage/6"]
 type: bug

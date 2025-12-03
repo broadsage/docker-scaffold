@@ -1,0 +1,5 @@
+---
+# Minimal example - inherits everything from defaults.yml
+image:
+  name: nginx-proxy
+  description: Nginx reverse proxy with automatic SSL

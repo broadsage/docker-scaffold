@@ -1,9 +1,9 @@
 name: Question / Support
-description: Ask for help or clarification about {{ project_name | default('this project') }}
-title: "[QUESTION] "
+description: Ask for help or clarification about {{ image.name | default('this project') }}
+title: "[QUESTION]"
 labels: ["question", "support"]
-{% if github_project_enabled and github_project_number %}
-projects: ["{{ project_organization }}/{{ github_project_number }}"]
+{% if github.projects.enabled and github.projects.number %}
+projects: ["{{ organization }}/{{ github.projects.number }}"]
 {% endif %}
 type: question
 assignees: []
@@ -12,12 +12,12 @@ body:
   - type: markdown
     attributes:
       value: |
-        ## Need help with {{ project_name }}?
+        ## Need help with {{ image.name }}?
         
         Before asking, please check:
-        - 📖 [Documentation](https://github.com/{{ project_organization }}/{{ project_name }}/blob/main/README.md)
-        - 💬 [Existing discussions](https://github.com/{{ project_organization }}/{{ project_name }}/discussions)
-        - 🔍 [Existing issues](https://github.com/{{ project_organization }}/{{ project_name }}/issues)
+        - 📖 [Documentation](https://github.com/{{ organization }}/{{ image.name }}/blob/main/README.md)
+        - 💬 [Existing discussions](https://github.com/{{ organization }}/{{ image.name }}/discussions)
+        - 🔍 [Existing issues](https://github.com/{{ organization }}/{{ image.name }}/issues)
 
   - type: checkboxes
     id: prerequisites
@@ -59,7 +59,7 @@ body:
         I'm trying to...
         How do I...?
         What is the recommended way to...?
-        Can {{ project_name }} support...?
+        Can {{ image.name }} support...?
     validations:
       required: true
 
@@ -73,7 +73,7 @@ body:
       placeholder: |
         I'm working on a project that...
         My goal is to...
-        I'm using {{ project_name }} to...
+        I'm using {{ image.name }} to...
     validations:
       required: true
 

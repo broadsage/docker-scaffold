@@ -1,9 +1,9 @@
 name: Documentation Issue
 description: Report missing, unclear, or incorrect documentation
-title: "[DOCS] "
+title: "[DOCS]"
 labels: ["documentation", "triage"]
-{% if github_project_enabled and github_project_number %}
-projects: ["{{ project_organization }}/{{ github_project_number }}"]
+{% if github.projects.enabled and github.projects.number %}
+projects: ["{{ organization }}/{{ github.projects.number }}"]
 {% endif %}
 type: documentation
 assignees: []
@@ -22,9 +22,9 @@ body:
       label: Prerequisites
       description: Please confirm you have completed the following steps.
       options:
-        - label: I have searched the [existing issues](https://github.com/{{ project_organization }}/{{ project_name }}/issues) and this hasn't been reported
+        - label: I have searched the [existing issues](https://github.com/{{ organization }}/{{ image.name }}/issues) and this hasn't been reported
           required: true
-        - label: I have read the [documentation](https://github.com/{{ project_organization }}/{{ project_name }}/blob/main/README.md)
+        - label: I have read the [documentation](https://github.com/{{ organization }}/{{ image.name }}/blob/main/README.md)
           required: true
 
   - type: dropdown
@@ -55,7 +55,7 @@ body:
       placeholder: |
         - File: README.md, line 45
         - Section: "Getting Started > Installation"
-        - URL: https://github.com/{{ project_organization }}/{{ project_name }}#usage
+        - URL: https://github.com/{{ organization }}/{{ image.name }}#usage
         - Ansible role: roles/repository/README.md
       value: |
         - Location: 
@@ -108,8 +108,8 @@ body:
         ```markdown
         ## Installation
         
-        To install {{ project_name }}:
-        1. Pull the image: `docker pull {{ registry_primary_provider }}/{{ project_organization }}/{{ registry_primary_image_name }}:latest`
+        To install {{ image.name }}:
+        1. Pull the image: `docker pull ghcr.io/{{ organization }}/{{ image.name }}:latest`
         2. Run the container: `docker run ...`
         ```
         

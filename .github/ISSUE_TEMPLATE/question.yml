@@ -1,6 +1,6 @@
 name: Question / Support
 description: Ask for help or clarification about docker-scaffold
-title: "[QUESTION] "
+title: "[QUESTION]"
 labels: ["question", "support"]
 projects: ["broadsage/6"]
 type: question

@@ -1,91 +1,45 @@
 ---
-# Project Configuration
-project:
+
+# Template for individual Docker image configuration.
+# Inherits all settings from defaults.yml - only specify what's different.
+#
+# REQUIRED FIELDS (must customize for each image):
+#   - image.name: Unique identifier for this Docker image
+#   - image.description: Brief description of image purpose
+#
+# OPTIONAL OVERRIDES (uncomment to override defaults.yml):
+#   - build.platforms: If different from org default
+#   - features.*: Enable/disable per image
+#   - Any setting from defaults.yml can be overridden here
+#
+# WORKFLOW:
+#   1. Copy this file to a new location
+#   2. Update image.name and image.description
+#   3. Customize features as needed
+#   4. Run: docker run -v $(pwd)/project.yml:/tmp/project.yml ghcr.io/broadsage/scaffold
+
+# Image Identity (REQUIRED - customize for each image)
+image:
   name: docker-scaffold
-  organization: broadsage
   description: Ansible-powered scaffolding tool for Docker image repositories
-  version: 1.0.0
-  license: Apache-2.0
+  # version: 1.0.0  # Optional: specify version (auto-generated if omitted)
 
-# Metadata
-metadata:
-  maintainer:
-    name: Broadsage Maintainers
-    email: opensource@broadsage.com
-  vendor: Broadsage Corporation Limited
+# Override Features (uncomment to change from defaults)
+features:
+  github: true             # Generate GitHub Actions workflow & Issue Templates
+  security: true           # Enable vulnerability scanning
+  registry: true           # Push Docker Images to registries
+  signing: true            # Sign images with Cosign
+  sbom: true               # Generate SBOM
 
-# GitHub Configuration
+# Override Build Settings (uncomment if needed)
+build:
+  platforms:
+    - linux/amd64             # Single platform build
+  dockerfile: Dockerfile.custom
+
+# Override GitHub Settings (uncomment if needed)
 github:
-  issues: false
-  workflows: true
   projects:
     enabled: true
     number: 6
-
-# Build Configuration
-build:
-  context: .
-  dockerfile: Dockerfile
-  platforms:
-    - linux/amd64
-    - linux/arm64
-  cache:
-    enabled: true
-    type: gha
-    mode: max
-
-# Registry Configuration
-registries:
-  # Primary registry (GitHub Container Registry)
-  primary:
-    enabled: true
-    provider: ghcr.io
-    namespace: broadsage
-    image_name: scaffold
-    public: true
-    credentials:
-      username_secret: GITHUB_ACTOR
-      password_secret: GITHUB_TOKEN
-  
-  # Docker Hub registry
-  dockerhub:
-    enabled: false
-    provider: docker.io
-    namespace: broadsage
-    image_name: scaffold
-    public: true
-    credentials:
-      username_secret: DOCKERHUB_USERNAME
-      password_secret: DOCKERHUB_TOKEN
-
-# Security Configuration
-security:
-  # Container Scanning
-  scan:
-    enabled: false
-    provider: trivy
-    severity:
-      - HIGH
-      - CRITICAL
-    fail_on_severity: CRITICAL
-  
-  # Image Signing
-  signing:
-    enabled: false
-    provider: cosign
-  
-  # Software Bill of Materials
-  sbom:
-    enabled: false
-    format: spdx
-  
-  # GitHub Security Features
-  github:
-    dependabot: true
-
-# Documentation
-documentation:
-  readme: true
-  changelog: true
-  contributing: true
-  license: true

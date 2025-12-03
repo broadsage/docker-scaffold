@@ -1,0 +1,4 @@
+# Python dependencies for docker-scaffold
+
+# Required for YAML configuration parsing
+PyYAML>=6.0.1

@@ -1,0 +1,19 @@
+---
+# Production example - security enabled
+image:
+  name: api-gateway
+  description: Production API gateway with enhanced security
+  version: 2.1.0
+
+features:
+  github_workflows: true
+  security_scan: true
+  dockerhub_push: true
+  image_signing: true
+  sbom_generation: true
+
+github:
+  issues: true
+  projects:
+    enabled: true
+    number: 3

@@ -1,0 +1,13 @@
+---
+# Single architecture example - ARM only
+image:
+  name: raspberry-pi-monitor
+  description: System monitoring tool for Raspberry Pi
+
+build:
+  platforms:
+    - linux/arm64
+
+features:
+  github_workflows: true
+  security_scan: false

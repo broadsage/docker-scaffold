@@ -1,9 +1,9 @@
 name: Bug Report
-description: Create a report to help us improve {{ project_name }}
-title: "[BUG] "
+description: Create a report to help us improve {{ image.name }}
+title: "[BUG]"
 labels: ["bug", "triage"]
-{% if github_project_enabled and github_project_number %}
-projects: ["{{ project_organization }}/{{ github_project_number }}"]
+{% if github.projects.enabled and github.projects.number %}
+projects: ["{{ organization }}/{{ github.projects.number }}"]
 {% endif %}
 type: bug
 assignees: []
@@ -22,11 +22,11 @@ body:
       label: Prerequisites
       description: Please confirm you have completed the following steps before submitting this issue.
       options:
-        - label: I have searched the [existing issues](https://github.com/{{ project_organization }}/{{ project_name }}/issues) and this is not a duplicate
+        - label: I have searched the [existing issues](https://github.com/{{ organization }}/{{ image.name }}/issues) and this is not a duplicate
           required: true
-        - label: I have read the [documentation](https://github.com/{{ project_organization }}/{{ project_name }}/blob/main/README.md)
+        - label: I have read the [documentation](https://github.com/{{ organization }}/{{ image.name }}/blob/main/README.md)
           required: true
-        - label: I am using the latest version of {{ project_name }}
+        - label: I am using the latest version of {{ image.name }}
           required: false
 
   - type: textarea
@@ -115,14 +115,14 @@ body:
         docker run -d \
           --name scaffold \
           -v /path/to/project:/workspace \
-          {{ registry_primary_provider }}/{{ project_organization }}/{{ registry_primary_image_name }}:latest
+          ghcr.io/{{ organization }}/{{ image.name }}:latest
         ```
         
         **For docker-compose.yml:**
         ```yaml
         services:
           scaffold:
-            image: {{ registry_primary_provider }}/{{ project_organization }}/{{ registry_primary_image_name }}:latest
+            image: ghcr.io/{{ organization }}/{{ image.name }}:latest
             volumes:
               - ./project:/workspace
         ```

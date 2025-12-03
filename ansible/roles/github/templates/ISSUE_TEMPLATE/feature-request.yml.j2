@@ -1,9 +1,9 @@
 name: Feature Request
-description: Suggest an idea or enhancement for {{ project_name }}
-title: "[FEATURE] "
+description: Suggest an idea or enhancement for {{ image.name }}
+title: "[FEATURE]"
 labels: ["enhancement", "triage"]
-{% if github_project_enabled and github_project_number %}
-projects: ["{{ project_organization }}/{{ github_project_number }}"]
+{% if github.projects.enabled and github.projects.number %}
+projects: ["{{ organization }}/{{ github.projects.number }}"]
 {% endif %}
 type: feature
 assignees: []
@@ -14,7 +14,7 @@ body:
       value: |
         ## Thanks for suggesting a new feature!
         
-        We appreciate your ideas to improve {{ project_name }}. Please provide as much detail as possible to help us understand and evaluate your proposal.
+        We appreciate your ideas to improve {{ image.name }}. Please provide as much detail as possible to help us understand and evaluate your proposal.
 
   - type: checkboxes
     id: prerequisites
@@ -22,11 +22,11 @@ body:
       label: Prerequisites
       description: Please confirm you have completed the following steps before submitting this request.
       options:
-        - label: I have searched the [existing issues](https://github.com/{{ project_organization }}/{{ project_name }}/issues) and this feature has not been requested before
+        - label: I have searched the [existing issues](https://github.com/{{ organization }}/{{ image.name }}/issues) and this feature has not been requested before
           required: true
-        - label: I have checked the [documentation](https://github.com/{{ project_organization }}/{{ project_name }}/blob/main/README.md) and this feature doesn't already exist
+        - label: I have checked the [documentation](https://github.com/{{ organization }}/{{ image.name }}/blob/main/README.md) and this feature doesn't already exist
           required: true
-        - label: This feature is related to {{ project_name }}'s core functionality
+        - label: This feature is related to {{ image.name }}'s core functionality
           required: true
 
   - type: textarea
@@ -50,7 +50,7 @@ body:
         Describe the solution you'd like to see implemented.
         Be as specific as possible about what you want to happen.
       placeholder: |
-        I would like {{ project_name }} to...
+        I would like {{ image.name }} to...
         The scaffold should be able to...
         
         For example:

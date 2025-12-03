@@ -1,6 +1,6 @@
 name: Documentation Issue
 description: Report missing, unclear, or incorrect documentation
-title: "[DOCS] "
+title: "[DOCS]"
 labels: ["documentation", "triage"]
 projects: ["broadsage/6"]
 type: documentation

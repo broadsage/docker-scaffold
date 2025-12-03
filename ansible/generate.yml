@@ -9,17 +9,24 @@
     scaffold_group: abc
 
   pre_tasks:
-    - name: Load project configuration
+    - name: Merge configuration files (defaults.yml + project.yml)
       tags: always
-      ansible.builtin.include_vars:
-        file: "/tmp/project.yml"
-      failed_when: false
+      ansible.builtin.command:
+        cmd: python3 scripts/merge_config.py
+        chdir: /app
+      changed_when: false
+      register: merge_result
     
-    - name: Load common variables (for string variables)
+    - name: Display merge output
+      tags: always
+      ansible.builtin.debug:
+        var: merge_result.stdout_lines
+      when: merge_result.stdout_lines is defined
+    
+    - name: Load merged configuration
       tags: always
       ansible.builtin.include_vars:
-        file: vars/common.yml
-      failed_when: false
+        file: "/tmp/merged_config.yml"
 
     - name: Set user ID from environment
       tags: always

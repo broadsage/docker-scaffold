@@ -1,0 +1,69 @@
+---
+
+# These defaults are applied to all generated Docker images.
+# Override any setting in project.yml for specific images.
+#
+# This file should rarely need modification once configured for your
+# organization. Most per-image customization happens in project.yml.
+
+# Organization Settings (shared across all images)
+organization: broadsage
+
+# Metadata (same for all images in the organization)
+metadata:
+  maintainer:
+    name: Broadsage Maintainers
+    email: opensource@broadsage.com
+  vendor: Broadsage Corporation Limited
+  license: Apache-2.0
+
+# Build Defaults
+build:
+  context: .
+  dockerfile: Dockerfile
+  platforms:
+    - linux/amd64
+    - linux/arm64
+  cache:
+    enabled: true
+    type: gha
+    mode: max
+
+# Registry Configuration
+registry:
+  github: true
+  dockerhub: true
+
+# Security Defaults
+security:
+  scan:
+    enabled: false
+    provider: 
+      - trivy
+      - clair
+    severity:
+      - HIGH
+      - CRITICAL
+    fail_on_severity: CRITICAL
+  
+  signing: true
+  sbom:
+    enabled: false
+    format: spdx
+  
+# GitHub Defaults
+github:
+  issues: true
+  workflows: true
+  dependabot: true
+  pull_requests: true
+  projects:
+    enabled: false
+    number: 1
+
+# Documentation Defaults
+documentation:
+  readme: true
+  changelog: true
+  contributing: true
+  license: true
