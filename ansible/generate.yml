@@ -1,0 +1,54 @@
+---
+- name: Generate Docker scaffold project structure
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  
+  vars:
+    scaffold_user: abc
+    scaffold_group: abc
+
+  pre_tasks:
+    - name: Load project configuration
+      tags: always
+      ansible.builtin.include_vars:
+        file: "/tmp/project.yml"
+      failed_when: false
+    
+    - name: Load common variables (for string variables)
+      tags: always
+      ansible.builtin.include_vars:
+        file: vars/common.yml
+      failed_when: false
+
+    - name: Set user ID from environment
+      tags: always
+      changed_when: false
+      when: 
+        - lookup('env', 'PUID') | length > 0
+      ansible.builtin.user:
+        name: "{{ scaffold_user }}"
+        non_unique: true
+        uid: "{{ lookup('env', 'PUID') | int }}"
+
+    - name: Set group ID from environment
+      tags: always
+      changed_when: false
+      when:
+        - lookup('env', 'PGID') | length > 0
+      ansible.builtin.group:
+        name: "{{ scaffold_group }}"
+        non_unique: true
+        gid: "{{ lookup('env', 'PGID') | int }}"
+
+  roles:
+    - role: github
+      tags: 
+        - github
+
+  post_tasks:
+    - name: Display scaffold completion message
+      tags: always
+      ansible.builtin.debug:
+        msg: |
+          ✅ Docker scaffold generation completed successfully!

@@ -1,0 +1,91 @@
+---
+# Project Configuration
+project:
+  name: docker-scaffold
+  organization: broadsage
+  description: Ansible-powered scaffolding tool for Docker image repositories
+  version: 1.0.0
+  license: Apache-2.0
+
+# Metadata
+metadata:
+  maintainer:
+    name: Broadsage Maintainers
+    email: opensource@broadsage.com
+  vendor: Broadsage Corporation Limited
+
+# GitHub Configuration
+github:
+  issues: false
+  workflows: true
+  projects:
+    enabled: true
+    number: 6
+
+# Build Configuration
+build:
+  context: .
+  dockerfile: Dockerfile
+  platforms:
+    - linux/amd64
+    - linux/arm64
+  cache:
+    enabled: true
+    type: gha
+    mode: max
+
+# Registry Configuration
+registries:
+  # Primary registry (GitHub Container Registry)
+  primary:
+    enabled: true
+    provider: ghcr.io
+    namespace: broadsage
+    image_name: scaffold
+    public: true
+    credentials:
+      username_secret: GITHUB_ACTOR
+      password_secret: GITHUB_TOKEN
+  
+  # Docker Hub registry
+  dockerhub:
+    enabled: false
+    provider: docker.io
+    namespace: broadsage
+    image_name: scaffold
+    public: true
+    credentials:
+      username_secret: DOCKERHUB_USERNAME
+      password_secret: DOCKERHUB_TOKEN
+
+# Security Configuration
+security:
+  # Container Scanning
+  scan:
+    enabled: false
+    provider: trivy
+    severity:
+      - HIGH
+      - CRITICAL
+    fail_on_severity: CRITICAL
+  
+  # Image Signing
+  signing:
+    enabled: false
+    provider: cosign
+  
+  # Software Bill of Materials
+  sbom:
+    enabled: false
+    format: spdx
+  
+  # GitHub Security Features
+  github:
+    dependabot: true
+
+# Documentation
+documentation:
+  readme: true
+  changelog: true
+  contributing: true
+  license: true

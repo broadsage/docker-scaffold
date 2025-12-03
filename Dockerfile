@@ -18,7 +18,8 @@ RUN \
   apk add --no-cache --upgrade \
     ansible \
     catatonit \
-    bash && \
+    bash \
+    shadow && \
   apk del alpine-release && \
   rm -rf /var/cache/apk/*
 

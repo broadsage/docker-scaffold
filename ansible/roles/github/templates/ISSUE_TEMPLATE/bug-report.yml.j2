@@ -1,0 +1,205 @@
+name: Bug Report
+description: Create a report to help us improve {{ project_name }}
+title: "[BUG] "
+labels: ["bug", "triage"]
+{% if github_project_enabled and github_project_number %}
+projects: ["{{ project_organization }}/{{ github_project_number }}"]
+{% endif %}
+type: bug
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Thanks for taking the time to report a bug!
+        
+        Please fill out the sections below to help us diagnose and fix the issue. The more details you provide, the faster we can resolve it.
+
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Prerequisites
+      description: Please confirm you have completed the following steps before submitting this issue.
+      options:
+        - label: I have searched the [existing issues](https://github.com/{{ project_organization }}/{{ project_name }}/issues) and this is not a duplicate
+          required: true
+        - label: I have read the [documentation](https://github.com/{{ project_organization }}/{{ project_name }}/blob/main/README.md)
+          required: true
+        - label: I am using the latest version of {{ project_name }}
+          required: false
+
+  - type: textarea
+    id: current-behavior
+    attributes:
+      label: Current Behavior
+      description: Describe what actually happens when you encounter this bug.
+      placeholder: |
+        When I run the scaffold with...
+        The following error occurs...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: Describe what you expected to happen instead.
+      placeholder: |
+        I expected the scaffold to...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps To Reproduce
+      description: Provide a detailed step-by-step guide to reproduce the issue.
+      placeholder: |
+        1. Run the container with command: `docker run ...`
+        2. Execute playbook with: `ansible-playbook ...`
+        3. Navigate to: `...`
+        4. See error: `...`
+      value: |
+        1. 
+        2. 
+        3. 
+        4. 
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: |
+        Provide details about your environment where the bug occurred.
+        
+        **Examples:**
+        - **OS**: Ubuntu 22.04 LTS
+        - **Docker Version**: 24.0.7
+        - **How Docker was installed**: Docker Desktop / apt package / docker.io snap
+        - **Container Runtime**: Docker / Podman / containerd
+        - **Ansible Version**: 2.15.5
+      value: |
+        - **OS**: 
+        - **Docker Version**: 
+        - **How Docker was installed**: 
+        - **Container Runtime**: 
+        - **Ansible Version**: 
+      render: markdown
+    validations:
+      required: true
+
+  - type: dropdown
+    id: cpu-architecture
+    attributes:
+      label: CPU Architecture
+      description: Select the CPU architecture where you encountered the issue
+      options:
+        - x86-64 (amd64)
+        - arm64 (aarch64)
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: docker-command
+    attributes:
+      label: Docker Command / Compose File
+      description: |
+        Provide the exact `docker run` command or `docker-compose.yml` file you used to create the container.
+        
+        **For docker run command:**
+        ```bash
+        docker run -d \
+          --name scaffold \
+          -v /path/to/project:/workspace \
+          {{ registry_primary_provider }}/{{ project_organization }}/{{ registry_primary_image_name }}:latest
+        ```
+        
+        **For docker-compose.yml:**
+        ```yaml
+        services:
+          scaffold:
+            image: {{ registry_primary_provider }}/{{ project_organization }}/{{ registry_primary_image_name }}:latest
+            volumes:
+              - ./project:/workspace
+        ```
+      placeholder: |
+        docker run ...
+        
+        OR paste your docker-compose.yml content
+      render: bash
+    validations:
+      required: true
+
+  - type: textarea
+    id: container-logs
+    attributes:
+      label: Container Logs
+      description: |
+        Provide the full container logs using one of the following commands:
+        - Docker: `docker logs <container_name>`
+        - Podman: `podman logs <container_name>`
+        
+        Please include at least 50 lines before the error occurred for context.
+      placeholder: |
+        $ docker logs scaffold
+        [Output here...]
+      render: bash
+    validations:
+      required: true
+
+  - type: textarea
+    id: ansible-output
+    attributes:
+      label: Ansible Playbook Output (if applicable)
+      description: |
+        If the issue is related to Ansible execution, provide the playbook output.
+        Run with verbose mode for better debugging: `ansible-playbook -vvv`
+      placeholder: |
+        TASK [repository : Create repository structure] ***
+        fatal: [localhost]: FAILED! => {...}
+      render: bash
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: |
+        Add any other context about the problem here. This could include:
+        - Screenshots or screencasts
+        - Configuration files (sanitize sensitive data)
+        - Network environment details
+        - Custom modifications you've made
+        - Links to related issues or discussions
+      placeholder: |
+        I also noticed that...
+        Here's a screenshot showing...
+    validations:
+      required: false
+
+  - type: textarea
+    id: possible-solution
+    attributes:
+      label: Possible Solution
+      description: |
+        If you have ideas on how to fix this bug, please share them here.
+        This is optional but can help speed up the resolution process.
+      placeholder: |
+        I think the issue might be in...
+        A possible fix could be...
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      description: Would you be willing to contribute a fix for this bug?
+      options:
+        - label: I am willing to submit a pull request for this issue
+          required: false
