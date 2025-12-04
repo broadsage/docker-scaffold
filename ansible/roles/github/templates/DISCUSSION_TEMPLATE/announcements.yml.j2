@@ -4,55 +4,41 @@ body:
   - type: markdown
     attributes:
       value: |
-        Share important news with the community! 📢
+        Welcome to announcements! 📢
 
-        Use this template for project announcements, releases, updates, or important information that affects all users.
+        Use this to share important news, releases, updates, or information that affects all users.
+        Our community stays informed about project developments here.
 
   - type: textarea
-    id: announcement-title
+    id: announcement-summary
     attributes:
-      label: Announcement Title
-      description: Clear, concise title for this announcement
-      placeholder: "e.g., Release: v2.0 with multi-platform support"
+      label: Announcement Summary
+      description: What is this announcement about?
+      placeholder: "Please provide a brief summary of this announcement"
     validations:
       required: true
 
   - type: textarea
-    id: announcement-content
+    id: announcement-details
     attributes:
-      label: Announcement Content
-      description: Detailed announcement information
+      label: Announcement Details
+      description: Provide detailed information about this announcement
       placeholder: |
-        ### Summary
-        Brief overview
+        ### What's New
+        Describe the announcement in detail
 
-        ### Key Points
-        - Point 1
-        - Point 2
-        - Point 3
+        ### Why It Matters
+        Explain the impact and relevance
 
-        ### Impact
-        How does this affect users?
-
-        ### Resources
-        - Link to documentation
-        - Link to migration guide
-      validations:
-        required: true
+        ### Next Steps
+        What should users do about this?
 
   - type: textarea
-    id: action-required
+    id: announcement-links
     attributes:
-      label: Action Required (if any)
-      description: Do users need to take any action?
-      placeholder: "Leave blank if no action needed"
-
-  - type: textarea
-    id: references
-    attributes:
-      label: Related Links
-      description: Links to documentation, issues, PRs, or other resources
+      label: Related Resources
+      description: Links to documentation, guides, or other resources
       placeholder: |
-        - GitHub Release: https://github.com/...
         - Documentation: https://...
-        - Migration Guide: https://...
+        - Release Notes: https://...
+        - Blog Post: https://...
