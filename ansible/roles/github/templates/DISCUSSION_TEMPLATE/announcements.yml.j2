@@ -40,35 +40,6 @@ body:
       validations:
         required: true
 
-  - type: dropdown
-    id: announcement-type
-    attributes:
-      label: Announcement Type
-      description: What category is this announcement?
-      options:
-        - Release / Version Update
-        - Security Update
-        - Breaking Changes
-        - Feature Launch
-        - Maintenance Window
-        - Policy Change
-        - Other
-      validations:
-        required: true
-
-  - type: dropdown
-    id: priority
-    attributes:
-      label: Priority Level
-      description: How urgent is this announcement?
-      options:
-        - Critical - Immediate action required
-        - High - Important for all users
-        - Medium - Good to know
-        - Low - FYI
-      validations:
-        required: true
-
   - type: textarea
     id: action-required
     attributes:
