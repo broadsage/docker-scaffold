@@ -1,5 +1,4 @@
 ---
-title: "❓ [Help]: "
 labels: ["help", "question"]
 body:
   - type: markdown
