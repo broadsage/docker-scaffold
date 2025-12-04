@@ -1,20 +1,8 @@
-<!--
-Welcome! Thanks for contributing to docker-scaffold.
-Our project focuses on optimized, secure Docker images.
+# 👋 Welcome
 
-Before submitting:
-- Review CONTRIBUTING.md
-- Ensure your PR aligns with project scope
-- Test your image locally
--->
-
-# Pull Request
+Thanks for contributing to **docker-scaffold**. Our project focuses on optimized, secure Docker images.
 
 ## 📝 Description
-
-Brief summary of changes and why they're needed.
-
-**Closes:** #(issue number)
 
 ---
 
@@ -31,10 +19,6 @@ Brief summary of changes and why they're needed.
 ---
 
 ## 🐳 Changes
-
-- Base Image: `FROM ...`
-- New Tags: 
-- Breaking Changes: [ ] No [ ] Yes
 
 ---
 
