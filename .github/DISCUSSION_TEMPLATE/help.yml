@@ -1,63 +1,14 @@
 ---
-title: "❓ [Help]: "
+title: "❓ Help"
 labels: ["help", "question"]
 body:
   - type: markdown
     attributes:
       value: |
-        Welcome to our community support! 👋
+        # ❓ Need Help?
 
-        Got a question or need help? This is the perfect place to ask.
-        Our community and maintainers are here to help you get the most out of this project.
-
-  - type: textarea
-    id: question
-    attributes:
-      label: Your Question
-      description: What would you like help with?
-      placeholder: "Please describe your question or the issue you're encountering"
-    validations:
-      required: true
-
-  - type: textarea
-    id: context
-    attributes:
-      label: Context
-      description: Provide more context about your situation
-      placeholder: "What were you trying to do? What's your use case?"
-
-  - type: textarea
-    id: steps-taken
-    attributes:
-      label: Steps You've Already Tried
-      description: What have you already tried to solve this?
-      placeholder: |
-        - I tried...
-        - I checked...
-        - I read...
-
-  - type: textarea
-    id: environment
-    attributes:
-      label: Environment
-      description: Share relevant environment details
-      value: |
-        - OS: [macOS/Linux/Windows]
-        - Version: [e.g., 1.0.0]
-        - Docker version: [e.g., 24.0]
-
-  - type: textarea
-    id: error-output
-    attributes:
-      label: Error Messages or Output
-      description: If applicable, share any error messages or relevant output
-      render: bash
-      placeholder: |
-        Paste error output or logs here...
-
-  - type: textarea
-    id: additional-info
-    attributes:
-      label: Additional Information
-      description: Any other details that might help?
-      placeholder: "Code snippets, configuration files, screenshots, etc."
+        Got a question or need assistance? Please provide:
+        - What are you trying to do?
+        - What have you already tried?
+        - What's your environment (OS, Docker version, etc)?
+        - Any error messages or output?
