@@ -4,13 +4,18 @@ body:
   - type: markdown
     attributes:
       value: |
-        Share your amazing work with the community! 🎉
+        # 🎉 Show and Tell
 
-        Show and tell discussions are perfect for:
-        - Showcasing projects built with this tool
-        - Sharing creative solutions or workarounds
-        - Demonstrating integrations or extensions
-        - Celebrating community achievements
+        **Welcome! We'd love to see what you've created.** Sharing your work inspires others and builds our community.
+
+        Show us what you've built, how you solved a problem, or how you're using this project. Your creativity and achievements deserve to be celebrated!
+
+        ## Best practices for sharing
+        - **Tell your story** about what you built and why
+        - **Show how it works** with examples or demos
+        - **Share the challenges** you overcame
+        - **Include links** to your code or project
+        - **Be generous** with knowledge and insights for others
 
   - type: textarea
     id: what-you-built

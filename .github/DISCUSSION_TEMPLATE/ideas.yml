@@ -4,10 +4,18 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for sharing your idea! 💡
+        # 💡 Share Your Idea
 
-        Ideas and suggestions from the community help drive the project forward.
-        Please provide as much detail as possible to help others understand and discuss your proposal.
+        **Welcome! We love hearing from you.** Your ideas help shape the future of this project.
+
+        Don't hold back—share what's on your mind. Whether it's a feature request, improvement, or completely new direction, we want to hear it. Your perspective matters!
+
+        ## Best practices for sharing ideas
+        - **Explain the problem** your idea solves
+        - **Describe your solution** clearly
+        - **Share real-world examples** or use cases
+        - **Be open to feedback** and discussion
+        - **Help refine ideas together** with the community
 
   - type: textarea
     id: summary

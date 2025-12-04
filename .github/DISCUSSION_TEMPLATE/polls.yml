@@ -4,9 +4,18 @@ body:
   - type: markdown
     attributes:
       value: |
-        Community polls help us make decisions together! 🗳️
+        # 🗳️ Community Poll
 
-        Use this template to create polls for community input on project decisions, feature priorities, or other topics where community consensus is valuable.
+        **Welcome! Let's make decisions together.** Your vote and input shape what we build next.
+
+        Create a poll to gather community input on important decisions. This is where we all have a voice in guiding the project forward.
+
+        ## Best practices for polls
+        - **Ask one clear question** at a time
+        - **Provide sufficient context** so people understand what they're voting on
+        - **Offer distinct options** that represent meaningful choices
+        - **Set a voting deadline** so we can move forward
+        - **Share results and next steps** with the community
 
   - type: textarea
     id: poll-question
