@@ -1,0 +1,113 @@
+# GitHub Discussions Templates Setup Guide
+
+This project includes pre-configured discussion templates located in `.github/DISCUSSION_TEMPLATE/`. These templates enable a structured community engagement experience.
+
+## Required Setup
+
+**Discussion templates only appear when their corresponding discussion categories are configured in your GitHub repository.**
+
+### Automatic Setup (Not Available Yet)
+
+GitHub does not yet support automating discussion category configuration via GitHub Actions. Categories must be manually created in repository settings.
+
+### Manual Setup Steps
+
+Follow these steps to enable discussion templates:
+
+1. **Navigate to Discussions Settings**
+   - Go to your repository on GitHub
+   - Click the **Discussions** tab
+   - In the left sidebar, next to "Categories", click the **pencil icon** ✏️
+
+2. **Create Categories**
+   
+   Your repository now includes templates for these 5 discussion categories:
+
+   | Template File | Category Name | Format | Emoji | Description |
+   |---|---|---|---|---|
+   | `ideas.yml` | Ideas | Open-ended discussion | 💡 | Feature ideas and suggestions |
+   | `polls.yml` | Polls | Polls | 🗳️ | Community voting on decisions |
+   | `show-and-tell.yml` | Show and Tell | Open-ended discussion | 🎉 | Showcase community projects |
+   | `help.yml` | Q&A | Question and Answer | ❓ | Community support & questions |
+   | `announcements.yml` | Announcements | Announcement | 📢 | Project updates & news |
+
+3. **Create Each Category**
+   
+   For each category above:
+   - Click **"New category"**
+   - Enter the category name and emoji (from table)
+   - Select the discussion format from dropdown
+   - Click **"Create"**
+
+4. **Verify Templates Load**
+   
+   Once categories are created:
+   - Go to **Discussions** → **New Discussion**
+   - You should see dropdown menu with your new categories
+   - Select a category → templates will auto-populate with pre-filled fields
+
+## Template Files
+
+All templates are located in `.github/DISCUSSION_TEMPLATE/`:
+
+- **ideas.yml** - Community feature ideas and improvement suggestions
+- **polls.yml** - Structured polling for community input
+- **show-and-tell.yml** - Showcase projects and achievements
+- **help.yml** - Q&A support with structured troubleshooting fields
+- **announcements.yml** - Official announcements with type/priority categorization
+
+## Template Format
+
+Templates follow GitHub's [discussion category form syntax](https://docs.github.com/en/discussions/managing-discussions-for-your-community/syntax-for-discussion-category-forms) with:
+
+- Pre-populated titles with emojis
+- Auto-assigned labels
+- Structured form fields (textareas, dropdowns)
+- Helpful descriptions and placeholders
+
+## Automated Deployment
+
+This project uses **Ansible** to automatically deploy these templates during project scaffolding:
+
+```bash
+ansible-playbook ansible/generate.yml
+```
+
+The Ansible role `ansible/roles/github/` handles:
+- Creating `.github/DISCUSSION_TEMPLATE/` directory
+- Populating template files
+- Cleaning up templates when feature is disabled
+
+### Configuration
+
+Templates are deployed when enabled in `project.yml`:
+
+```yaml
+features:
+  github:
+    discussions: true  # Enable discussion template deployment
+```
+
+## Troubleshooting
+
+### Templates Not Appearing
+
+1. ✅ Verify categories are created in repository settings
+2. ✅ Confirm category slugs match template filenames
+3. ✅ Check repository has Discussions enabled (Settings → Features)
+4. ✅ Verify you're using a public or internal repository (private repos have limited discussion support)
+
+### Template Validation
+
+Templates are validated against GitHub's form schema. Common issues:
+
+- Missing required `body` array with at least 1 non-markdown field
+- Invalid field types (must be: `markdown`, `textarea`, `input`, `dropdown`, `checkboxes`)
+- Missing `id` attributes on form fields
+- Dropdown options as single string instead of array
+
+## Resources
+
+- [GitHub Discussion Documentation](https://docs.github.com/en/discussions)
+- [Discussion Category Forms Syntax](https://docs.github.com/en/discussions/managing-discussions-for-your-community/syntax-for-discussion-category-forms)
+- [Managing Discussion Categories](https://docs.github.com/en/discussions/managing-discussions-for-your-community/managing-categories-for-discussions)
