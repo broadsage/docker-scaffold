@@ -20,7 +20,7 @@ Follow these steps to enable discussion templates:
    - In the left sidebar, next to "Categories", click the **pencil icon** ✏️
 
 2. **Create Categories**
-   
+
    Your repository now includes templates for these 5 discussion categories:
 
    | Template File | Category Name | Format | Emoji | Description |
@@ -32,7 +32,7 @@ Follow these steps to enable discussion templates:
    | `announcements.yml` | Announcements | Announcement | 📢 | Project updates & news |
 
 3. **Create Each Category**
-   
+
    For each category above:
    - Click **"New category"**
    - Enter the category name and emoji (from table)
@@ -40,7 +40,7 @@ Follow these steps to enable discussion templates:
    - Click **"Create"**
 
 4. **Verify Templates Load**
-   
+
    Once categories are created:
    - Go to **Discussions** → **New Discussion**
    - You should see dropdown menu with your new categories
@@ -74,6 +74,7 @@ ansible-playbook ansible/generate.yml
 ```
 
 The Ansible role `ansible/roles/github/` handles:
+
 - Creating `.github/DISCUSSION_TEMPLATE/` directory
 - Populating template files
 - Cleaning up templates when feature is disabled
