@@ -1,0 +1,21 @@
+---
+# Remove ISSUE_TEMPLATE only if issues disabled
+- name: Remove GitHub issue templates when disabled
+  ansible.builtin.file:
+    path: /tmp/.github/ISSUE_TEMPLATE
+    state: absent
+  when: not github.issues | bool
+
+# Remove workflows only if workflows disabled
+- name: Remove GitHub workflows directory when disabled
+  ansible.builtin.file:
+    path: /tmp/.github/workflows
+    state: absent
+  when: not github.workflows | bool
+
+# Remove entire .github if nothing is left
+- name: Remove empty .github directory
+  ansible.builtin.file:
+    path: /tmp/.github
+    state: absent
+  when: not github.issues | bool and not github.workflows | bool

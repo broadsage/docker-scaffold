@@ -1,0 +1,42 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for github
+
+# Uses variables directly from merged_config.yml
+
+- name: Create .github/ISSUE_TEMPLATE directory
+  ansible.builtin.file:
+    path: "/tmp/{{ item }}"
+    state: directory
+    owner: "abc"
+    group: "abc"
+    mode: '0755'
+  when: github.issues | bool
+  loop:
+    - .github/ISSUE_TEMPLATE
+
+- name: Create .github/workflows directory
+  ansible.builtin.file:
+    path: "/tmp/{{ item }}"
+    state: directory
+    owner: "abc"
+    group: "abc"
+    mode: '0755'
+  when: github.workflows | bool
+  loop:
+    - .github/workflows
+
+- name: Populate GitHub issue templates
+  ansible.builtin.template:
+    src: "ISSUE_TEMPLATE/{{ item }}.j2"
+    dest: "/tmp/.github/ISSUE_TEMPLATE/{{ item }}"
+    owner: "abc"
+    group: "abc"
+    mode: '0644'
+  when: github.issues | bool
+  loop:
+    - config.yml
+    - bug-report.yml
+    - documentation.yml
+    - feature-request.yml
+    - question.yml
