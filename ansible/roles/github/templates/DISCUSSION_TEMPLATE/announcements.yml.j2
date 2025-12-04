@@ -1,34 +1,88 @@
 ---
-title: "📢 Announcement"
+title: "📢 [Announcement]: "
 labels: ["announcement", "news"]
 body:
   - type: markdown
     attributes:
       value: |
-        # 📢 Project Announcement
+        Share important news with the community! 📢
 
-        Use this template to share important news with the community.
-
-        ## Guidelines
-        - Keep announcements clear and concise
-        - Include links to relevant documentation or resources
-        - Indicate if any action is required from users
+        Use this template for project announcements, releases, updates, or important information that affects all users.
 
   - type: textarea
-    id: announcement
+    id: announcement-title
     attributes:
-      label: Announcement
-      description: Share your announcement here
+      label: Announcement Title
+      description: Clear, concise title for this announcement
+      placeholder: "e.g., Release: v2.0 with multi-platform support"
+    validations:
+      required: true
+
+  - type: textarea
+    id: announcement-content
+    attributes:
+      label: Announcement Content
+      description: Detailed announcement information
       placeholder: |
-        ## Summary
-        Brief overview of the announcement
+        ### Summary
+        Brief overview
 
-        ## Details
-        Additional information and context
+        ### Key Points
+        - Point 1
+        - Point 2
+        - Point 3
 
-        ## Action Required
-        What, if anything, do users need to do?
+        ### Impact
+        How does this affect users?
 
-        ## Resources
+        ### Resources
         - Link to documentation
-        - Link to related issues/PRs
+        - Link to migration guide
+      validations:
+        required: true
+
+  - type: dropdown
+    id: announcement-type
+    attributes:
+      label: Announcement Type
+      description: What category is this announcement?
+      options:
+        - Release / Version Update
+        - Security Update
+        - Breaking Changes
+        - Feature Launch
+        - Maintenance Window
+        - Policy Change
+        - Other
+      validations:
+        required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority Level
+      description: How urgent is this announcement?
+      options:
+        - Critical - Immediate action required
+        - High - Important for all users
+        - Medium - Good to know
+        - Low - FYI
+      validations:
+        required: true
+
+  - type: textarea
+    id: action-required
+    attributes:
+      label: Action Required (if any)
+      description: Do users need to take any action?
+      placeholder: "Leave blank if no action needed"
+
+  - type: textarea
+    id: references
+    attributes:
+      label: Related Links
+      description: Links to documentation, issues, PRs, or other resources
+      placeholder: |
+        - GitHub Release: https://github.com/...
+        - Documentation: https://...
+        - Migration Guide: https://...
