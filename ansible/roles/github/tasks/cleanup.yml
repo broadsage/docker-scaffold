@@ -6,6 +6,13 @@
     state: absent
   when: not github.issues | bool
 
+# Remove DISCUSSION_TEMPLATE only if issues disabled
+- name: Remove GitHub discussion templates when disabled
+  ansible.builtin.file:
+    path: /tmp/.github/DISCUSSION_TEMPLATE
+    state: absent
+  when: not github.discussions | bool
+
 # Remove workflows only if workflows disabled
 - name: Remove GitHub workflows directory when disabled
   ansible.builtin.file:
@@ -18,4 +25,4 @@
   ansible.builtin.file:
     path: /tmp/.github
     state: absent
-  when: not github.issues | bool and not github.workflows | bool
+  when: not github.issues | bool and not github.workflows | bool and not github.discussions | bool

@@ -1,0 +1,144 @@
+title: Community Polls & Surveys
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # 🗳️ Community Polls & Surveys
+
+        Help shape the future of {{ image.name }}! Share your opinions and participate in community polls.
+        
+        Your feedback directly influences our roadmap and feature prioritization.
+
+  - type: textarea
+    id: poll-title
+    attributes:
+      label: Poll Title
+      description: What are you asking the community?
+      placeholder: "What's your preferred approach for Docker image optimization?"
+      validations:
+        required: true
+
+  - type: textarea
+    id: poll-context
+    attributes:
+      label: Context & Background
+      description: Why are we asking this? What decision does this influence?
+      placeholder: |
+        We're considering different strategies for image optimization and want community input on which approach would be most valuable.
+      validations:
+        required: true
+
+  - type: checkboxes
+    id: poll-options
+    attributes:
+      label: Poll Options
+      description: What are the voting options? (Check the ones you want included)
+      options:
+        - label: "Option 1: [Describe option]"
+        - label: "Option 2: [Describe option]"
+        - label: "Option 3: [Describe option]"
+        - label: "Option 4: [Describe option]"
+        - label: "Option 5: [Describe option]"
+      validations:
+        required: true
+
+  - type: textarea
+    id: option-details
+    attributes:
+      label: Detailed Option Descriptions
+      description: Provide more information about each option to help voters decide
+      placeholder: |
+        ### Option 1: Layer Caching
+        Focuses on intelligent caching strategies to speed up rebuilds. Pros: faster iterations. Cons: more complex setup.
+
+        ### Option 2: Multi-Stage Builds
+        Optimizes using Docker's multi-stage feature. Pros: cleaner approach. Cons: requires Docker knowledge.
+
+        ### Option 3: Registry-Level Optimization
+        Optimizes at registry level with compression. Pros: transparent to users. Cons: less control.
+      validations:
+        required: true
+
+  - type: dropdown
+    id: poll-urgency
+    attributes:
+      label: Decision Timeline
+      description: When do we need to decide?
+      options:
+        - "Low Urgency - Just gathering input for future planning"
+        - "Medium Urgency - Needed within next 2-3 months"
+        - "High Urgency - Needed for next release cycle"
+        - "Critical - Blocking current development"
+      validations:
+        required: true
+
+  - type: dropdown
+    id: target-audience
+    attributes:
+      label: Target Audience
+      description: Who should participate in this poll?
+      options:
+        - "All users and contributors"
+        - "Active maintainers and contributors only"
+        - "Specific expertise (DevOps, Security, Performance)"
+        - "Organizations using {{ image.name }} at scale"
+      validations:
+        required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact & Implications
+      description: What will happen based on the results? How will it affect users?
+      placeholder: |
+        Based on the poll results:
+        - Top option will be implemented in v2.0
+        - Alternative options will be documented as future roadmap items
+        - Community will be involved in implementation planning
+      validations:
+        required: true
+
+  - type: textarea
+    id: follow-up
+    attributes:
+      label: Follow-Up Plan
+      description: How will we communicate the results and next steps?
+      placeholder: |
+        - Results will be shared in next community meeting
+        - Winning option will be implemented with design discussion
+        - Detailed roadmap post will be published in announcements
+
+  - type: checkboxes
+    id: voting-method
+    attributes:
+      label: Voting Method
+      description: How should voting be conducted?
+      options:
+        - label: "Reactions (👍 upvote, 👎 downvote on this post)"
+        - label: "Reply-based voting (comment to vote for preferred option)"
+        - label: "Thread responses (each option gets a top-level comment to upvote)"
+        - label: "GitHub Issues vote (separate issue created for each option)"
+      validations:
+        required: true
+
+  - type: textarea
+    id: poll-duration
+    attributes:
+      label: Poll Duration & Deadline
+      description: When will voting end?
+      placeholder: |
+        - Poll opens: [Date]
+        - Voting deadline: [Date]
+        - Results announcement: [Date]
+      validations:
+        required: true
+
+  - type: textarea
+    id: additional-notes
+    attributes:
+      label: Additional Notes
+      description: Any other important information for voters?
+      placeholder: |
+        - No voting restrictions (one vote per community member)
+        - Voting is anonymous unless you choose to add comments
+        - Feel free to discuss options below before voting

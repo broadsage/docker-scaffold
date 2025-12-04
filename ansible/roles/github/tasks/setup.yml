@@ -40,3 +40,30 @@
     - documentation.yml
     - feature-request.yml
     - question.yml
+
+- name: Create .github/DISCUSSION_TEMPLATE directory
+  ansible.builtin.file:
+    path: "/tmp/{{ item }}"
+    state: directory
+    owner: "abc"
+    group: "abc"
+    mode: '0755'
+  when: github.discussions | bool
+  loop:
+    - .github/DISCUSSION_TEMPLATE
+
+- name: Populate GitHub discussion templates
+  ansible.builtin.template:
+    src: "DISCUSSION_TEMPLATE/{{ item }}.j2"
+    dest: "/tmp/.github/DISCUSSION_TEMPLATE/{{ item }}"
+    owner: "abc"
+    group: "abc"
+    mode: '0644'
+  when: github.discussions | bool
+  loop:
+    - announcements.yml
+    - help-support.yml
+    - ideas-feedback.yml
+    - showcase.yml
+    - best-practices.yml
+    - polls.yml

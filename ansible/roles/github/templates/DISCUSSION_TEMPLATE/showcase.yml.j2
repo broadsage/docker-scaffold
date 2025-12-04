@@ -1,0 +1,102 @@
+title: Showcase & Community Wins
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # 🎉 Showcase & Community Wins
+
+        Share your success stories, projects, and use cases with the {{ image.name }} community!
+        
+        This is a space to celebrate accomplishments and inspire others.
+
+  - type: textarea
+    id: project-title
+    attributes:
+      label: Project/Use Case Title
+      description: What are you showcasing?
+      placeholder: "Building a production-grade microservices platform with {{ image.name }}"
+      validations:
+        required: true
+
+  - type: textarea
+    id: project-description
+    attributes:
+      label: Project Description
+      description: Tell us about your project and how you used {{ image.name }}
+      placeholder: |
+        ### Overview
+        We built a containerized deployment platform that...
+
+        ### Challenges Solved
+        - [Challenge 1]
+        - [Challenge 2]
+
+        ### Results
+        - Performance improvement: X%
+        - Time saved: Y hours
+        - Cost reduction: Z%
+      validations:
+        required: true
+
+  - type: textarea
+    id: technical-details
+    attributes:
+      label: Technical Stack
+      description: What technologies and tools did you use with {{ image.name }}?
+      placeholder: |
+        - Docker version: 24.0
+        - Kubernetes: v1.28
+        - CI/CD: GitHub Actions
+        - Registry: ghcr.io
+      validations:
+        required: true
+
+  - type: textarea
+    id: key-learnings
+    attributes:
+      label: Key Learnings & Tips
+      description: What did you learn? What tips would you share with others?
+      placeholder: |
+        - Best practice 1: ...
+        - Tip 2: ...
+        - What we'd do differently: ...
+
+  - type: textarea
+    id: metrics
+    attributes:
+      label: Impact Metrics (if applicable)
+      description: Share any metrics that demonstrate success
+      placeholder: |
+        - Build time reduced from 30m to 5m
+        - Image size: 2.5GB → 500MB
+        - Deployment frequency: weekly → daily
+
+  - type: textarea
+    id: resources
+    attributes:
+      label: Resources & Links
+      description: Share relevant links (GitHub repo, blog post, documentation, etc.)
+      placeholder: |
+        - GitHub Repository: https://github.com/...
+        - Blog Post: https://...
+        - Live Demo: https://...
+
+  - type: textarea
+    id: contact-info
+    attributes:
+      label: Contact Information (Optional)
+      description: If you'd like others to reach out, share how they can contact you
+      placeholder: |
+        - GitHub: @username
+        - LinkedIn: https://linkedin.com/in/...
+        - Email: [if comfortable sharing]
+
+  - type: checkboxes
+    id: permission
+    attributes:
+      label: Permissions
+      description: Can we share this story with the community?
+      options:
+        - label: Yes, feel free to share this in announcements or documentation
+        - label: Yes, you can feature this on the project website
+        - label: Yes, include in monthly community highlights
