@@ -1,144 +1,66 @@
-title: Community Polls & Surveys
+---
+title: "🗳️ [Poll]: "
+labels: ["poll", "community-input"]
 body:
   - type: markdown
     attributes:
       value: |
-        # 🗳️ Community Polls & Surveys
+        Community polls help us make decisions together! 🗳️
 
-        Help shape the future of {{ image.name }}! Share your opinions and participate in community polls.
-        
-        Your feedback directly influences our roadmap and feature prioritization.
+        Use this template to create polls for community input on project decisions, feature priorities, or other topics where community consensus is valuable.
 
   - type: textarea
-    id: poll-title
+    id: poll-question
     attributes:
-      label: Poll Title
-      description: What are you asking the community?
-      placeholder: "What's your preferred approach for Docker image optimization?"
-      validations:
-        required: true
+      label: Poll Question
+      description: What question are you asking the community?
+      placeholder: "Clear, specific question for the community to vote on"
+    validations:
+      required: true
 
   - type: textarea
-    id: poll-context
+    id: context
     attributes:
-      label: Context & Background
-      description: Why are we asking this? What decision does this influence?
-      placeholder: |
-        We're considering different strategies for image optimization and want community input on which approach would be most valuable.
-      validations:
-        required: true
+      label: Context and Background
+      description: Provide context to help community members make informed decisions
+      placeholder: "Why is this poll needed? What background information is relevant?"
+    validations:
+      required: true
 
-  - type: checkboxes
-    id: poll-options
+  - type: textarea
+    id: options
     attributes:
       label: Poll Options
-      description: What are the voting options? (Check the ones you want included)
-      options:
-        - label: "Option 1: [Describe option]"
-        - label: "Option 2: [Describe option]"
-        - label: "Option 3: [Describe option]"
-        - label: "Option 4: [Describe option]"
-        - label: "Option 5: [Describe option]"
-      validations:
-        required: true
+      description: List the available options (you can also use reaction emojis in the discussion)
+      placeholder: |
+        Option A: Description
+        Option B: Description
+        Option C: Description
+
+        Or use reaction emojis:
+        👍 for Yes
+        👎 for No
+        🤔 for Maybe/Unsure
+    validations:
+      required: true
 
   - type: textarea
-    id: option-details
+    id: criteria
     attributes:
-      label: Detailed Option Descriptions
-      description: Provide more information about each option to help voters decide
-      placeholder: |
-        ### Option 1: Layer Caching
-        Focuses on intelligent caching strategies to speed up rebuilds. Pros: faster iterations. Cons: more complex setup.
+      label: Decision Criteria
+      description: What factors should people consider when voting?
+      placeholder: "What criteria or considerations should influence the decision?"
 
-        ### Option 2: Multi-Stage Builds
-        Optimizes using Docker's multi-stage feature. Pros: cleaner approach. Cons: requires Docker knowledge.
-
-        ### Option 3: Registry-Level Optimization
-        Optimizes at registry level with compression. Pros: transparent to users. Cons: less control.
-      validations:
-        required: true
-
-  - type: dropdown
-    id: poll-urgency
+  - type: input
+    id: deadline
     attributes:
-      label: Decision Timeline
-      description: When do we need to decide?
-      options:
-        - "Low Urgency - Just gathering input for future planning"
-        - "Medium Urgency - Needed within next 2-3 months"
-        - "High Urgency - Needed for next release cycle"
-        - "Critical - Blocking current development"
-      validations:
-        required: true
-
-  - type: dropdown
-    id: target-audience
-    attributes:
-      label: Target Audience
-      description: Who should participate in this poll?
-      options:
-        - "All users and contributors"
-        - "Active maintainers and contributors only"
-        - "Specific expertise (DevOps, Security, Performance)"
-        - "Organizations using {{ image.name }} at scale"
-      validations:
-        required: true
+      label: Poll Deadline
+      description: When should voting close?
+      placeholder: "e.g., 2025-09-15 or 'one week from now'"
 
   - type: textarea
     id: impact
     attributes:
-      label: Impact & Implications
-      description: What will happen based on the results? How will it affect users?
-      placeholder: |
-        Based on the poll results:
-        - Top option will be implemented in v2.0
-        - Alternative options will be documented as future roadmap items
-        - Community will be involved in implementation planning
-      validations:
-        required: true
-
-  - type: textarea
-    id: follow-up
-    attributes:
-      label: Follow-Up Plan
-      description: How will we communicate the results and next steps?
-      placeholder: |
-        - Results will be shared in next community meeting
-        - Winning option will be implemented with design discussion
-        - Detailed roadmap post will be published in announcements
-
-  - type: checkboxes
-    id: voting-method
-    attributes:
-      label: Voting Method
-      description: How should voting be conducted?
-      options:
-        - label: "Reactions (👍 upvote, 👎 downvote on this post)"
-        - label: "Reply-based voting (comment to vote for preferred option)"
-        - label: "Thread responses (each option gets a top-level comment to upvote)"
-        - label: "GitHub Issues vote (separate issue created for each option)"
-      validations:
-        required: true
-
-  - type: textarea
-    id: poll-duration
-    attributes:
-      label: Poll Duration & Deadline
-      description: When will voting end?
-      placeholder: |
-        - Poll opens: [Date]
-        - Voting deadline: [Date]
-        - Results announcement: [Date]
-      validations:
-        required: true
-
-  - type: textarea
-    id: additional-notes
-    attributes:
-      label: Additional Notes
-      description: Any other important information for voters?
-      placeholder: |
-        - No voting restrictions (one vote per community member)
-        - Voting is anonymous unless you choose to add comments
-        - Feel free to discuss options below before voting
+      label: Impact of Decision
+      description: How will the poll results be used?
+      placeholder: "How will this decision affect the project? Who will implement the results?"
