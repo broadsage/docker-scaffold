@@ -20,9 +20,16 @@
     state: absent
   when: not github.workflows | bool
 
+# Remove pull_request template only if pull_requests disabled
+- name: Remove GitHub Pull Request template. when disabled
+  ansible.builtin.file:
+    path: /tmp/.github/PULL_REQUEST_TEMPLATE.md
+    state: absent
+  when: not github.pull_requests | bool
+  
 # Remove entire .github if nothing is left
 - name: Remove empty .github directory
   ansible.builtin.file:
     path: /tmp/.github
     state: absent
-  when: not github.issues | bool and not github.workflows | bool and not github.discussions | bool
+  when: not github.issues | bool and not github.workflows | bool and not github.discussions | bool and not github.pull_requests | bool

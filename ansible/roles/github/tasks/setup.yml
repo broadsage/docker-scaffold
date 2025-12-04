@@ -26,7 +26,7 @@
   loop:
     - .github/workflows
 
-- name: Populate GitHub issue templates
+- name: Populate GitHub Issue templates
   ansible.builtin.template:
     src: "ISSUE_TEMPLATE/{{ item }}.j2"
     dest: "/tmp/.github/ISSUE_TEMPLATE/{{ item }}"
@@ -66,3 +66,14 @@
     - show-and-tell.yml
     - announcements.yml
     - README.md
+
+- name: Populate GitHub Pull Request templates
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "/tmp/.github/{{ item }}"
+    owner: "abc"
+    group: "abc"
+    mode: '0644'
+  when: github.pull_requests | bool
+  loop:
+    - PULL_REQUEST_TEMPLATE.md
