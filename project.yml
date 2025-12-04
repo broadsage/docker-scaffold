@@ -29,13 +29,11 @@ features:
   github: true             # Generate GitHub Actions workflow & Issue Templates
   security: true           # Enable vulnerability scanning
   registry: true           # Push Docker Images to registries
-  signing: true            # Sign images with Cosign
-  sbom: true               # Generate SBOM
 
 # Override Build Settings (uncomment if needed)
 build:
   platforms:
-    - linux/amd64             # Single platform build
+    - linux/amd64          # Single platform build
   dockerfile: Dockerfile.custom
 
 # Override GitHub Settings (uncomment if needed)

@@ -36,16 +36,7 @@ registry:
 
 # Security Defaults
 security:
-  scan:
-    enabled: false
-    provider: 
-      - trivy
-      - clair
-    severity:
-      - HIGH
-      - CRITICAL
-    fail_on_severity: CRITICAL
-  
+  scan: true
   signing: true
   sbom:
     enabled: false
