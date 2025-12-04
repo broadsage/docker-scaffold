@@ -72,118 +72,139 @@ def deep_merge(base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any]
     return result
 
 
-def _get_feature_bundle_map() -> Dict[str, List[str]]:
+def _extract_safe_defaults(defaults: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Get the feature bundle mapping (features → config sections).
+    Dynamically extract safe defaults from defaults.yml.
 
-    Returns:
-        Dictionary mapping feature names to bundle keys
-    """
-    return {
-        'github': ['github'],
-        'security': ['security'],
-        'registry': ['registry'],
-        'signing': ['security'],  # Part of security bundle
-        'sbom': ['security'],     # Part of security bundle
-    }
+    For each feature bundle (github, security, registry, etc.),
+    creates a safe default version where all boolean/list/dict values
+    become false/[]/empty equivalents. This approach makes the script
+    automatically adapt to new features without code changes.
 
-
-def _get_safe_defaults() -> Dict[str, Any]:
-    """
-    Get safe default values for all feature bundles (when disabled).
-
-    These ensure all variables are always present in merged config,
-    even when features are disabled. Ansible conditions work gracefully
-    without undefined variable errors.
+    Args:
+        defaults: The defaults.yml configuration
 
     Returns:
         Dictionary of safe default values for disabled features
     """
-    return {
-        'github': {
-            'issues': False,
-            'workflows': False,
-            'dependabot': False,
-            'pull_requests': False,
-            'projects': {
-                'enabled': False,
-                'number': 0
-            }
-        },
-        'security': {
-            'scan': {
-                'enabled': False,
-                'provider': [],
-                'severity': [],
-                'fail_on_severity': 'CRITICAL'
-            },
-            'signing': False,
-            'sbom': {
-                'enabled': False,
-                'format': 'spdx'
-            }
-        },
-        'registry': {
-            'github': False,
-            'dockerhub': False
-        }
-    }
+    safe_defaults: Dict[str, Any] = {}
+    feature_bundles = _get_feature_bundles(defaults)
+
+    for bundle_name in feature_bundles:
+        if bundle_name in defaults:
+            safe_defaults[bundle_name] = _make_safe_default(
+                defaults[bundle_name],  # type: ignore[index]
+                bundle_name
+            )
+
+    return safe_defaults
+
+
+def _make_safe_default(value: Any, bundle_name: str) -> Any:
+    """
+    Recursively convert a value to its safe default (all false/empty).
+
+    Preserves structure but makes all leaf values safe (false for bool,
+    empty for collections, etc.).
+
+    Args:
+        value: The value to convert
+        bundle_name: Bundle name (for special handling if needed)
+
+    Returns:
+        Safe default version of the value
+    """
+    if isinstance(value, dict):
+        result: Dict[str, Any] = {}
+        for key, val in value.items():  # type: ignore[union-attr]
+            result[key] = _make_safe_default(val, bundle_name)
+        return result
+    elif isinstance(value, list):
+        return []  # Empty list for safe default
+    elif isinstance(value, bool):
+        return False  # False for all booleans
+    elif isinstance(value, (int, float)):
+        return 0  # Zero for numbers
+    elif isinstance(value, str):
+        # Keep strings as-is (like 'CRITICAL', 'spdx', etc.)
+        # but could be set to '' if needed
+        return value
+    else:
+        return None
+
+
+def _get_feature_bundles(defaults: Dict[str, Any]) -> List[str]:
+    """
+    Dynamically detect feature bundles from defaults.yml.
+
+    Features are detected as sections that exist in defaults.yml but NOT
+    in the hardcoded list of core sections. This makes the script
+    automatically discover new features.
+
+    Args:
+        defaults: The defaults.yml configuration
+
+    Returns:
+        List of feature bundle names
+    """
+    core_sections = {'organization', 'metadata', 'build', 'image', 'documentation'}
+    detected_features = [
+        key for key in defaults.keys()  # type: ignore[union-attr]
+        if key not in core_sections
+    ]
+    return sorted(detected_features)
 
 
 def activate_feature_bundles(defaults: Dict[str, Any], project: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Activate feature bundles based on features.* flags.
+    Activate feature bundles based on features.* flags (dynamically detected).
 
-    Feature Bundle Mapping:
-      - features.github → github.*
-      - features.security → security.*
-      - features.registry → registry.*
-      - features.signing → security.signing
-      - features.sbom → security.sbom
+    This function automatically discovers all features from defaults.yml,
+    so adding a new feature requires ONLY updating defaults.yml - no Python
+    code changes needed.
 
-    When a feature is disabled, safe default values are used to ensure
-    all variables are always present in the merged config. This prevents
-    undefined variable errors in Ansible tasks.
+    How it works:
+      1. Detects all feature bundles from defaults.yml (anything not a core section)
+      2. Loads enabled feature bundles from defaults
+      3. Applies project.yml overrides
+      4. Ensures disabled features have safe defaults (prevent undefined vars in Ansible)
+
+    Core sections (always included): organization, metadata, build, image, documentation
+    Feature bundles (conditional): github, security, registry, and any future additions
 
     Args:
-        defaults: Default configuration with feature bundles
-        project: Project-specific configuration
+        defaults: Default configuration with feature bundles (from defaults.yml)
+        project: Project-specific configuration (from project.yml)
 
     Returns:
         Merged configuration with all features (enabled or disabled)
     """
     merged: Dict[str, Any] = {}
     features: Dict[str, Any] = project.get('features', {})
-    feature_bundles = _get_feature_bundle_map()
-    safe_defaults = _get_safe_defaults()
+    feature_bundles = _get_feature_bundles(defaults)
+    safe_defaults = _extract_safe_defaults(defaults)
     activated_bundles: Set[str] = set()
 
     # Activate feature bundles (only if enabled)
-    for feature_name, bundle_keys in feature_bundles.items():
-        feature_enabled = features.get(feature_name, False)
+    for bundle_name in feature_bundles:
+        feature_enabled = features.get(bundle_name, False)
 
         if feature_enabled:
-            for bundle_key in bundle_keys:  # type: ignore
-                if bundle_key in activated_bundles:
-                    continue
-
-                # Load bundle from defaults using deep copy
-                if bundle_key in defaults:
-                    merged[bundle_key] = copy.deepcopy(defaults[bundle_key])
-                    activated_bundles.add(bundle_key)
+            # Load bundle from defaults using deep copy
+            if bundle_name in defaults:
+                merged[bundle_name] = copy.deepcopy(defaults[bundle_name])  # type: ignore[index]
+                activated_bundles.add(bundle_name)
 
     # Apply project-specific overrides (separate loop to avoid duplicate merges)
-    for feature_name, bundle_keys in feature_bundles.items():
-        feature_enabled = features.get(feature_name, False)
+    for bundle_name in feature_bundles:
+        feature_enabled = features.get(bundle_name, False)
 
-        if feature_enabled:
-            for bundle_key in bundle_keys:
-                # Override with project-specific settings
-                if bundle_key in project and bundle_key in merged:
-                    merged[bundle_key] = deep_merge(  # type: ignore[arg-type]
-                        merged[bundle_key],  # type: ignore[index]
-                        project[bundle_key]
-                    )
+        if feature_enabled and bundle_name in project and bundle_name in merged:
+            # Override with project-specific settings
+            merged[bundle_name] = deep_merge(  # type: ignore[arg-type]
+                merged[bundle_name],  # type: ignore[index]
+                project[bundle_name]  # type: ignore[index]
+            )
 
     # Ensure all feature bundles exist (use safe defaults if not activated)
     for bundle_name, default_value in safe_defaults.items():
@@ -202,7 +223,7 @@ def activate_feature_bundles(defaults: Dict[str, Any], project: Dict[str, Any]) 
         if section in project:
             merged[section] = deep_merge(  # type: ignore[arg-type]
                 merged.get(section, {}),  # type: ignore[arg-type]
-                project[section]
+                project[section]  # type: ignore[index]
             )
 
     # Add features section for reference (shows what's enabled/disabled)
