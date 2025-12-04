@@ -61,9 +61,8 @@
     mode: '0644'
   when: github.discussions | bool
   loop:
-    - announcements.yml
-    - help-support.yml
-    - ideas-feedback.yml
-    - showcase.yml
-    - best-practices.yml
+    - ideas.yml
     - polls.yml
+    - show-and-tell.yml
+    - help.yml
+    - announcements.yml

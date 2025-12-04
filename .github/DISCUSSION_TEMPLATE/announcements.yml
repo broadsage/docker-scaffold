@@ -1,18 +1,24 @@
-title: Announcement Template
+#
+# SPDX-FileCopyrightText: Copyright (c) 2025 Broadsage
+# SPDX-License-Identifier: Apache-2.0
+#
+
+title: "📢 [Announcement]: "
+labels: ["announcement", "news"]
 body:
   - type: markdown
     attributes:
       value: |
-        # 📢 Community Announcement
+        Share important news with the community! 📢
 
-        ## For Broadsage Maintainers and Community
+        Use this template for project announcements, releases, updates, or important information that affects all users.
 
   - type: textarea
     id: announcement-title
     attributes:
       label: Announcement Title
-      description: Provide a clear, concise title for this announcement
-      placeholder: "e.g., Release of docker-scaffold v2.0 with new Docker BuildKit support"
+      description: Clear, concise title for this announcement
+      placeholder: "e.g., Release: v2.0 with multi-platform support"
     validations:
       required: true
 
@@ -20,29 +26,40 @@ body:
     id: announcement-content
     attributes:
       label: Announcement Content
-      description: Share the important information or updates with the community
+      description: Detailed announcement information
       placeholder: |
-        - Key points to highlight
-        - Changes or improvements
-        - Impact on users
-        - Call to action (if applicable)
-      value: |
         ### Summary
-        [Brief overview of the announcement]
+        Brief overview
 
         ### Key Points
-        - [Important point 1]
-        - [Important point 2]
-        - [Important point 3]
+        - Point 1
+        - Point 2
+        - Point 3
 
-        ### Action Required
-        [If any action is needed from the community]
+        ### Impact
+        How does this affect users?
 
         ### Resources
-        - [Link to documentation](https://github.com/broadsage/docker-scaffold)
-        - [Link to changelog](https://github.com/broadsage/docker-scaffold/releases)
-    validations:
-      required: true
+        - Link to documentation
+        - Link to migration guide
+      validations:
+        required: true
+
+  - type: dropdown
+    id: announcement-type
+    attributes:
+      label: Announcement Type
+      description: What category is this announcement?
+      options:
+        - Release / Version Update
+        - Security Update
+        - Breaking Changes
+        - Feature Launch
+        - Maintenance Window
+        - Policy Change
+        - Other
+      validations:
+        required: true
 
   - type: dropdown
     id: priority
@@ -51,28 +68,25 @@ body:
       description: How urgent is this announcement?
       options:
         - Critical - Immediate action required
-        - High - Important information
-        - Medium - General information
+        - High - Important for all users
+        - Medium - Good to know
         - Low - FYI
-    validations:
-      required: true
+      validations:
+        required: true
 
   - type: textarea
-    id: target-audience
+    id: action-required
     attributes:
-      label: Target Audience
-      description: Who should see this announcement? (e.g., all users, contributors, DevOps teams)
-      placeholder: "e.g., All users, particularly those scaffolding Docker images"
-    validations:
-      required: true
+      label: Action Required (if any)
+      description: Do users need to take any action?
+      placeholder: "Leave blank if no action needed"
 
-  - type: checkboxes
-    id: communication-channels
+  - type: textarea
+    id: references
     attributes:
-      label: Notify Via
-      description: Select channels to amplify this announcement
-      options:
-        - label: GitHub Release Notes
-        - label: Documentation Update
-        - label: Email Notification (if available)
-        - label: Social Media (if applicable)
+      label: Related Links
+      description: Links to documentation, issues, PRs, or other resources
+      placeholder: |
+        - GitHub Release: https://github.com/...
+        - Documentation: https://...
+        - Migration Guide: https://...
