@@ -1,0 +1,78 @@
+title: Announcement Template
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # 📢 Community Announcement
+
+        ## For Broadsage Maintainers and Community
+
+  - type: textarea
+    id: announcement-title
+    attributes:
+      label: Announcement Title
+      description: Provide a clear, concise title for this announcement
+      placeholder: "e.g., Release of docker-scaffold v2.0 with new Docker BuildKit support"
+    validations:
+      required: true
+
+  - type: textarea
+    id: announcement-content
+    attributes:
+      label: Announcement Content
+      description: Share the important information or updates with the community
+      placeholder: |
+        - Key points to highlight
+        - Changes or improvements
+        - Impact on users
+        - Call to action (if applicable)
+      value: |
+        ### Summary
+        [Brief overview of the announcement]
+
+        ### Key Points
+        - [Important point 1]
+        - [Important point 2]
+        - [Important point 3]
+
+        ### Action Required
+        [If any action is needed from the community]
+
+        ### Resources
+        - [Link to documentation](https://github.com/broadsage/docker-scaffold)
+        - [Link to changelog](https://github.com/broadsage/docker-scaffold/releases)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority Level
+      description: How urgent is this announcement?
+      options:
+        - Critical - Immediate action required
+        - High - Important information
+        - Medium - General information
+        - Low - FYI
+    validations:
+      required: true
+
+  - type: textarea
+    id: target-audience
+    attributes:
+      label: Target Audience
+      description: Who should see this announcement? (e.g., all users, contributors, DevOps teams)
+      placeholder: "e.g., All users, particularly those scaffolding Docker images"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: communication-channels
+    attributes:
+      label: Notify Via
+      description: Select channels to amplify this announcement
+      options:
+        - label: GitHub Release Notes
+        - label: Documentation Update
+        - label: Email Notification (if available)
+        - label: Social Media (if applicable)
