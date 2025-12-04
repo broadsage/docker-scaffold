@@ -22,7 +22,7 @@ body:
     attributes:
       label: Context and Background
       description: Provide context to help community members make informed decisions
-      placeholder: "Why is this poll needed? What background information is relevant?"
+      placeholder: "Why is this poll needed? What's the background information?"
     validations:
       required: true
 
@@ -30,16 +30,8 @@ body:
     id: options
     attributes:
       label: Poll Options
-      description: List the available options (you can also use reaction emojis in the discussion)
-      placeholder: |
-        Option A: Description
-        Option B: Description
-        Option C: Description
-
-        Or use reaction emojis:
-        👍 for Yes
-        👎 for No
-        🤔 for Maybe/Unsure
+      description: List the available options or use reaction emojis
+      placeholder: "List voting options or use: 👍 for Yes, 👎 for No, 🤔 for Maybe"
     validations:
       required: true
 
@@ -62,4 +54,4 @@ body:
     attributes:
       label: Impact of Decision
       description: How will the poll results be used?
-      placeholder: "How will this decision affect the project? Who will implement the results?"
+      placeholder: "Describe how this decision will affect the project"

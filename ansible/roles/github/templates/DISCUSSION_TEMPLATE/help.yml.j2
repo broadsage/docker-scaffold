@@ -30,20 +30,14 @@ body:
     attributes:
       label: Steps You've Already Tried
       description: What have you already tried to solve this?
-      placeholder: |
-        - I tried...
-        - I checked...
-        - I read...
+      placeholder: "Describe the steps you've already taken"
 
   - type: textarea
     id: environment
     attributes:
       label: Environment
       description: Share relevant environment details
-      value: |
-        - OS: [macOS/Linux/Windows]
-        - {{ image.name }} version: [e.g., 1.0.0]
-        - Docker version: [e.g., 24.0]
+      value: "OS: [macOS/Linux/Windows], {{ image.name }} version: [e.g., 1.0.0], Docker version: [e.g., 24.0]"
 
   - type: textarea
     id: error-output
@@ -51,8 +45,7 @@ body:
       label: Error Messages or Output
       description: If applicable, share any error messages or relevant output
       render: bash
-      placeholder: |
-        Paste error output or logs here...
+      placeholder: "Paste error output or logs here"
 
   - type: textarea
     id: additional-info

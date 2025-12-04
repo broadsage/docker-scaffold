@@ -23,22 +23,11 @@ body:
     attributes:
       label: Announcement Details
       description: Provide detailed information about this announcement
-      placeholder: |
-        ### What's New
-        Describe the announcement in detail
-
-        ### Why It Matters
-        Explain the impact and relevance
-
-        ### Next Steps
-        What should users do about this?
+      placeholder: "Describe the announcement, why it matters, and any next steps"
 
   - type: textarea
     id: announcement-links
     attributes:
       label: Related Resources
       description: Links to documentation, guides, or other resources
-      placeholder: |
-        - Documentation: https://...
-        - Release Notes: https://...
-        - Blog Post: https://...
+      placeholder: "Share relevant links: documentation, release notes, blog posts, etc."
