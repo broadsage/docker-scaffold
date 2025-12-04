@@ -107,7 +107,38 @@ class TestFeatureActivation(unittest.TestCase):
 
         result: Dict[str, Any] = activate_feature_bundles(defaults, project)  # type: ignore
 
-        self.assertNotIn('github', result)
+        self.assertIn('github', result)
+        # Should have safe defaults (not completely missing)
+        self.assertFalse(result['github']['issues'])
+        self.assertFalse(result['github']['workflows'])
+
+    def test_disabled_features_have_safe_defaults(self) -> None:
+        """Test that disabled features still exist with safe default values."""
+        defaults: Dict[str, Any] = {
+            'github': {'issues': True},
+            'security': {'scan': {'enabled': True}},
+            'registry': {'github': True}
+        }
+        project: Dict[str, Any] = {
+            'features': {
+                'github': False,
+                'security': False,
+                'registry': False
+            },
+            'image': {'name': 'test', 'description': 'Test'}
+        }
+
+        result: Dict[str, Any] = activate_feature_bundles(defaults, project)  # type: ignore
+
+        # All sections should exist even if disabled
+        self.assertIn('github', result)
+        self.assertIn('security', result)
+        self.assertIn('registry', result)
+
+        # All should have safe defaults (False values)
+        self.assertFalse(result['github']['issues'])
+        self.assertFalse(result['security']['scan']['enabled'])
+        self.assertFalse(result['registry']['github'])
 
     def test_feature_with_override(self) -> None:
         defaults: Dict[str, Any] = {
