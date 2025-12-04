@@ -21,7 +21,7 @@ Thanks for contributing to **docker-scaffold**. We maintain production-grade, op
 <!-- Summary of changes and reasoning -->
 
 **Base Image:** `FROM ...`
-**New Tags:** 
+**New Tags:**
 **Breaking Changes:** [ ] No [ ] Yes
 
 **Closes:** #(issue number)
