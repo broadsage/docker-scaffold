@@ -5,9 +5,6 @@ vars:
   PYTHON: python3
   VENV: venv
   PYTHON_VENV: "{{.VENV}}/bin/python3"
-  SCRIPTS_DIR: scripts
-  PROJECT_YML: project.yml
-  DEFAULTS_YML: ansible/vars/defaults.yml
 
 tasks:
   default:
@@ -47,20 +44,20 @@ tasks:
     desc: Run all code quality & compliance checks
     deps: [setup]
     cmds:
-      - "{{.PYTHON_VENV}} {{.SCRIPTS_DIR}}/compliance.py all"
+      - "{{.PYTHON_VENV}} scripts/compliance.py all"
     aliases: [compliance]
 
   check-lint:
     desc: Run linting checks (MegaLinter)
     deps: [setup]
     cmds:
-      - "{{.PYTHON_VENV}} {{.SCRIPTS_DIR}}/compliance.py lint"
+      - "{{.PYTHON_VENV}} scripts/compliance.py lint"
 
   check-publiccode:
     desc: Validate publiccode.yml configuration
     deps: [setup]
     cmds:
-      - "{{.PYTHON_VENV}} {{.SCRIPTS_DIR}}/compliance.py publiccodelint"
+      - "{{.PYTHON_VENV}} scripts/compliance.py publiccodelint"
 
   check-license:
     desc: |
@@ -68,13 +65,13 @@ tasks:
       Automatically downloads missing licenses before linting
     deps: [setup]
     cmds:
-      - "{{.PYTHON_VENV}} {{.SCRIPTS_DIR}}/compliance.py license"
+      - "{{.PYTHON_VENV}} scripts/compliance.py license"
 
   check-commit:
     desc: Validate commit messages with Conform
     deps: [setup]
     cmds:
-      - "{{.PYTHON_VENV}} {{.SCRIPTS_DIR}}/compliance.py commit"
+      - "{{.PYTHON_VENV}} scripts/compliance.py commit"
 
   check-docker:
     desc: Verify Docker is installed and available
@@ -126,7 +123,7 @@ tasks:
     desc: Run Python unit tests
     deps: [setup]
     cmds:
-      - "cd {{.SCRIPTS_DIR}} && ../{{.VENV}}/bin/python test_merge_config.py"
+      - "cd scripts && ../{{.VENV}}/bin/python test_merge_config.py"
 
   check-python-deps:
     desc: Verify required Python dependencies
