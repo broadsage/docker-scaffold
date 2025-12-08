@@ -5,3 +5,6 @@ PyYAML>=6.0.1
 
 # Required for pretty table output
 prettytable>=3.0.0
+
+# Required for executing Ansible playbooks
+ansible>=2.20.0
