@@ -95,6 +95,20 @@ tasks:
       - "docker build -t broadsage/docker-scaffold:latest ."
       - echo "✓ Docker image built successfully"
 
+  docker-run:
+    desc: Run docker-scaffold on this project
+    deps: [check-docker, docker-build]
+    cmds:
+      - |
+        echo "Running docker-scaffold on current project..."
+        docker run --rm \
+          -v "$(pwd):/tmp" \
+          -e PUID=$(id -u) \
+          -e PGID=$(id -g) \
+          broadsage/docker-scaffold:latest
+        echo "✓ Docker container executed successfully"
+        echo "Review generated files in the current directory"
+
   # Environment Cleanup 
   cleanup:
     desc: Remove Python virtual environment and clean up
