@@ -13,7 +13,7 @@ This directory contains example configurations for different use cases.
 1. **Copy an example** that matches your needs:
 
    ```bash
-   cp examples/minimal-image.yml my-image.yml
+   cp examples/minimal-image.yaml my-image.yaml
    ```
 
 2. **Customize** the image name and description:
@@ -28,8 +28,8 @@ This directory contains example configurations for different use cases.
 
    ```bash
    docker run --rm \
-     -v $(pwd)/my-image.yml:/tmp/project.yml \
-     -v $(pwd)/defaults.yml:/tmp/defaults.yml \
+     -v $(pwd)/my-image.yaml:/tmp/project.yaml \
+     -v $(pwd)/defaults.yaml:/tmp/defaults.yaml \
      -v $(pwd)/output:/tmp \
      ghcr.io/broadsage/scaffold
    ```
@@ -38,18 +38,18 @@ This directory contains example configurations for different use cases.
 
 | Example | Use Case | Features Enabled |
 |---------|----------|------------------|
-| `minimal-image.yml` | Quick setup, inherits all defaults | Workflows only |
-| `production-image.yml` | Production-ready with security | All security features |
-| `single-arch-image.yml` | Platform-specific builds | ARM64 only |
+| `minimal-image.yaml` | Quick setup, inherits all defaults | Workflows only |
+| `production-image.yaml` | Production-ready with security | All security features |
+| `single-arch-image.yaml` | Platform-specific builds | ARM64 only |
 
 ## Configuration Hierarchy
 
 ```text
-defaults.yml (organization defaults)
+defaults.yaml (organization defaults)
     ↓
-project.yml (image-specific overrides)
+project.yaml (image-specific overrides)
     ↓
-ansible/vars/common.yml (variable mapping)
+ansible/vars/common.yaml (variable mapping)
     ↓
 Ansible roles (generation)
 ```
@@ -100,27 +100,27 @@ build:
 
 ## Tips for Managing 100+ Images
 
-1. **Keep defaults.yml stable** - rarely modify it
-2. **Use minimal project.yml** - only specify differences
+1. **Keep defaults.yaml stable** - rarely modify it
+2. **Use minimal project.yaml** - only specify differences
 3. **Organize by category**:
 
    ```text
    images/
    ├── web-apps/
-   │   ├── nginx.yml
-   │   └── apache.yml
+   │   ├── nginx.yaml
+   │   └── apache.yaml
    ├── databases/
-   │   ├── postgres.yml
-   │   └── mysql.yml
+   │   ├── postgres.yaml
+   │   └── mysql.yaml
    └── utilities/
-       ├── backup.yml
-       └── monitor.yml
+       ├── backup.yaml
+       └── monitor.yaml
    ```
 
 4. **Automate generation** with CI/CD
-5. **Version control** all .yml files
+5. **Version control** all .yaml files
 6. **Use consistent naming** (kebab-case recommended)
 
 ## Advanced Configuration
 
-See the main `project.yml` for all available options and inline documentation.
+See the main `project.yaml` for all available options and inline documentation.

@@ -12,7 +12,7 @@
     scaffold_group: abc
 
   pre_tasks:
-    - name: Merge configuration files (defaults.yml + project.yml)
+    - name: Merge configuration files (defaults.yaml + project.yaml)
       tags: always
       ansible.builtin.command:
         cmd: python3 scripts/merge_config.py
@@ -29,7 +29,7 @@
     - name: Load merged configuration
       tags: always
       ansible.builtin.include_vars:
-        file: "/tmp/merged_config.yml"
+        file: "/tmp/merged_config.yaml"
 
     - name: Set user ID from environment
       tags: always

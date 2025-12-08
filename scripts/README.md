@@ -33,7 +33,7 @@ pip install -r requirements.txt
 The script runs automatically when the container starts:
 
 ```bash
-docker run -v $(pwd)/project.yml:/tmp/project.yml ghcr.io/broadsage/scaffold
+docker run -v $(pwd)/project.yaml:/tmp/project.yaml ghcr.io/broadsage/scaffold
 ```
 
 ### Local Testing
@@ -50,22 +50,22 @@ python3 merge_config.py
 ## How It Works
 
 ```text
-defaults.yml + project.yml → merge_config.py → merged_config.yml → Ansible
+defaults.yaml + project.yaml → merge_config.py → merged_config.yaml → Ansible
 ```
 
 ### Feature Activation Logic
 
 1. **Feature enabled** (`features.github: true`)
-   - Loads entire `github.*` bundle from `defaults.yml`
-   - Applies project-specific overrides from `project.yml`
+   - Loads entire `github.*` bundle from `defaults.yaml`
+   - Applies project-specific overrides from `project.yaml`
 
 2. **Feature disabled** (`features.github: false`)
    - Skips entire `github.*` bundle
-   - Ignores any `github.*` settings in `project.yml`
+   - Ignores any `github.*` settings in `project.yaml`
 
 ### Example
 
-**defaults.yml:**
+**defaults.yaml:**
 
 ```yaml
 github:
@@ -75,7 +75,7 @@ github:
     enabled: false
 ```
 
-**project.yml:**
+**project.yaml:**
 
 ```yaml
 features:
@@ -88,7 +88,7 @@ github:
     number: 6
 ```
 
-**Result (merged_config.yml):**
+**Result (merged_config.yaml):**
 
 ```yaml
 github:
@@ -138,8 +138,8 @@ Valid platforms:
 The script provides clear error messages:
 
 ```bash
-❌ Error: /tmp/project.yml not found
-   Please mount your project.yml to /tmp/project.yml
+❌ Error: /tmp/project.yaml not found
+   Please mount your project.yaml to /tmp/project.yaml
 
 ❌ Validation failed:
   • Image name is required: image.name not found

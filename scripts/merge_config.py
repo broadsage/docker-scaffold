@@ -7,26 +7,26 @@
 """
 Configuration merger for docker-scaffold.
 
-Merges defaults.yml + project.yml with feature bundle activation.
-Outputs a single merged_config.yml for Ansible consumption.
+Merges defaults.yaml + project.yaml with feature bundle activation.
+Outputs a single merged_config.yaml for Ansible consumption.
 
 Architecture:
-  defaults.yml (feature bundles) + project.yml (toggles + overrides)
+  defaults.yaml (feature bundles) + project.yaml (toggles + overrides)
     → Python merger (this script)
-    → merged_config.yml (flat config for Ansible)
+    → merged_config.yaml (flat config for Ansible)
 
 Logic:
-  1. features.github: true → Load all github.* from defaults.yml
-  2. github.* in project.yml → Override specific settings
+  1. features.github: true → Load all github.* from defaults.yaml
+  2. github.* in project.yaml → Override specific settings
   3. features.github: false → Exclude all github.*
 
 Example:
-  defaults.yml:
+  defaults.yaml:
     github:
       workflows: true
       issues: true
 
-  project.yml:
+  project.yaml:
     features:
       github: true
     github:
@@ -79,7 +79,7 @@ def deep_merge(base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any]
 
 def _extract_safe_defaults(defaults: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Dynamically extract safe defaults from defaults.yml.
+    Dynamically extract safe defaults from defaults.yaml.
 
     For each feature bundle (github, security, registry, etc.),
     creates a safe default version where all boolean/list/dict values
@@ -87,7 +87,7 @@ def _extract_safe_defaults(defaults: Dict[str, Any]) -> Dict[str, Any]:
     automatically adapt to new features without code changes.
 
     Args:
-        defaults: The defaults.yml configuration
+        defaults: The defaults.yaml configuration
 
     Returns:
         Dictionary of safe default values for disabled features
@@ -140,14 +140,14 @@ def _make_safe_default(value: Any, bundle_name: str) -> Any:
 
 def _get_feature_bundles(defaults: Dict[str, Any]) -> List[str]:
     """
-    Dynamically detect feature bundles from defaults.yml.
+    Dynamically detect feature bundles from defaults.yaml.
 
-    Features are detected as sections that exist in defaults.yml but NOT
+    Features are detected as sections that exist in defaults.yaml but NOT
     in the hardcoded list of core sections. This makes the script
     automatically discover new features.
 
     Args:
-        defaults: The defaults.yml configuration
+        defaults: The defaults.yaml configuration
 
     Returns:
         List of feature bundle names
@@ -164,22 +164,22 @@ def activate_feature_bundles(defaults: Dict[str, Any], project: Dict[str, Any]) 
     """
     Activate feature bundles based on features.* flags (dynamically detected).
 
-    This function automatically discovers all features from defaults.yml,
-    so adding a new feature requires ONLY updating defaults.yml - no Python
+    This function automatically discovers all features from defaults.yaml,
+    so adding a new feature requires ONLY updating defaults.yaml - no Python
     code changes needed.
 
     How it works:
-      1. Detects all feature bundles from defaults.yml (anything not a core section)
-      2. Loads enabled feature bundles from defaults
-      3. Applies project.yml overrides
+      1. Detects all feature bundles from defaults.yaml (anything not a core section)
+      2. Loads enabled feature bundles from defaults.yaml
+      3. Applies project.yaml overrides
       4. Ensures disabled features have safe defaults (prevent undefined vars in Ansible)
 
     Core sections (always included): organization, metadata, build, image, documentation
     Feature bundles (conditional): github, security, registry, and any future additions
 
     Args:
-        defaults: Default configuration with feature bundles (from defaults.yml)
-        project: Project-specific configuration (from project.yml)
+        defaults: Default configuration with feature bundles (from defaults.yaml)
+        project: Project-specific configuration (from project.yaml)
 
     Returns:
         Merged configuration with all features (enabled or disabled)
@@ -329,9 +329,9 @@ def main() -> None:
     """Main entry point for configuration merger."""
 
     # File paths
-    defaults_file = Path('vars/defaults.yml')
-    project_file = Path('/tmp/project.yml')
-    output_file = Path('/tmp/merged_config.yml')
+    defaults_file = Path('vars/defaults.yaml')
+    project_file = Path('/tmp/project.yaml')
+    output_file = Path('/tmp/merged_config.yaml')
 
     print("=" * 70)
     print("Docker Scaffold Configuration Merger")
@@ -340,7 +340,7 @@ def main() -> None:
     # Check project file exists (required)
     if not project_file.exists():
         print(f"\n❌ Error: {project_file} not found")
-        print("   Please mount your project.yml to /tmp/project.yml")
+        print("   Please mount your project.yaml to /tmp/project.yaml")
         sys.exit(1)
 
     # Load defaults (optional but recommended)
@@ -354,7 +354,7 @@ def main() -> None:
             print(f"❌ Error parsing {defaults_file}: {e}")
             sys.exit(1)
     else:
-        print(f"⚠ Warning: {defaults_file} not found, using project.yml only")
+        print(f"⚠ Warning: {defaults_file} not found, using project.yaml only")
 
     # Load project configuration (required)
     try:
