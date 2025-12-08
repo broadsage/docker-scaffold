@@ -107,7 +107,7 @@ body:
         ## Installation
         
         To install docker-scaffold:
-        1. Pull the image: `docker pull ghcr.io/broadsage/scaffold:latest`
+        1. Pull the image: `docker pull ghcr.io/broadsage/docker-scaffold:latest`
         2. Run the container: `docker run ...`
         ```
         

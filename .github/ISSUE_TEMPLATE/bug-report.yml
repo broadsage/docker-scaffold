@@ -113,14 +113,14 @@ body:
         docker run -d \
           --name scaffold \
           -v /path/to/project:/workspace \
-          ghcr.io/broadsage/scaffold:latest
+          ghcr.io/broadsage/docker-scaffold:latest
         ```
         
         **For docker-compose.yml:**
         ```yaml
         services:
           scaffold:
-            image: ghcr.io/broadsage/scaffold:latest
+            image: ghcr.io/broadsage/docker-scaffold:latest
             volumes:
               - ./project:/workspace
         ```
