@@ -24,6 +24,7 @@ RUN \
   rm -rf /var/cache/apk/*
 
 COPY ansible /app
+COPY scripts /app/scripts
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
