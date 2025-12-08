@@ -25,7 +25,7 @@ tasks:
       - |
         source {{.VENV}}/bin/activate
         pip3 install --upgrade pip
-        pip3 install -r {{.SCRIPTS_DIR}}/requirements.txt
+        pip3 install -r requirements.txt
         echo "✓ Virtual environment created and dependencies installed"
 
   setup-dev:
