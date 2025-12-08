@@ -88,6 +88,13 @@ tasks:
           exit 1
         fi
 
+  docker-build:
+    desc: Build Docker image
+    deps: [check-docker]
+    cmds:
+      - "docker build -t broadsage/docker-scaffold:latest ."
+      - echo "✓ Docker image built successfully"
+
   # Environment Cleanup 
   cleanup:
     desc: Remove Python virtual environment and clean up
