@@ -4,13 +4,6 @@
 
 version = 3
 
-# Global attribution (applicable to files not covered by specific rules)
-[[annotations]]
-path = ["**"]
-precedence = "override"
-SPDX-FileCopyrightText = "Copyright (c) 2025 Broadsage Corporation Limited"
-SPDX-License-Identifier = "Apache-2.0"
-
 # Build artifacts and dependencies (not part of distribution)
 [[annotations]]
 path = [
@@ -31,7 +24,7 @@ skip = true
 
 # Git and version control
 [[annotations]]
-path = [".git/**", ".gitignore", ".gitmodules"]
+path = [".git/**", ".gitmodules"]
 precedence = "override"
 skip = true
 
@@ -41,60 +34,16 @@ path = [".vscode/**", ".idea/**", ".sublime-project", ".sublime-workspace", "*.s
 precedence = "override"
 skip = true
 
-# GitHub workflows (auto-generated or standard configuration)
+# Jinja2 templates (covered by role)
 [[annotations]]
-path = [".github/workflows/**"]
+path = [
+  "*.j2",
+  "**/*.j2",
+  "ansible/roles/**/templates/**",
+  "ansible/roles/**/*.j2",
+]
 precedence = "override"
-SPDX-FileCopyrightText = "2024-2025 Broadsage Corporation Limited"
-SPDX-License-Identifier = "Apache-2.0"
-
-# Ansible files
-[[annotations]]
-path = ["ansible/**"]
-precedence = "override"
-SPDX-FileCopyrightText = "2024-2025 Broadsage Corporation Limited"
-SPDX-License-Identifier = "Apache-2.0"
-
-# Docker and container files
-[[annotations]]
-path = ["Dockerfile", "Dockerfile.*", ".dockerignore", ".containerignore"]
-precedence = "override"
-SPDX-FileCopyrightText = "2024-2025 Broadsage Corporation Limited"
-SPDX-License-Identifier = "Apache-2.0"
-
-# Configuration and data files
-[[annotations]]
-path = ["*.yml", "*.yaml", "*.toml", "*.json", "*.xml"]
-precedence = "override"
-SPDX-FileCopyrightText = "2024-2025 Broadsage Corporation Limited"
-SPDX-License-Identifier = "Apache-2.0"
-
-# Documentation
-[[annotations]]
-path = ["*.md", "*.rst", "*.txt"]
-precedence = "override"
-SPDX-FileCopyrightText = "2024-2025 Broadsage Corporation Limited"
-SPDX-License-Identifier = "Apache-2.0"
-
-# Shell scripts
-[[annotations]]
-path = ["*.sh", "entrypoint.sh"]
-precedence = "override"
-SPDX-FileCopyrightText = "2024-2025 Broadsage Corporation Limited"
-SPDX-License-Identifier = "Apache-2.0"
-
-# Makefile
-[[annotations]]
-path = ["Makefile"]
-precedence = "override"
-SPDX-FileCopyrightText = "2024-2025 Broadsage Corporation Limited"
-SPDX-License-Identifier = "Apache-2.0"
-
-# Python source files
-[[annotations]]
-path = ["*.py"]
-precedence = "override"
-SPDX-FileCopyrightText = "2024-2025 Broadsage Corporation Limited"
+SPDX-FileCopyrightText = "Copyright (c) 2025 Broadsage <opensource@broadsage.com>"
 SPDX-License-Identifier = "Apache-2.0"
 
 # License file itself

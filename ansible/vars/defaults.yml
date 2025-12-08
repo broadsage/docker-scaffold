@@ -1,5 +1,7 @@
+# SPDX-FileCopyrightText: Copyright (c) 2025 Broadsage <opensource@broadsage.com>
+#
+# SPDX-License-Identifier: Apache-2.0
 ---
-
 # These defaults are applied to all generated Docker images.
 # Override any setting in project.yml for specific images.
 #

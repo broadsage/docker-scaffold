@@ -1,5 +1,7 @@
+# SPDX-FileCopyrightText: Copyright (c) 2025 Broadsage <opensource@broadsage.com>
+#
+# SPDX-License-Identifier: Apache-2.0
 ---
-
 # Template for individual Docker image configuration.
 # Inherits all settings from defaults.yml - only specify what's different.
 #
