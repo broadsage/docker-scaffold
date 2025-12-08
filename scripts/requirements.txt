@@ -2,3 +2,6 @@
 
 # Required for YAML configuration parsing
 PyYAML>=6.0.1
+
+# Required for pretty table output
+prettytable>=3.0.0

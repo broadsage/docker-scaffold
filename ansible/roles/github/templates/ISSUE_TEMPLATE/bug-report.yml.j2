@@ -79,13 +79,13 @@ body:
         - **OS**: Ubuntu 22.04 LTS
         - **Docker Version**: 24.0.7
         - **How Docker was installed**: Docker Desktop / apt package / docker.io snap
-        - **Container Runtime**: Docker / Podman / containerd
+        - **Container Runtime**: Docker
         - **Ansible Version**: 2.15.5
       value: |
         - **OS**: 
         - **Docker Version**: 
         - **How Docker was installed**: 
-        - **Container Runtime**: 
+        - **Container Runtime**: Docker
         - **Ansible Version**: 
       render: markdown
     validations:
@@ -139,9 +139,10 @@ body:
     attributes:
       label: Container Logs
       description: |
-        Provide the full container logs using one of the following commands:
-        - Docker: `docker logs <container_name>`
-        - Podman: `podman logs <container_name>`
+        Provide the full container logs using the following command:
+        ```bash
+        docker logs <container_name>
+        ```
         
         Please include at least 50 lines before the error occurred for context.
       placeholder: |

@@ -1,0 +1,105 @@
+# REUSE.toml - REUSE Specification v3.3
+# This file specifies copyright and licensing information for the docker-scaffold project
+# See https://reuse.software/ for more information
+
+version = 3
+
+# Global attribution (applicable to files not covered by specific rules)
+[[annotations]]
+path = ["**"]
+precedence = "override"
+SPDX-FileCopyrightText = "Copyright (c) 2025 Broadsage Corporation Limited"
+SPDX-License-Identifier = "Apache-2.0"
+
+# Build artifacts and dependencies (not part of distribution)
+[[annotations]]
+path = [
+  "venv/",
+  ".venv/",
+  "*.egg-info/",
+  ".pytest_cache/",
+  ".tox/",
+  ".coverage",
+  "build/",
+  "dist/",
+  "__pycache__/",
+  "*.pyc",
+  ".DS_Store",
+]
+precedence = "override"
+skip = true
+
+# Git and version control
+[[annotations]]
+path = [".git/**", ".gitignore", ".gitmodules"]
+precedence = "override"
+skip = true
+
+# IDE and editor configuration
+[[annotations]]
+path = [".vscode/**", ".idea/**", ".sublime-project", ".sublime-workspace", "*.swp", "*.swo"]
+precedence = "override"
+skip = true
+
+# GitHub workflows (auto-generated or standard configuration)
+[[annotations]]
+path = [".github/workflows/**"]
+precedence = "override"
+SPDX-FileCopyrightText = "2024-2025 Broadsage Corporation Limited"
+SPDX-License-Identifier = "Apache-2.0"
+
+# Ansible files
+[[annotations]]
+path = ["ansible/**"]
+precedence = "override"
+SPDX-FileCopyrightText = "2024-2025 Broadsage Corporation Limited"
+SPDX-License-Identifier = "Apache-2.0"
+
+# Docker and container files
+[[annotations]]
+path = ["Dockerfile", "Dockerfile.*", ".dockerignore", ".containerignore"]
+precedence = "override"
+SPDX-FileCopyrightText = "2024-2025 Broadsage Corporation Limited"
+SPDX-License-Identifier = "Apache-2.0"
+
+# Configuration and data files
+[[annotations]]
+path = ["*.yml", "*.yaml", "*.toml", "*.json", "*.xml"]
+precedence = "override"
+SPDX-FileCopyrightText = "2024-2025 Broadsage Corporation Limited"
+SPDX-License-Identifier = "Apache-2.0"
+
+# Documentation
+[[annotations]]
+path = ["*.md", "*.rst", "*.txt"]
+precedence = "override"
+SPDX-FileCopyrightText = "2024-2025 Broadsage Corporation Limited"
+SPDX-License-Identifier = "Apache-2.0"
+
+# Shell scripts
+[[annotations]]
+path = ["*.sh", "entrypoint.sh"]
+precedence = "override"
+SPDX-FileCopyrightText = "2024-2025 Broadsage Corporation Limited"
+SPDX-License-Identifier = "Apache-2.0"
+
+# Makefile
+[[annotations]]
+path = ["Makefile"]
+precedence = "override"
+SPDX-FileCopyrightText = "2024-2025 Broadsage Corporation Limited"
+SPDX-License-Identifier = "Apache-2.0"
+
+# Python source files
+[[annotations]]
+path = ["*.py"]
+precedence = "override"
+SPDX-FileCopyrightText = "2024-2025 Broadsage Corporation Limited"
+SPDX-License-Identifier = "Apache-2.0"
+
+# License file itself
+[[annotations]]
+path = ["LICENSE"]
+precedence = "override"
+SPDX-FileCopyrightText = "2004 Apache Software Foundation"
+SPDX-License-Identifier = "Apache-2.0"

@@ -1,0 +1,122 @@
+---
+version: '3'
+
+vars:
+  PYTHON: python3
+  VENV: venv
+  PYTHON_VENV: "{{.VENV}}/bin/python3"
+  SCRIPTS_DIR: scripts
+  PROJECT_YML: project.yml
+  DEFAULTS_YML: ansible/vars/defaults.yml
+
+tasks:
+  default:
+    desc: Show available tasks
+    cmds:
+      - task -l
+
+  # Setup Targets
+  setup:
+    desc: Create Python virtual environment and install dependencies
+    status:
+      - test -d "{{.VENV}}" && test -f "{{.VENV}}/pyvenv.cfg"
+    cmds:
+      - "{{.PYTHON}} -m venv {{.VENV}}"
+      - |
+        source {{.VENV}}/bin/activate
+        pip3 install --upgrade pip
+        pip3 install -r {{.SCRIPTS_DIR}}/requirements.txt
+        echo "✓ Virtual environment created and dependencies installed"
+
+  setup-dev:
+    desc: Set up development environment
+    cmds:
+      - echo "Setting up development environment..."
+      - echo "Installing git hooks..."
+      - |
+        if [ -d ".git" ]; then
+          mkdir -p .git/hooks
+          cp scripts/git-hooks/* .git/hooks/ 2>/dev/null || true
+          chmod +x .git/hooks/* 2>/dev/null || true
+          echo "✓ Git hooks installed successfully"
+        else
+          echo "⚠ Not a git repository - skipping git hooks"
+        fi
+
+  check-compliance:
+    desc: Run all code quality & compliance checks
+    deps: [setup]
+    cmds:
+      - "{{.PYTHON_VENV}} {{.SCRIPTS_DIR}}/compliance.py all"
+    aliases: [compliance]
+
+  check-lint:
+    desc: Run linting checks (MegaLinter)
+    deps: [setup]
+    cmds:
+      - "{{.PYTHON_VENV}} {{.SCRIPTS_DIR}}/compliance.py lint"
+
+  check-publiccode:
+    desc: Validate publiccode.yml configuration
+    deps: [setup]
+    cmds:
+      - "{{.PYTHON_VENV}} {{.SCRIPTS_DIR}}/compliance.py publiccodelint"
+
+  check-license:
+    desc: |
+      Check REUSE license compliance
+      Automatically downloads missing licenses before linting
+    deps: [setup]
+    cmds:
+      - "{{.PYTHON_VENV}} {{.SCRIPTS_DIR}}/compliance.py license"
+
+  check-commit:
+    desc: Validate commit messages with Conform
+    deps: [setup]
+    cmds:
+      - "{{.PYTHON_VENV}} {{.SCRIPTS_DIR}}/compliance.py commit"
+
+  check-docker:
+    desc: Verify Docker is installed and available
+    cmds:
+      - |
+        if command -v docker >/dev/null 2>&1; then
+          echo "✓ Docker is available"
+          docker --version
+        else
+          echo "✗ Docker is NOT installed"
+          exit 1
+        fi
+
+  # Environment Cleanup 
+  cleanup:
+    desc: Remove Python virtual environment and clean up
+    cmds:
+      - |
+        if [ -d "{{.VENV}}" ]; then
+          rm -rf {{.VENV}}
+          echo "✓ Virtual environment removed"
+        else
+          echo "⚠ No virtual environment found to clean up"
+        fi
+
+  # Python Compliance Checks
+  test-python:
+    desc: Run Python unit tests
+    deps: [setup]
+    cmds:
+      - "cd {{.SCRIPTS_DIR}} && ../{{.VENV}}/bin/python test_merge_config.py"
+
+  check-python-deps:
+    desc: Verify required Python dependencies
+    deps: [setup]
+    cmds:
+      - "{{.PYTHON_VENV}} --version"
+      - echo "✓ Python dependencies verified"
+
+  # Main Entry Points
+  all:
+    desc: Run full setup and checks
+    deps: [setup, check-compliance, test-python]
+    cmds:
+      - echo "✓ All tasks completed successfully"
