@@ -90,7 +90,7 @@ db.sqlite3-journal
 .~*
 
 # Generated files
-merged_config.yml
+merged_config.yaml
 /tmp/
 
 # Environment variables
@@ -98,4 +98,4 @@ merged_config.yml
 .env.*.local
 
 # Project specific
-/ansible/vars/merged_config.yml
+/ansible/vars/merged_config.yaml
