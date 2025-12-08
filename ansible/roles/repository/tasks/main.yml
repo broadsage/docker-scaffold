@@ -4,7 +4,7 @@
 ---
 # tasks file for repository
 
-- name: Copy .gitignore template to project root
+- name: Copy template files to project root (if not excluded)
   template:
     src: "{{ item }}.j2"
     dest: "/tmp/{{ item }}"
@@ -13,3 +13,6 @@
     mode: '0644'
   loop:
     - .gitignore
+    - requirements.txt
+    - REUSE.toml
+  when: item not in template.exclude | default([])

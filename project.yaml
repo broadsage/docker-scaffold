@@ -26,6 +26,11 @@ image:
   description: Ansible-powered scaffolding tool for Docker image repositories
   # version: 1.0.0  # Optional: specify version (auto-generated if omitted)
 
+# Template Configuration (Files to exclude from generated projects)
+template:
+  exclude:
+    - REUSE.toml
+
 # Override Features (uncomment to change from defaults)
 features:
   github: true             # Generate GitHub Actions workflow & Issue Templates

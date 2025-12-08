@@ -1,0 +1,42 @@
+# REUSE.toml - REUSE Specification v3.3
+# This file specifies copyright and licensing information for the {{ image.name }} project
+# See https://reuse.software/ for more information
+
+version = 3
+
+# Build artifacts and dependencies (not part of distribution)
+[[annotations]]
+path = [
+  "venv/",
+  ".venv/",
+  "*.egg-info/",
+  ".pytest_cache/",
+  ".tox/",
+  ".coverage",
+  "build/",
+  "dist/",
+  "__pycache__/",
+  "*.pyc",
+  ".DS_Store",
+]
+precedence = "override"
+skip = true
+
+# Git and version control
+[[annotations]]
+path = [".git/**", ".gitmodules"]
+precedence = "override"
+skip = true
+
+# IDE and editor configuration
+[[annotations]]
+path = [".vscode/**", ".idea/**", ".sublime-project", ".sublime-workspace", "*.swp", "*.swo"]
+precedence = "override"
+skip = true
+
+# License file itself
+[[annotations]]
+path = ["LICENSE"]
+precedence = "override"
+SPDX-FileCopyrightText = "2004 Apache Software Foundation"
+SPDX-License-Identifier = "Apache-2.0"

@@ -217,7 +217,7 @@ def activate_feature_bundles(defaults: Dict[str, Any], project: Dict[str, Any]) 
             merged[bundle_name] = copy.deepcopy(default_value)
 
     # Always include core sections (not feature-gated)
-    core_sections = ['organization', 'metadata', 'build', 'image', 'documentation']
+    core_sections = ['organization', 'metadata', 'build', 'image', 'documentation', 'template']
 
     for section in core_sections:
         # Start with defaults using deep copy

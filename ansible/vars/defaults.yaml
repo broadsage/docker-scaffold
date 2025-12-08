@@ -19,6 +19,10 @@ metadata:
   vendor: Broadsage Corporation Limited
   license: Apache-2.0
 
+# Template Configuration (Files to exclude from generated projects)
+template:
+  exclude: []
+
 # Build Defaults
 build:
   context: .
