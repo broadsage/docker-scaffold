@@ -52,6 +52,10 @@
     - role: github
       tags: 
         - github
+        
+    - role: repository
+      tags:
+        - repository
 
   post_tasks:
     - name: Display scaffold completion message

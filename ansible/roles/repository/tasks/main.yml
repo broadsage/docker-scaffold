@@ -5,7 +5,7 @@
 - name: Copy .gitignore template to project root
   template:
     src: "{{ item }}.j2"
-    dest: "/tmp{{ item }}"
+    dest: "/tmp/{{ item }}"
     owner: "abc"
     group: "abc"
     mode: '0644'

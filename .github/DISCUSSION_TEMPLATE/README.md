@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: Copyright (c) 2025 Broadsage <opensource@broadsage.com>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
 # GitHub Discussions Templates Setup Guide
 
 This project includes pre-configured discussion templates located in `.github/DISCUSSION_TEMPLATE/`. These templates enable a structured community engagement experience.

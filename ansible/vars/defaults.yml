@@ -12,7 +12,7 @@ organization: broadsage
 # Metadata (same for all images in the organization)
 metadata:
   maintainer:
-    name: Broadsage Maintainers
+    name: Broadsage
     email: opensource@broadsage.com
   vendor: Broadsage Corporation Limited
   license: Apache-2.0
