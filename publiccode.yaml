@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 ---
-publiccodeYmlVersion: "0"
+publiccodeYmlVersion: "0.5.0"
 
 name: docker-scaffold
 applicationSuite: Community Health Files Framework
@@ -19,37 +19,40 @@ description:
       It provides Community Health Files, compliance checklists, linting configurations,
       and automation for code quality assurance.
 
-      The scaffold includes:
-      - Standardized directory structure for professional open source projects
-      - Community Health Files (README, CONTRIBUTING, CODE_OF_CONDUCT, etc.)
-      - Pre-configured linting and code quality tools (MegaLinter, Black, Flake8, Pylint)
-      - REUSE Software compliance automation
-      - Git workflow automation (Conform for commits)
-      - Docker containerization with multi-architecture support
-      - Ansible playbooks for infrastructure automation
-      - GitHub Actions CI/CD pipelines
-      - Comprehensive documentation and templates
+      Features include:
+      - Standardized directory structure following industry best practices
+      - Community Health Files (README, CONTRIBUTING, CODE_OF_CONDUCT, LICENSE, etc.)
+      - Pre-configured linting and code quality tools (MegaLinter v9, Black, Flake8, Pylint)
+      - REUSE Software compliance automation for license headers
+      - Git workflow automation (Conform for commit message validation)
+      - Docker containerization with multi-architecture build support (amd64, arm64)
+      - Ansible playbooks for infrastructure and configuration automation
+      - GitHub Actions CI/CD pipelines for automated testing and deployment
+      - Comprehensive documentation, issue templates, and discussion templates
 
-      Created to be generally usable and follows well-known conventions and de-facto
-      standards. However, it is intentionally opinionated - adjust contents to suit
-      your project needs.
+      This scaffold is designed to be generally usable for any open source project and
+      follows well-known conventions and de-facto standards. However, it is intentionally
+      opinionated - you are expected to adjust the contents and suggestions to suit your
+      specific project needs.
 
     features:
-      - Automated code quality checks
-      - REUSE license compliance verification
-      - Git commit message validation
-      - Docker multi-architecture support
-      - Community health file templates
-      - Ansible configuration management
-      - Python configuration with feature activation
+      - Automated code quality checks (linting, formatting, type checking)
+      - REUSE license compliance verification and automation
+      - Git commit message validation with Conform
+      - Docker multi-architecture build support (amd64, arm64)
+      - Community health file templates (issues, discussions, PRs)
+      - Ansible playbooks for configuration management
+      - Python configuration merging with feature activation
+      - Comprehensive GitHub Actions workflows
+      - Pre-configured MegaLinter with 10+ linters
 
-# Development status and roadmap
+# Development and Release information
 developmentStatus: development
 releaseDate: "2025-06-27"
 softwareVersion: dev
 roadmap: "https://github.com/broadsage/docker-scaffold#roadmap"
 
-# Software and platform information
+# Software and Platform information
 softwareType: standalone/other
 categories:
   - collaboration
@@ -58,28 +61,44 @@ platforms:
   - windows
   - macos
 
-# Legal information
+# Legal and Licensing
 legal:
   license: Apache-2.0
   mainCopyrightOwner: Broadsage
 
-# Organization information
+# Organization information (v0.5.0)
 organisation:
   name: Broadsage Corporation Limited
   uri: "https://github.com/broadsage"
 
-# Localization
+# Localization and internationalization
 localisation:
   localisationReady: true
   availableLanguages:
     - en
 
-# Repository information
+# Repository URLs
 url: "https://github.com/broadsage/docker-scaffold"
 
-# Maintenance information
+# Maintenance and support
 maintenance:
   type: internal
   contacts:
-    - name: Broadsage
+    - name: Broadsage Open Source Team
       email: opensource@broadsage.com
+      affiliation: Broadsage
+
+# Funding information (v0.5.0 feature)
+fundedBy:
+  - name: Broadsage
+    uri: "https://github.com/broadsage"
+
+# Intended audience and scope
+intendedAudience:
+  scope:
+    - government
+  countries:
+    - IN
+    - US
+    - UK
+  unsupportedCountries: []
