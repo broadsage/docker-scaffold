@@ -25,7 +25,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
 
 class CheckStatus(Enum):
@@ -158,19 +158,26 @@ class DockerCommand:
             Logger.error("Please install Docker: https://docs.docker.com/get-docker/")
             sys.exit(2)
 
-    def run(self, image: str, *args: str, **kwargs: str) -> Tuple[int, str]:
+    def run(
+        self, image: str, *args: str, stdin_data: str | None = None, **kwargs: str
+    ) -> Tuple[int, str]:
         """
         Run a Docker container.
 
         Args:
             image: Container image name
             *args: Additional arguments
+            stdin_data: Optional data to pass to stdin
             **kwargs: Volume mappings (volume_name -> container_path)
 
         Returns:
             Tuple of (exit_code, output)
         """
         cmd: List[str] = [self.engine, "run", "--rm"]
+
+        # Add stdin flag if data provided
+        if stdin_data:
+            cmd.append("-i")
 
         # Add volume mappings
         for host_path, container_path in kwargs.items():
@@ -180,7 +187,13 @@ class DockerCommand:
         cmd.extend(list(args))
 
         try:
-            result = subprocess.run(cmd, capture_output=False, text=True, check=False)
+            result = subprocess.run(
+                cmd,
+                capture_output=False,
+                text=True,
+                input=stdin_data,
+                check=False,
+            )
             return result.returncode, ""
         except Exception as e:
             Logger.error(f"Docker execution failed: {e}")
@@ -228,34 +241,36 @@ class ComplianceChecker:
         )
 
     def check_publiccode(self) -> CheckResult:
-        """Validate publiccode.yml."""
-        Logger.header("LINTER publiccode.yml (publiccode-parser-go)")
+        """Validate publiccode.yaml using publiccode-parser-go."""
+        Logger.header("LINTER publiccode.yaml (publiccode-parser-go)")
 
-        publiccode_path = self.config.project_root / "publiccode.yml"
+        publiccode_path = self.config.project_root / "publiccode.yaml"
 
         if not publiccode_path.exists():
             return CheckResult(
-                "publiccode.yml", CheckStatus.SKIP, "publiccode.yml not found"
+                "publiccode.yaml", CheckStatus.SKIP, "publiccode.yaml not found"
             )
 
         try:
             with open(publiccode_path, "r", encoding="utf-8") as f:
-                exit_code, _ = self.docker.run(
-                    "italia/publiccode-parser-go",
-                    "-no-network",
-                    "/dev/stdin",
-                    input=f.read(),
-                )
+                file_content = f.read()
+
+            exit_code, _ = self.docker.run(
+                "italia/publiccode-parser-go",
+                "-no-network",
+                "/dev/stdin",
+                stdin_data=file_content,
+            )
 
             return self._create_result(
-                "publiccode.yml",
+                "publiccode.yaml",
                 exit_code,
                 "Validation passed",
                 "Validation failed, see logs above",
             )
 
         except Exception as e:
-            return CheckResult("publiccode.yml", CheckStatus.FAIL, f"Error: {e}")
+            return CheckResult("publiccode.yaml", CheckStatus.FAIL, f"Error: {e}")
 
     def check_license(self) -> CheckResult:
         """Run REUSE license compliance check with automatic download."""
@@ -365,7 +380,7 @@ class ComplianceChecker:
         }
         return color_map.get(status, Logger.WHITE)
 
-    def _build_table_borders(self) -> dict:
+    def _build_table_borders(self) -> Dict[str, str]:
         """Build colored unicode box-drawing border characters (DRY)."""
         return {
             "h": Logger.colorize("─", Logger.CYAN),

@@ -1,0 +1,85 @@
+# SPDX-FileCopyrightText: Copyright (c) 2025 Broadsage <opensource@broadsage.com>
+#
+# SPDX-License-Identifier: Apache-2.0
+
+---
+publiccodeYmlVersion: "0"
+
+name: docker-scaffold
+applicationSuite: Community Health Files Framework
+
+# Primary project description
+description:
+  en:
+    shortDescription: >-
+      Template scaffold for standardized Docker projects with community health files
+      and compliance automation.
+    longDescription: >-
+      Docker Scaffold is a comprehensive template for releasing projects as Open Source.
+      It provides Community Health Files, compliance checklists, linting configurations,
+      and automation for code quality assurance.
+
+      The scaffold includes:
+      - Standardized directory structure for professional open source projects
+      - Community Health Files (README, CONTRIBUTING, CODE_OF_CONDUCT, etc.)
+      - Pre-configured linting and code quality tools (MegaLinter, Black, Flake8, Pylint)
+      - REUSE Software compliance automation
+      - Git workflow automation (Conform for commits)
+      - Docker containerization with multi-architecture support
+      - Ansible playbooks for infrastructure automation
+      - GitHub Actions CI/CD pipelines
+      - Comprehensive documentation and templates
+
+      Created to be generally usable and follows well-known conventions and de-facto
+      standards. However, it is intentionally opinionated - adjust contents to suit
+      your project needs.
+
+    features:
+      - Automated code quality checks
+      - REUSE license compliance verification
+      - Git commit message validation
+      - Docker multi-architecture support
+      - Community health file templates
+      - Ansible configuration management
+      - Python configuration with feature activation
+
+# Development status and roadmap
+developmentStatus: development
+releaseDate: "2025-06-27"
+softwareVersion: dev
+roadmap: "https://github.com/broadsage/docker-scaffold#roadmap"
+
+# Software and platform information
+softwareType: standalone/other
+categories:
+  - collaboration
+platforms:
+  - linux
+  - windows
+  - macos
+
+# Legal information
+legal:
+  license: Apache-2.0
+  mainCopyrightOwner: Broadsage
+
+# Organization information
+organisation:
+  name: Broadsage Corporation Limited
+  uri: "https://github.com/broadsage"
+
+# Localization
+localisation:
+  localisationReady: true
+  availableLanguages:
+    - en
+
+# Repository information
+url: "https://github.com/broadsage/docker-scaffold"
+
+# Maintenance information
+maintenance:
+  type: internal
+  contacts:
+    - name: Broadsage
+      email: opensource@broadsage.com
