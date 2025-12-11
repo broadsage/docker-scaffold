@@ -15,7 +15,7 @@ body:
     attributes:
       value: |
         ## Help us improve our documentation!
-        
+
         Good documentation is crucial for project success. Thank you for taking the time to report issues with our docs.
 
   - type: checkboxes
@@ -60,7 +60,7 @@ body:
         - URL: https://github.com/broadsage/docker-scaffold#usage
         - Ansible role: roles/repository/README.md
       value: |
-        - Location: 
+        - Location:
     validations:
       required: true
 
@@ -73,9 +73,9 @@ body:
       placeholder: |
         The documentation currently says:
         "Run the container with..."
-        
+
         OR
-        
+
         There is no documentation about how to...
       render: markdown
     validations:
@@ -105,16 +105,16 @@ body:
         Provide suggested text, examples, or outline what should be included.
       placeholder: |
         The documentation should explain...
-        
+
         Suggested text:
         ```markdown
         ## Installation
-        
+
         To install docker-scaffold:
         1. Pull the image: `docker pull ghcr.io/broadsage/docker-scaffold:latest`
         2. Run the container: `docker run ...`
         ```
-        
+
         Or should include:
         - Example of how to configure...
         - Step-by-step guide for...

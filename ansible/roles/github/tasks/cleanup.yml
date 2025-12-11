@@ -29,7 +29,7 @@
     path: /tmp/.github/PULL_REQUEST_TEMPLATE.md
     state: absent
   when: not github.pull_requests | bool
-  
+
 # Remove entire .github if nothing is left
 - name: Remove empty .github directory
   ansible.builtin.file:

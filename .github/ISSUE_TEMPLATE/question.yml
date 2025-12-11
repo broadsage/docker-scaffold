@@ -15,7 +15,7 @@ body:
     attributes:
       value: |
         ## Need help with docker-scaffold?
-        
+
         Before asking, please check:
         - 📖 [Documentation](https://github.com/broadsage/docker-scaffold/blob/main/README.md)
         - 💬 [Existing discussions](https://github.com/broadsage/docker-scaffold/discussions)
@@ -117,7 +117,7 @@ body:
         ```bash
         docker run ...
         ```
-        
+
         project.yml snippet:
         ```yaml
         ...

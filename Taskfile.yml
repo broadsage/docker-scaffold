@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 ---
-version: '3'
+version: "3"
 
 vars:
   PYTHON: python3
@@ -10,12 +10,26 @@ vars:
   PYTHON_VENV: "{{.VENV}}/bin/python3"
 
 tasks:
+  # Default Task - Show Help
   default:
     desc: Show available tasks
     cmds:
       - task -l
 
-  # Setup Targets
+  # Utility Tasks - System & Environment Checks
+  check-docker:
+    desc: Verify Docker is installed and available
+    cmds:
+      - |
+        if command -v docker >/dev/null 2>&1; then
+          echo "✓ Docker is available"
+          docker --version
+        else
+          echo "✗ Docker is NOT installed"
+          exit 1
+        fi
+
+  # Setup Tasks - Environment Initialization
   setup:
     desc: Create Python virtual environment and install dependencies
     status:
@@ -27,34 +41,15 @@ tasks:
         pip3 install --upgrade pip
         pip3 install -r requirements.txt
         echo "✓ Virtual environment created and dependencies installed"
+    aliases: [init]
 
-  setup-dev:
-    desc: Set up development environment
-    cmds:
-      - echo "Setting up development environment..."
-      - echo "Installing git hooks..."
-      - |
-        if [ -d ".git" ]; then
-          mkdir -p .git/hooks
-          cp scripts/git-hooks/* .git/hooks/ 2>/dev/null || true
-          chmod +x .git/hooks/* 2>/dev/null || true
-          echo "✓ Git hooks installed successfully"
-        else
-          echo "⚠ Not a git repository - skipping git hooks"
-        fi
-
-  check-compliance:
-    desc: Run all code quality & compliance checks
-    deps: [setup]
-    cmds:
-      - "{{.PYTHON_VENV}} scripts/compliance.py all"
-    aliases: [compliance]
-
+  # Quality Checks - Code Quality & Compliance
   check-lint:
     desc: Run linting checks (MegaLinter)
     deps: [setup]
     cmds:
       - "{{.PYTHON_VENV}} scripts/compliance.py lint"
+    aliases: [lint]
 
   check-publiccode:
     desc: Validate publiccode.yml configuration
@@ -69,35 +64,42 @@ tasks:
     deps: [setup]
     cmds:
       - "{{.PYTHON_VENV}} scripts/compliance.py license"
+    aliases: [license]
 
   check-commit:
     desc: Validate commit messages with Conform
     deps: [setup]
     cmds:
       - "{{.PYTHON_VENV}} scripts/compliance.py commit"
+    aliases: [commitlint]
 
-  check-docker:
-    desc: Verify Docker is installed and available
+  check-compliance:
+    desc: Run all code quality & compliance checks
+    deps: [check-lint, check-publiccode, check-license, check-commit]
     cmds:
-      - |
-        if command -v docker >/dev/null 2>&1; then
-          echo "✓ Docker is available"
-          docker --version
-        else
-          echo "✗ Docker is NOT installed"
-          exit 1
-        fi
+      - echo "✓ All compliance checks passed"
+    aliases: [compliance]
 
-  docker-build:
-    desc: Build Docker image
+  # Testing - Unit & Integration Tests
+  test:
+    desc: Run all unit tests
+    deps: [setup]
+    cmds:
+      - "{{.PYTHON_VENV}} scripts/test_merge_config.py"
+    aliases: [tests, test-all]
+
+  # Build Tasks - Docker Image Building
+  build-docker:
+    desc: Build Docker image (broadsage/docker-scaffold:latest)
     deps: [check-docker]
     cmds:
       - "docker build -t broadsage/docker-scaffold:latest ."
       - echo "✓ Docker image built successfully"
+    aliases: [build]
 
-  docker-run:
-    desc: Run docker-scaffold on this project
-    deps: [check-docker, docker-build]
+  build-and-test:
+    desc: Build Docker image and test on current project
+    deps: [build-docker]
     cmds:
       - |
         echo "Running docker-scaffold on current project..."
@@ -108,10 +110,11 @@ tasks:
           broadsage/docker-scaffold:latest
         echo "✓ Docker container executed successfully"
         echo "Review generated files in the current directory"
+    aliases: [docker-run, test-docker]
 
-  # Environment Cleanup 
-  cleanup:
-    desc: Remove Python virtual environment and clean up
+  # Cleanup Tasks - Environment Cleanup
+  clean:
+    desc: Remove Python virtual environment and cached files
     cmds:
       - |
         if [ -d "{{.VENV}}" ]; then
@@ -120,24 +123,29 @@ tasks:
         else
           echo "⚠ No virtual environment found to clean up"
         fi
+      - |
+        find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
+        find . -type f -name "*.pyc" -delete 2>/dev/null || true
+        echo "✓ Cached files cleaned"
+    aliases: [cleanup]
 
-  # Python Compliance Checks
-  test-python:
-    desc: Run Python unit tests
-    deps: [setup]
+  # Workflow Tasks - Complete Workflows
+  validate:
+    desc: Validate code quality (checks and tests only, no build)
+    deps: [setup, check-compliance, test]
     cmds:
-      - "cd scripts && ../{{.VENV}}/bin/python test_merge_config.py"
+      - echo "✓ All validation checks passed"
+    aliases: [verify]
 
-  check-python-deps:
-    desc: Verify required Python dependencies
-    deps: [setup]
+  pipeline:
+    desc: Complete CI pipeline (checks, tests, and docker build)
+    deps: [check-compliance, test, build-docker]
     cmds:
-      - "{{.PYTHON_VENV}} --version"
-      - echo "✓ Python dependencies verified"
+      - echo "✓ CI pipeline completed successfully"
+    aliases: [ci]
 
-  # Main Entry Points
   all:
-    desc: Run full setup and checks
-    deps: [setup, check-compliance, test-python]
+    desc: Complete setup and CI workflow (first-time setup + validation + build)
+    deps: [check-compliance, test, build-docker]
     cmds:
       - echo "✓ All tasks completed successfully"

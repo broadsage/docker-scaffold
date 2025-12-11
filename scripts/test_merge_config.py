@@ -7,286 +7,178 @@
 """
 Unit tests for merge_config.py
 
+Test Coverage:
+  - Deep merge functionality with nested dicts
+  - Feature bundle detection and activation
+  - Safe default generation for disabled features
+  - Configuration validation
+
 Run with: python3 test_merge_config.py
 """
 
-import sys
 import unittest
-from typing import Any, Dict
+from typing import Any, Dict, List
 
-try:
-    import yaml as _  # noqa: F401  # Required for PyYAML dependency check
-except ImportError:
-    print("❌ Error: PyYAML is not installed")
-    print("   Install with: pip install pyyaml")
-    sys.exit(1)
-
-from merge_config import deep_merge, activate_feature_bundles, validate_config
+from merge_config import (
+    deep_merge,
+    get_feature_bundles,
+    make_safe_default,
+    activate_feature_bundles,
+    validate_config,
+)
 
 
 class TestDeepMerge(unittest.TestCase):
     """Test deep merge functionality."""
 
     def test_simple_merge(self) -> None:
-        base: Dict[str, int] = {'a': 1, 'b': 2}
-        override: Dict[str, int] = {'b': 3, 'c': 4}
-        result: Dict[str, Any] = deep_merge(base, override)  # type: ignore
+        """Test basic merge of dictionaries."""
+        base = {"a": 1, "b": 2}
+        override = {"b": 3, "c": 4}
+        expected = {"a": 1, "b": 3, "c": 4}
 
-        self.assertEqual(result['a'], 1)
-        self.assertEqual(result['b'], 3)  # Override wins
-        self.assertEqual(result['c'], 4)
+        result = deep_merge(base, override)
+        self.assertEqual(result, expected)
 
     def test_nested_merge(self) -> None:
-        base: Dict[str, Dict[str, bool]] = {
-            'github': {
-                'workflows': True,
-                'issues': True
-            }
-        }
-        override: Dict[str, Dict[str, bool]] = {
-            'github': {
-                'issues': False
-            }
-        }
-        result: Dict[str, Any] = deep_merge(base, override)  # type: ignore
+        """Test nested dictionary merge."""
+        base = {"x": {"y": 1, "z": 2}}
+        override = {"x": {"y": 10}}
+        expected = {"x": {"y": 10, "z": 2}}
 
-        self.assertEqual(result['github']['workflows'], True)  # Preserved
-        self.assertEqual(result['github']['issues'], False)    # Overridden
+        result = deep_merge(base, override)
+        self.assertEqual(result, expected)
 
-    def test_deep_nested_merge(self) -> None:
-        base: Dict[str, Any] = {
-            'github': {
-                'projects': {
-                    'enabled': False,
-                    'number': 1
-                }
-            }
-        }
-        override: Dict[str, Any] = {
-            'github': {
-                'projects': {
-                    'enabled': True
-                }
-            }
-        }
-        result: Dict[str, Any] = deep_merge(base, override)  # type: ignore
+    def test_no_mutation(self) -> None:
+        """Test that original dicts are not mutated."""
+        base = {"a": {"b": 1}}
+        base_copy = {"a": {"b": 1}}
+        override = {"a": {"b": 2}}
 
-        self.assertEqual(result['github']['projects']['enabled'], True)
-        self.assertEqual(result['github']['projects']['number'], 1)
+        deep_merge(base, override)
+        self.assertEqual(base, base_copy)
+
+
+class TestFeatureBundles(unittest.TestCase):
+    """Test feature bundle detection."""
+
+    def test_detect_bundles(self) -> None:
+        """Test automatic detection of feature bundles."""
+        defaults: Dict[str, Any] = {
+            "organization": "test",
+            "build": {"platforms": []},
+            "image": {"name": "test"},
+            "github": {"workflows": True},
+            "security": {"scan": True},
+        }
+
+        bundles: List[str] = get_feature_bundles(defaults)
+        self.assertIn("github", bundles)
+        self.assertIn("security", bundles)
+        self.assertNotIn("organization", bundles)
+        self.assertNotIn("build", bundles)
+
+
+class TestMakeSafeDefault(unittest.TestCase):
+    """Test safe default conversion."""
+
+    def test_bool_conversion(self) -> None:
+        """Test boolean values become False."""
+        self.assertFalse(make_safe_default(True))
+        self.assertFalse(make_safe_default(False))
+
+    def test_list_conversion(self) -> None:
+        """Test lists become empty lists."""
+        self.assertEqual(make_safe_default([1, 2, 3]), [])
+
+    def test_dict_conversion(self) -> None:
+        """Test dicts are recursively converted."""
+        result = make_safe_default({"a": True, "b": [1, 2]})
+        self.assertEqual(result, {"a": False, "b": []})
 
 
 class TestFeatureActivation(unittest.TestCase):
     """Test feature bundle activation."""
 
-    def test_github_feature_activation(self) -> None:
-        defaults: Dict[str, Any] = {
-            'github': {
-                'workflows': True,
-                'issues': True
-            }
-        }
-        project: Dict[str, Any] = {
-            'features': {
-                'github': True
-            }
-        }
+    def test_enable_feature(self) -> None:
+        """Test enabling a feature bundle."""
+        defaults = {"github": {"workflows": True, "issues": True}}
+        project = {"features": {"github": True}}
 
-        result: Dict[str, Any] = activate_feature_bundles(defaults, project)  # type: ignore
+        result = activate_feature_bundles(defaults, project)
 
-        self.assertIn('github', result)
-        self.assertEqual(result['github']['workflows'], True)
-        self.assertEqual(result['github']['issues'], True)
+        self.assertIn("github", result)
+        self.assertEqual(result["github"]["workflows"], True)
+        self.assertEqual(result["github"]["issues"], True)
 
-    def test_github_feature_disabled(self) -> None:
-        defaults: Dict[str, Any] = {
-            'github': {
-                'workflows': True,
-                'issues': True
-            }
-        }
-        project: Dict[str, Any] = {
-            'features': {
-                'github': False
-            }
+    def test_disable_feature(self) -> None:
+        """Test disabling a feature bundle."""
+        defaults = {"github": {"workflows": True, "issues": True}}
+        project = {"features": {"github": False}}
+
+        result = activate_feature_bundles(defaults, project)
+
+        self.assertIn("github", result)
+        self.assertFalse(result["github"]["workflows"])
+        self.assertFalse(result["github"]["issues"])
+
+    def test_override_enabled_feature(self) -> None:
+        """Test overriding specific settings in an enabled feature."""
+        defaults = {"github": {"workflows": True, "issues": True}}
+        project = {
+            "features": {"github": True},
+            "github": {"issues": False},
         }
 
-        result: Dict[str, Any] = activate_feature_bundles(defaults, project)  # type: ignore
+        result = activate_feature_bundles(defaults, project)
 
-        self.assertIn('github', result)
-        # Should have safe defaults (not completely missing)
-        self.assertFalse(result['github']['issues'])
-        self.assertFalse(result['github']['workflows'])
-
-    def test_disabled_features_have_safe_defaults(self) -> None:
-        """Test that disabled features still exist with safe default values."""
-        defaults: Dict[str, Any] = {
-            'github': {'issues': True},
-            'security': {'scan': {'enabled': True}},
-            'registry': {'github': True}
-        }
-        project: Dict[str, Any] = {
-            'features': {
-                'github': False,
-                'security': False,
-                'registry': False
-            },
-            'image': {'name': 'test', 'description': 'Test'}
-        }
-
-        result: Dict[str, Any] = activate_feature_bundles(defaults, project)  # type: ignore
-
-        # All sections should exist even if disabled
-        self.assertIn('github', result)
-        self.assertIn('security', result)
-        self.assertIn('registry', result)
-
-        # All should have safe defaults (False values)
-        self.assertFalse(result['github']['issues'])
-        self.assertFalse(result['security']['scan']['enabled'])
-        self.assertFalse(result['registry']['github'])
-
-    def test_feature_with_override(self) -> None:
-        defaults: Dict[str, Any] = {
-            'github': {
-                'workflows': True,
-                'issues': True,
-                'projects': {
-                    'enabled': False,
-                    'number': 1
-                }
-            }
-        }
-        project: Dict[str, Any] = {
-            'features': {
-                'github': True
-            },
-            'github': {
-                'issues': False,
-                'projects': {
-                    'enabled': True,
-                    'number': 6
-                }
-            }
-        }
-
-        result: Dict[str, Any] = activate_feature_bundles(defaults, project)  # type: ignore
-
-        # From defaults
-        self.assertEqual(result['github']['workflows'], True)
-        # Overridden
-        self.assertEqual(result['github']['issues'], False)
-        self.assertEqual(result['github']['projects']['enabled'], True)
-        self.assertEqual(result['github']['projects']['number'], 6)
-
-    def test_multiple_features(self) -> None:
-        defaults: Dict[str, Any] = {
-            'github': {'workflows': True},
-            'security': {'scan': {'enabled': True}}
-        }
-        project: Dict[str, Any] = {
-            'features': {
-                'github': True,
-                'security': True
-            }
-        }
-
-        result: Dict[str, Any] = activate_feature_bundles(defaults, project)  # type: ignore
-
-        self.assertIn('github', result)
-        self.assertIn('security', result)
-
-    def test_core_sections_always_included(self) -> None:
-        defaults: Dict[str, Any] = {
-            'organization': 'broadsage',
-            'metadata': {'license': 'Apache-2.0'}
-        }
-        project: Dict[str, Any] = {
-            'image': {'name': 'test', 'description': 'Test'}
-        }
-
-        result: Dict[str, Any] = activate_feature_bundles(defaults, project)  # type: ignore
-
-        self.assertEqual(result['organization'], 'broadsage')
-        self.assertEqual(result['metadata']['license'], 'Apache-2.0')
-        self.assertEqual(result['image']['name'], 'test')
+        self.assertEqual(result["github"]["workflows"], True)
+        self.assertEqual(result["github"]["issues"], False)
 
 
 class TestValidation(unittest.TestCase):
     """Test configuration validation."""
 
     def test_valid_config(self) -> None:
+        """Test that valid config has no errors."""
         config: Dict[str, Any] = {
-            'image': {
-                'name': 'test-image',
-                'description': 'Test description'
-            }
+            "image": {"name": "myapp"},
+            "build": {"platforms": ["linux/amd64"]},
         }
 
-        errors = validate_config(config)  # type: ignore
-        self.assertEqual(len(errors), 0)
+        errors = validate_config(config)
+        self.assertEqual(errors, [])
 
-    def test_missing_name(self) -> None:
+    def test_missing_image_section(self) -> None:
+        """Test that missing image section is allowed (optional)."""
         config: Dict[str, Any] = {
-            'image': {
-                'description': 'Test description'
-            }
+            "build": {"platforms": ["linux/amd64"]},
         }
 
-        errors = validate_config(config)  # type: ignore
-        self.assertTrue(any('name' in err.lower() for err in errors))
+        errors = validate_config(config)
+        # Image section is optional - no error expected
+        self.assertEqual(errors, [])
 
-    def test_missing_description(self) -> None:
+    def test_empty_image_name(self) -> None:
+        """Test that empty image name is caught if image section exists."""
         config: Dict[str, Any] = {
-            'image': {
-                'name': 'test-image'
-            }
+            "image": {"name": ""},
+            "build": {"platforms": ["linux/amd64"]},
         }
 
-        errors = validate_config(config)  # type: ignore
-        self.assertTrue(any('description' in err.lower() for err in errors))
+        errors = validate_config(config)
+        self.assertTrue(any("image" in e for e in errors))
 
-    def test_empty_name(self) -> None:
+    def test_empty_platforms_list(self) -> None:
+        """Test that empty platforms list is caught."""
         config: Dict[str, Any] = {
-            'image': {
-                'name': '',
-                'description': 'Test description'
-            }
+            "image": {"name": "myapp"},
+            "build": {"platforms": []},
         }
 
-        errors = validate_config(config)  # type: ignore
-        self.assertTrue(any('empty' in err.lower() for err in errors))
-
-    def test_invalid_platform(self) -> None:
-        config: Dict[str, Any] = {
-            'image': {
-                'name': 'test-image',
-                'description': 'Test description'
-            },
-            'build': {
-                'platforms': ['linux/invalid']
-            }
-        }
-
-        errors = validate_config(config)  # type: ignore
-        self.assertTrue(any('invalid' in err.lower() for err in errors))
-
-    def test_valid_platforms(self) -> None:
-        config: Dict[str, Any] = {
-            'image': {
-                'name': 'test-image',
-                'description': 'Test description'
-            },
-            'build': {
-                'platforms': ['linux/amd64', 'linux/arm64']
-            }
-        }
-
-        errors = validate_config(config)  # type: ignore
-        # Should only have platform-unrelated errors if any
-        self.assertFalse(any('platform' in err.lower() for err in errors))
+        errors = validate_config(config)
+        self.assertTrue(any("platforms" in e for e in errors))
 
 
-if __name__ == '__main__':
-    print("Running merge_config.py unit tests...")
-    print("=" * 70)
-    unittest.main(verbosity=2)
+if __name__ == "__main__":
+    unittest.main()

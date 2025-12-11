@@ -12,7 +12,7 @@
     state: directory
     owner: "abc"
     group: "abc"
-    mode: '0755'
+    mode: "0755"
   when: github.issues | bool
   loop:
     - .github/ISSUE_TEMPLATE
@@ -23,7 +23,7 @@
     state: directory
     owner: "abc"
     group: "abc"
-    mode: '0755'
+    mode: "0755"
   when: github.workflows | bool
   loop:
     - .github/workflows
@@ -34,7 +34,7 @@
     dest: "/tmp/.github/ISSUE_TEMPLATE/{{ item }}"
     owner: "abc"
     group: "abc"
-    mode: '0644'
+    mode: "0644"
   when: github.issues | bool
   loop:
     - config.yml
@@ -49,7 +49,7 @@
     state: directory
     owner: "abc"
     group: "abc"
-    mode: '0755'
+    mode: "0755"
   when: github.discussions | bool
   loop:
     - .github/DISCUSSION_TEMPLATE
@@ -60,7 +60,7 @@
     dest: "/tmp/.github/DISCUSSION_TEMPLATE/{{ item }}"
     owner: "abc"
     group: "abc"
-    mode: '0644'
+    mode: "0644"
   when: github.discussions | bool
   loop:
     - ideas.yml
@@ -75,7 +75,7 @@
     dest: "/tmp/.github/{{ item }}"
     owner: "abc"
     group: "abc"
-    mode: '0644'
+    mode: "0644"
   when: github.pull_requests | bool
   loop:
     - PULL_REQUEST_TEMPLATE.md

@@ -7,8 +7,10 @@
 set -euo pipefail
 
 # Run ansible playbook in interactive mode, otherwise just log completion
-if [[ -z "${CI_RUN:-}" ]]; then
-    exec ansible-playbook generate.yaml "$@"
+CI_RUN="${CI_RUN:-}"
+
+if [[ -z "$CI_RUN" ]]; then
+  exec ansible-playbook generate.yaml "$@"
 else
-    echo '[broadsage-init] done.'
+  echo '[broadsage-init] done.'
 fi

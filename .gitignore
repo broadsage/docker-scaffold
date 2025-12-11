@@ -91,6 +91,7 @@ db.sqlite3-journal
 
 # Generated files
 merged_config.yaml
+megalinter-reports
 /tmp/
 
 # Environment variables
@@ -99,3 +100,4 @@ merged_config.yaml
 
 # Project specific
 /ansible/vars/merged_config.yaml
+.ruff_cache/

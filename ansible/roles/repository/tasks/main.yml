@@ -10,7 +10,7 @@
     dest: "/tmp/{{ item }}"
     owner: "abc"
     group: "abc"
-    mode: '0644'
+    mode: "0644"
   loop:
     - .gitignore
     - requirements.txt

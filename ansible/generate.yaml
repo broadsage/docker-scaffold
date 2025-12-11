@@ -6,7 +6,7 @@
   hosts: localhost
   connection: local
   gather_facts: false
-  
+
   vars:
     scaffold_user: abc
     scaffold_group: abc
@@ -19,13 +19,13 @@
         chdir: /app
       changed_when: false
       register: merge_result
-    
+
     - name: Display merge output
       tags: always
       ansible.builtin.debug:
         var: merge_result.stdout_lines
       when: merge_result.stdout_lines is defined
-    
+
     - name: Load merged configuration
       tags: always
       ansible.builtin.include_vars:
@@ -34,7 +34,7 @@
     - name: Set user ID from environment
       tags: always
       changed_when: false
-      when: 
+      when:
         - lookup('env', 'PUID') | length > 0
       ansible.builtin.user:
         name: "{{ scaffold_user }}"
@@ -53,9 +53,9 @@
 
   roles:
     - role: github
-      tags: 
+      tags:
         - github
-        
+
     - role: repository
       tags:
         - repository

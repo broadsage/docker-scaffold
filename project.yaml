@@ -33,14 +33,14 @@ template:
 
 # Override Features (uncomment to change from defaults)
 features:
-  github: true             # Generate GitHub Actions workflow & Issue Templates
-  security: true           # Enable vulnerability scanning
-  registry: true           # Push Docker Images to registries
+  github: true # Generate GitHub Actions workflow & Issue Templates
+  security: true # Enable vulnerability scanning
+  registry: true # Push Docker Images to registries
 
 # Override Build Settings (uncomment if needed)
 build:
   platforms:
-    - linux/amd64          # Single platform build
+    - linux/amd64 # Single platform build
   dockerfile: Dockerfile.custom
 
 # Override GitHub Settings (uncomment if needed)

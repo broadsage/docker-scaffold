@@ -6,7 +6,7 @@
 
 FROM alpine:3.22
 
-LABEL org.opencontainers.image.authors="Broadsage Opensource <opensource@broadsage.com>" \
+LABEL org.opencontainers.image.authors="Broadsage <opensource@broadsage.com>" \
       org.opencontainers.image.url="https://github.com/broadsage/docker-scaffold" \
       org.opencontainers.image.source="https://github.com/broadsage/docker-scaffold" \
       org.opencontainers.image.vendor="Broadsage Corporation Limited" \
@@ -17,7 +17,7 @@ LABEL org.opencontainers.image.authors="Broadsage Opensource <opensource@broadsa
 RUN \
   echo "**** Install packages ****" && \
   YQ_VERSION=v4.45.1 && \
-  wget -q https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64 -O /usr/bin/yq && \
+  wget -q https://github.com/mikefarah/yq/releases/download/"${YQ_VERSION}"/yq_linux_amd64 -O /usr/bin/yq && \
   chmod +x /usr/bin/yq && \
   apk add --no-cache --upgrade \
     ansible \

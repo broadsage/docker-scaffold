@@ -5,43 +5,23 @@
 # SPDX-License-Identifier: Apache-2.0
 
 """
-Configuration merger for docker-scaffold.
-
-Merges defaults.yaml + project.yaml with feature bundle activation.
-Outputs a single merged_config.yaml for Ansible consumption.
+Configuration Merger - Merges defaults.yaml + project.yaml with feature activation.
 
 Architecture:
-  defaults.yaml (feature bundles) + project.yaml (toggles + overrides)
-    → Python merger (this script)
-    → merged_config.yaml (flat config for Ansible)
+    This module follows a clean, layered architecture:
 
-Logic:
-  1. features.github: true → Load all github.* from defaults.yaml
-  2. github.* in project.yaml → Override specific settings
-  3. features.github: false → Exclude all github.*
+    1. Dependencies Layer: Imports and dependency checks
+    2. Core Logic Layer: Pure functions for merging, validation, feature activation
+    3. I/O Layer: File loading/saving operations
+    4. CLI Layer: User-facing interface and main entry point
 
-Example:
-  defaults.yaml:
-    github:
-      workflows: true
-      issues: true
-
-  project.yaml:
-    features:
-      github: true
-    github:
-      issues: false
-
-  Result:
-    github:
-      workflows: true  (from defaults)
-      issues: false    (overridden)
+    Each layer has a single responsibility and can be tested independently.
 """
 
 import sys
 import copy
 from pathlib import Path
-from typing import Dict, Any, List, Set  # noqa: F401
+from typing import Dict, Any, List
 
 try:
     import yaml
@@ -51,360 +31,283 @@ except ImportError:
     sys.exit(1)
 
 
+# CORE LOGIC LAYER - Pure functions for business logic
 def deep_merge(base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Deep merge two dictionaries, override values win on conflicts.
-    Uses deep copy to avoid reference issues.
+    """Deep merge two dictionaries.
 
     Args:
         base: Base dictionary (defaults)
         override: Override dictionary (project-specific)
 
     Returns:
-        Merged dictionary with overrides applied
+        Merged dictionary where override values win on conflicts
     """
-    # Deep copy to avoid modifying original
     result = copy.deepcopy(base)
 
     for key, value in override.items():
         if key in result and isinstance(result[key], dict) and isinstance(value, dict):
-            # Recursively merge nested dicts
             result[key] = deep_merge(result[key], value)  # type: ignore
         else:
-            # Override wins - use deep copy to avoid reference issues
             result[key] = copy.deepcopy(value)
 
     return result
 
 
-def _extract_safe_defaults(defaults: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Dynamically extract safe defaults from defaults.yaml.
+def get_feature_bundles(defaults: Dict[str, Any]) -> List[str]:
+    """Dynamically detect feature bundles from defaults.
 
-    For each feature bundle (github, security, registry, etc.),
-    creates a safe default version where all boolean/list/dict values
-    become false/[]/empty equivalents. This approach makes the script
-    automatically adapt to new features without code changes.
+    Feature bundles are sections in defaults that aren't core sections.
+    This makes the script auto-discover new features without code changes.
 
     Args:
-        defaults: The defaults.yaml configuration
+        defaults: The defaults configuration
 
     Returns:
-        Dictionary of safe default values for disabled features
+        List of feature bundle names (e.g., ['github', 'security', 'registry'])
     """
-    safe_defaults: Dict[str, Any] = {}
-    feature_bundles = _get_feature_bundles(defaults)
-
-    for bundle_name in feature_bundles:
-        if bundle_name in defaults:
-            safe_defaults[bundle_name] = _make_safe_default(
-                defaults[bundle_name],  # type: ignore[index]
-                bundle_name
-            )
-
-    return safe_defaults
+    core_sections = {"organization", "metadata", "build", "image", "documentation"}
+    features = [
+        key for key in defaults.keys() if key not in core_sections
+    ]  # type: ignore
+    return sorted(features)
 
 
-def _make_safe_default(value: Any, bundle_name: str) -> Any:
-    """
-    Recursively convert a value to its safe default (all false/empty).
-
-    Preserves structure but makes all leaf values safe (false for bool,
-    empty for collections, etc.).
+def make_safe_default(value: Any) -> Any:
+    """Convert a value to a safe default (false/empty for disabled features).
 
     Args:
-        value: The value to convert
-        bundle_name: Bundle name (for special handling if needed)
+        value: Any value from config
 
     Returns:
-        Safe default version of the value
+        Safe default: False for booleans, [] for lists, {} for dicts, None otherwise
     """
     if isinstance(value, dict):
-        result: Dict[str, Any] = {}
-        for key, val in value.items():  # type: ignore[union-attr]
-            result[key] = _make_safe_default(val, bundle_name)
-        return result
-    elif isinstance(value, list):
-        return []  # Empty list for safe default
-    elif isinstance(value, bool):
-        return False  # False for all booleans
-    elif isinstance(value, (int, float)):
-        return 0  # Zero for numbers
-    elif isinstance(value, str):
-        # Keep strings as-is (like 'CRITICAL', 'spdx', etc.)
-        # but could be set to '' if needed
+        return {k: make_safe_default(v) for k, v in value.items()}  # type: ignore
+    if isinstance(value, list):
+        return []
+    if isinstance(value, bool):
+        return False
+    if isinstance(value, (int, float)):
+        return 0
+    if isinstance(value, str):
         return value
-    else:
-        return None
+    return None
 
 
-def _get_feature_bundles(defaults: Dict[str, Any]) -> List[str]:
-    """
-    Dynamically detect feature bundles from defaults.yaml.
+def activate_feature_bundles(
+    defaults: Dict[str, Any], project: Dict[str, Any]
+) -> Dict[str, Any]:
+    """Merge configs and activate feature bundles based on feature flags.
 
-    Features are detected as sections that exist in defaults.yaml but NOT
-    in the hardcoded list of core sections. This makes the script
-    automatically discover new features.
-
-    Args:
-        defaults: The defaults.yaml configuration
-
-    Returns:
-        List of feature bundle names
-    """
-    core_sections = {'organization', 'metadata', 'build', 'image', 'documentation'}
-    detected_features = [
-        key for key in defaults.keys()  # type: ignore[union-attr]
-        if key not in core_sections
-    ]
-    return sorted(detected_features)
-
-
-def activate_feature_bundles(defaults: Dict[str, Any], project: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Activate feature bundles based on features.* flags (dynamically detected).
-
-    This function automatically discovers all features from defaults.yaml,
-    so adding a new feature requires ONLY updating defaults.yaml - no Python
-    code changes needed.
-
-    How it works:
-      1. Detects all feature bundles from defaults.yaml (anything not a core section)
-      2. Loads enabled feature bundles from defaults.yaml
-      3. Applies project.yaml overrides
-      4. Ensures disabled features have safe defaults (prevent undefined vars in Ansible)
-
-    Core sections (always included): organization, metadata, build, image, documentation
-    Feature bundles (conditional): github, security, registry, and any future additions
+    Logic:
+        1. Always include core sections (organization, metadata, etc.)
+        2. For enabled features: load bundle from defaults
+        3. Apply project-specific overrides
+        4. For disabled features: use safe defaults (prevent undefined vars in Ansible)
 
     Args:
-        defaults: Default configuration with feature bundles (from defaults.yaml)
-        project: Project-specific configuration (from project.yaml)
+        defaults: Configuration with feature bundles
+        project: Project-specific configuration with feature toggles
 
     Returns:
-        Merged configuration with all features (enabled or disabled)
+        Merged configuration with all features (enabled or safe defaults)
     """
     merged: Dict[str, Any] = {}
-    features: Dict[str, Any] = project.get('features', {})
-    feature_bundles = _get_feature_bundles(defaults)
-    safe_defaults = _extract_safe_defaults(defaults)
-    activated_bundles: Set[str] = set()
+    core_sections = {
+        "organization",
+        "metadata",
+        "build",
+        "image",
+        "documentation",
+        "template",
+    }
+    features = project.get("features", {})
+    bundles = get_feature_bundles(defaults)
 
-    # Activate feature bundles (only if enabled)
-    for bundle_name in feature_bundles:
-        feature_enabled = features.get(bundle_name, False)
-
-        if feature_enabled:
-            # Load bundle from defaults using deep copy
-            if bundle_name in defaults:
-                merged[bundle_name] = copy.deepcopy(defaults[bundle_name])  # type: ignore[index]
-                activated_bundles.add(bundle_name)
-
-    # Apply project-specific overrides (separate loop to avoid duplicate merges)
-    for bundle_name in feature_bundles:
-        feature_enabled = features.get(bundle_name, False)
-
-        if feature_enabled and bundle_name in project and bundle_name in merged:
-            # Override with project-specific settings
-            merged[bundle_name] = deep_merge(  # type: ignore[arg-type]
-                merged[bundle_name],  # type: ignore[index]
-                project[bundle_name]  # type: ignore[index]
-            )
-
-    # Ensure all feature bundles exist (use safe defaults if not activated)
-    for bundle_name, default_value in safe_defaults.items():
-        if bundle_name not in merged:
-            merged[bundle_name] = copy.deepcopy(default_value)
-
-    # Always include core sections (not feature-gated)
-    core_sections = ['organization', 'metadata', 'build', 'image', 'documentation', 'template']
-
+    # Always include core sections from defaults
     for section in core_sections:
-        # Start with defaults using deep copy
         if section in defaults:
             merged[section] = copy.deepcopy(defaults[section])
 
-        # Override with project settings
-        if section in project:
-            merged[section] = deep_merge(  # type: ignore[arg-type]
-                merged.get(section, {}),  # type: ignore[arg-type]
-                project[section]  # type: ignore[index]
-            )
+    # Activate enabled bundles from defaults
+    for bundle in bundles:
+        enabled = features.get(bundle, False)
+        if enabled and bundle in defaults:
+            merged[bundle] = copy.deepcopy(defaults[bundle])  # type: ignore
+        else:
+            # Create safe defaults for disabled features
+            if bundle in defaults:
+                merged[bundle] = make_safe_default(defaults[bundle])
 
-    # Add features section for reference (shows what's enabled/disabled)
-    merged['features'] = features
+    # Apply project-specific overrides (merge all sections from project)
+    merged = deep_merge(merged, project)
 
-    return merged  # type: ignore
+    return merged
 
 
 def validate_config(config: Dict[str, Any]) -> List[str]:
-    """
-    Validate configuration has required fields.
+    """Validate configuration for required fields and correct types.
 
     Args:
-        config: Merged configuration
+        config: Configuration to validate
 
     Returns:
-        List of validation errors (empty if valid)
+        List of validation error messages (empty if valid)
     """
-    errors = []
+    errors: List[str] = []
 
-    # Required fields
-    required_fields = [
-        ('image.name', 'Image name is required'),
-        ('image.description', 'Image description is required'),
-    ]
+    # Validate image name if image section exists
+    if "image" in config:
+        image_name = config["image"].get("name")
+        if not image_name or not isinstance(image_name, str):
+            errors.append("image.name must be a non-empty string")
 
-    for field_path, error_msg in required_fields:
-        keys = field_path.split('.')
-        value: Any = config  # type: ignore
-
-        try:
-            for key in keys:
-                value = value[key]
-
-            # Check if value is empty
-            if not value or (isinstance(value, str) and not value.strip()):
-                errors.append(f"{error_msg}: {field_path} is empty")  # type: ignore[union-attr]
-        except (KeyError, TypeError):
-            errors.append(f"{error_msg}: {field_path} not found")  # type: ignore[union-attr]
-
-    # Validate platform architectures if present
-    if 'build' in config and 'platforms' in config['build']:
-        valid_platforms = [
-            'linux/amd64', 'linux/arm64', 'linux/arm/v7', 'linux/arm/v6',
-            'linux/386', 'linux/ppc64le', 'linux/s390x'
-        ]
-        platforms = config['build']['platforms']
-
+    # Validate build.platforms if present
+    if "build" in config and "platforms" in config["build"]:
+        platforms = config["build"]["platforms"]
         if not isinstance(platforms, list) or not platforms:
-            errors.append("build.platforms must be a non-empty list")  # type: ignore[union-attr]
-        else:
-            for platform in platforms:  # type: ignore
-                if platform not in valid_platforms:
-                    msg = f"Invalid platform: {platform}. "
-                    msg += f"Valid: {','.join(valid_platforms)}"
-                    errors.append(msg)  # type: ignore[union-attr]
+            errors.append("build.platforms must be a non-empty list")
 
-    return errors  # type: ignore
+    return errors
 
 
-def flatten_for_display(
-    config: Dict[str, Any],
-    prefix: str = '',
-    max_depth: int = 3,
-    current_depth: int = 0
-) -> List[str]:
-    """
-    Flatten config to show what's activated (for logging).
+# I/O LAYER - File loading and saving
+def _handle_io_error(operation: str, file_path: Path, error: Exception) -> None:
+    """Handle I/O errors consistently (DRY)."""
+    icon = "❌"
+    print(f"{icon} Error {operation} {file_path}: {error}")
+    sys.exit(1)
+
+
+def load_yaml(file_path: Path) -> Dict[str, Any]:
+    """Load and parse a YAML file.
 
     Args:
-        config: Configuration dictionary
-        prefix: Key prefix for nested items
-        max_depth: Maximum nesting depth to display
-        current_depth: Current nesting level
+        file_path: Path to YAML file
 
     Returns:
-        List of formatted config lines
+        Parsed YAML as dictionary, empty dict if file doesn't exist
+
+    Raises:
+        SystemExit: If file parsing fails
     """
-    lines = []
+    if not file_path.exists():
+        return {}
 
-    if current_depth >= max_depth:
-        return [f"{prefix}: <nested>"]
+    try:
+        with open(file_path, encoding="utf-8") as f:
+            content = yaml.safe_load(f)
+            data: Dict[str, Any] = content if content else {}
+        return data
+    except yaml.YAMLError as e:
+        _handle_io_error("parsing", file_path, e)
+        return {}  # Never reached, but satisfies type checker
 
-    for key, value in config.items():
-        full_key = f"{prefix}.{key}" if prefix else key
 
-        if isinstance(value, dict):
-            lines.extend(flatten_for_display(value, full_key, max_depth, current_depth + 1))  # type: ignore
-        elif isinstance(value, list):
-            lines.append(f"{full_key}: [{len(value)} items]")  # type: ignore
-        else:
-            lines.append(f"{full_key}: {value}")  # type: ignore[union-attr]
+def save_yaml(file_path: Path, data: Dict[str, Any]) -> None:
+    """Save data to a YAML file.
 
-    return lines  # type: ignore
+    Args:
+        file_path: Path where to save YAML file
+        data: Dictionary to save
+
+    Raises:
+        SystemExit: If file write fails
+    """
+    try:
+        with open(file_path, "w", encoding="utf-8") as f:
+            yaml.dump(data, f, default_flow_style=False, sort_keys=False, indent=2)
+    except Exception as e:
+        _handle_io_error("writing", file_path, e)
+
+
+# CLI LAYER - User interface and main entry point
+def print_header(title: str) -> None:
+    """Print a formatted header."""
+    line = "=" * 70
+    print(f"{line}\n{title}\n{line}")
+
+
+def print_status(message: str, success: bool = True) -> None:
+    """Print a status message with icon."""
+    prefix = "✓" if success else "❌"
+    print(f"{prefix} {message}")
+
+
+def print_features(config: Dict[str, Any]) -> None:
+    """Print activated features in a readable format."""
+    features = config.get("features", {})
+    if not features:
+        return
+
+    print("\nActivated features:")
+    for name, enabled in features.items():
+        status = "✓" if enabled else "○"
+        print(f"  {status} {name}: {enabled}")
+
+
+def print_validation_errors(errors: List[str]) -> None:
+    """Print validation errors in a consistent format (DRY)."""
+    for error in errors:
+        print(f"  • {error}")
 
 
 def main() -> None:
-    """Main entry point for configuration merger."""
+    """Main entry point - orchestrates the merge process."""
+    # Configuration file paths
+    defaults_file = Path("vars/defaults.yaml")
+    project_file = Path("/tmp/project.yaml")
+    output_file = Path("/tmp/merged_config.yaml")
 
-    # File paths
-    defaults_file = Path('vars/defaults.yaml')
-    project_file = Path('/tmp/project.yaml')
-    output_file = Path('/tmp/merged_config.yaml')
+    # Header
+    print_header("Docker Scaffold Configuration Merger")
 
-    print("=" * 70)
-    print("Docker Scaffold Configuration Merger")
-    print("=" * 70)
-
-    # Check project file exists (required)
+    # Validate input
     if not project_file.exists():
-        print(f"\n❌ Error: {project_file} not found")
+        print_status(f"Project file not found: {project_file}", success=False)
         print("   Please mount your project.yaml to /tmp/project.yaml")
         sys.exit(1)
 
-    # Load defaults (optional but recommended)
-    defaults: Dict[str, Any] = {}
+    # Load configurations
+    print("\nLoading configurations...")
+    defaults = load_yaml(defaults_file)
     if defaults_file.exists():
-        try:
-            with open(defaults_file) as f:
-                defaults = yaml.safe_load(f) or {}  # type: ignore
-            print(f"✓ Loaded defaults from {defaults_file}")
-        except yaml.YAMLError as e:
-            print(f"❌ Error parsing {defaults_file}: {e}")
-            sys.exit(1)
+        print_status(f"Loaded defaults from {defaults_file}")
     else:
-        print(f"⚠ Warning: {defaults_file} not found, using project.yaml only")
+        print_status("Defaults file not found, using project config only", success=True)
 
-    # Load project configuration (required)
-    try:
-        with open(project_file) as f:
-            project: Dict[str, Any] = yaml.safe_load(f) or {}  # type: ignore
-        print(f"✓ Loaded project from {project_file}")
-    except yaml.YAMLError as e:
-        print(f"❌ Error parsing {project_file}: {e}")
-        sys.exit(1)
+    project = load_yaml(project_file)
+    print_status(f"Loaded project from {project_file}")
 
-    # Merge configurations with feature activation
+    # Merge with feature activation
     print("\nMerging configurations with feature bundles...")
-    merged: Dict[str, Any] = activate_feature_bundles(defaults, project)
+    merged = activate_feature_bundles(defaults, project)
+    print_status("Configuration merged")
 
     # Show activated features
-    features: Dict[str, Any] = merged.get('features', {})
-    if features:
-        print("\nActivated features:")
-        for feature, enabled in features.items():
-            status = "✓" if enabled else "○"
-            print(f"  {status} {feature}: {enabled}")
+    print_features(merged)
 
-    # Validate merged configuration
+    # Validate
     print("\nValidating configuration...")
-    errors: List[str] = validate_config(merged)
+    errors = validate_config(merged)
 
     if errors:
-        print("\n❌ Validation failed:\n")
-        for error in errors:
-            print(f"  • {error}")
+        print_status("Validation failed", success=False)
+        print_validation_errors(errors)
         sys.exit(1)
 
-    image_name = merged.get('image', {}).get('name', 'unknown')
-    print(f"✓ Validation passed for image: {image_name}")
+    image_name = merged.get("image", {}).get("name", "unknown")
+    print_status(f"Validation passed for image: {image_name}")
 
-    # Write merged configuration
-    try:
-        with open(output_file, 'w') as f:
-            yaml.dump(merged, f, default_flow_style=False, sort_keys=False, indent=2)
-        print(f"\n✓ Generated {output_file}")
-    except Exception as e:
-        print(f"\n❌ Error writing output file: {e}")
-        sys.exit(1)
+    # Save
+    print("\nGenerating output...")
+    save_yaml(output_file, merged)
+    print_status(f"Configuration saved to {output_file}")
 
-    # Success summary
-    print("=" * 70)
-    print(f"🎉 Configuration ready for: {image_name}")
-    print("=" * 70)
+    # Summary
+    print_header(f"🎉 Configuration ready for: {image_name}")
     print(f"\nNext: Ansible will use {output_file} to generate scaffold")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

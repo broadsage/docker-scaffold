@@ -9,7 +9,7 @@ on:
     branches:
       - main
     tags:
-      - 'v*'
+      - "v*"
   pull_request:
     branches:
       - main
@@ -32,7 +32,7 @@ jobs:
           - runner: ubuntu-24.04-arm
             platform: linux/arm64
             arch: arm64
-    
+
     permissions:
       contents: read
       packages: write
@@ -98,7 +98,7 @@ jobs:
     name: Create Multi-Arch Manifest
     runs-on: ubuntu-24.04
     needs: build
-    
+
     permissions:
       contents: read
       packages: write
@@ -142,8 +142,14 @@ jobs:
       - name: Create manifest list and push
         working-directory: /tmp/digests
         run: |
-          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(printf '${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@sha256:%s ' *)
+          set -e
+          tags=$(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON")
+          digests=""
+          for file in *; do
+            digests="${digests} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@sha256:${file#sha256:}"
+          done
+          # shellcheck disable=SC2086
+          docker buildx imagetools create ${tags} ${digests}
 
       - name: Inspect image
         run: |

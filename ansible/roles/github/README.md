@@ -245,7 +245,7 @@ MIT-0
 
 **Created by:** Broadsage  
 **Project:** docker-scaffold  
-**Repository:** https://github.com/broadsage/docker-scaffold
+**Repository:** <https://github.com/broadsage/docker-scaffold>
 
 ## Contributing
 

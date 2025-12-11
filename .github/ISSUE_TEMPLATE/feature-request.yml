@@ -15,7 +15,7 @@ body:
     attributes:
       value: |
         ## Thanks for suggesting a new feature!
-        
+
         We appreciate your ideas to improve docker-scaffold. Please provide as much detail as possible to help us understand and evaluate your proposal.
 
   - type: checkboxes
@@ -54,7 +54,7 @@ body:
       placeholder: |
         I would like docker-scaffold to...
         The scaffold should be able to...
-        
+
         For example:
         - Add a new Ansible role that...
         - Support for configuration option...
@@ -85,7 +85,7 @@ body:
         Use the format: "As a [type of user], I want [feature] so that [benefit]"
       placeholder: |
         As a DevOps engineer, I want to automatically generate CI/CD pipelines so that I can quickly deploy my Docker images.
-        
+
         As a developer working on multiple projects, I want to save scaffold templates so that I can reuse configurations.
     validations:
       required: true
@@ -127,7 +127,7 @@ body:
       label: Additional Context
       description: |
         Add any other context, screenshots, mockups, or examples about the feature request here.
-        
+
         Examples:
         - Screenshots or mockups of desired behavior
         - Links to similar features in other projects
