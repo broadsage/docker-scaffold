@@ -68,7 +68,7 @@ legal:
 
 # Organization information (v0.5.0)
 organisation:
-  name: Broadsage Corporation Limited
+  name: Broadsage
   uri: "https://github.com/broadsage"
 
 # Localization and internationalization
@@ -98,7 +98,7 @@ intendedAudience:
   scope:
     - government
   countries:
-    - IN
     - US
-    - UK
+    - IT
+    - DE
   unsupportedCountries: []
