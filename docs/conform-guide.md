@@ -64,14 +64,6 @@ All commits must follow the [Conventional Commits](https://www.conventionalcommi
 - `style` - Code style changes (formatting, semicolons)
 - `test` - Test additions or modifications
 
-#### Allowed Scopes
-
-- `ansible` - Ansible playbooks and roles
-- `docker` - Docker and container configuration
-- `github` - GitHub templates and workflows
-- `scripts` - Python and shell scripts
-- `docs` - Documentation
-
 ### 5. **Commit Body**
 
 - **Required**: Yes
