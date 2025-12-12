@@ -17,7 +17,7 @@ tasks:
       - task -l
 
   # Utility Tasks - System & Environment Checks
-  check-docker:
+  docker:
     desc: Verify Docker is installed and available
     cmds:
       - |
@@ -28,6 +28,7 @@ tasks:
           echo "✗ Docker is NOT installed"
           exit 1
         fi
+    aliases: [verify-docker-installation]
 
   # Setup Tasks - Environment Initialization
   setup:
@@ -44,41 +45,37 @@ tasks:
     aliases: [init]
 
   # Quality Checks - Code Quality & Compliance
-  check-lint:
+  lint:
     desc: Run linting checks (MegaLinter)
     deps: [setup]
     cmds:
       - "{{.PYTHON_VENV}} scripts/compliance.py lint"
-    aliases: [lint]
 
-  check-publiccode:
+  publiccode:
     desc: Validate publiccode.yml configuration
     deps: [setup]
     cmds:
       - "{{.PYTHON_VENV}} scripts/compliance.py publiccodelint"
 
-  check-license:
+  license:
     desc: |
       Check REUSE license compliance
       Automatically downloads missing licenses before linting
     deps: [setup]
     cmds:
       - "{{.PYTHON_VENV}} scripts/compliance.py license"
-    aliases: [license]
 
-  check-commit:
-    desc: Validate commit messages with Conform
+  conform:
+    desc: Validate commits with Conform (direct execution)
     deps: [setup]
     cmds:
-      - "{{.PYTHON_VENV}} scripts/compliance.py commit"
-    aliases: [commitlint]
+     - "{{.PYTHON_VENV}} scripts/compliance.py conform"
 
-  check-compliance:
+  compliance:
     desc: Run all code quality & compliance checks
-    deps: [check-lint, check-publiccode, check-license, check-commit]
+    deps: [lint, publiccode, license, conform]
     cmds:
       - echo "✓ All compliance checks passed"
-    aliases: [compliance]
 
   # Testing - Unit & Integration Tests
   test:
@@ -86,20 +83,18 @@ tasks:
     deps: [setup]
     cmds:
       - "{{.PYTHON_VENV}} scripts/test_merge_config.py"
-    aliases: [tests, test-all]
 
   # Build Tasks - Docker Image Building
-  build-docker:
+  build:
     desc: Build Docker image (broadsage/docker-scaffold:latest)
-    deps: [check-docker]
+    deps: [docker]
     cmds:
       - "docker build -t broadsage/docker-scaffold:latest ."
       - echo "✓ Docker image built successfully"
-    aliases: [build]
 
-  build-and-test:
+  docker-test:
     desc: Build Docker image and test on current project
-    deps: [build-docker]
+    deps: [build]
     cmds:
       - |
         echo "Running docker-scaffold on current project..."
@@ -110,7 +105,6 @@ tasks:
           broadsage/docker-scaffold:latest
         echo "✓ Docker container executed successfully"
         echo "Review generated files in the current directory"
-    aliases: [docker-run, test-docker]
 
   # Cleanup Tasks - Environment Cleanup
   clean:
@@ -127,25 +121,22 @@ tasks:
         find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
         find . -type f -name "*.pyc" -delete 2>/dev/null || true
         echo "✓ Cached files cleaned"
-    aliases: [cleanup]
 
   # Workflow Tasks - Complete Workflows
   validate:
     desc: Validate code quality (checks and tests only, no build)
-    deps: [setup, check-compliance, test]
+    deps: [setup, compliance, test]
     cmds:
       - echo "✓ All validation checks passed"
-    aliases: [verify]
 
   pipeline:
     desc: Complete CI pipeline (checks, tests, and docker build)
-    deps: [check-compliance, test, build-docker]
+    deps: [compliance, test, build]
     cmds:
       - echo "✓ CI pipeline completed successfully"
-    aliases: [ci]
 
   all:
     desc: Complete setup and CI workflow (first-time setup + validation + build)
-    deps: [check-compliance, test, build-docker]
+    deps: [compliance, test, build]
     cmds:
       - echo "✓ All tasks completed successfully"
