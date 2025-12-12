@@ -308,7 +308,7 @@ class ComplianceChecker:
             "License check failed, see logs above",
         )
 
-    def check_commit(self) -> CheckResult:
+    def check_conform(self) -> CheckResult:
         """Validate commit messages with Conform."""
         Logger.header("COMMIT HEALTH (CONFORM)")
 
@@ -360,7 +360,7 @@ class ComplianceChecker:
             self.check_lint,
             self.check_publiccode,
             self.check_license,
-            self.check_commit,
+            self.check_conform,
         ]
 
         results: List[CheckResult] = []
@@ -511,7 +511,7 @@ def main():
         "lint": "check_lint",
         "publiccodelint": "check_publiccode",
         "license": "check_license",
-        "commit": "check_commit",
+        "conform": "check_conform",
     }
 
     valid_checks = {"all"} | check_map.keys()
