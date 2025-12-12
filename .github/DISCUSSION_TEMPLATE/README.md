@@ -31,11 +31,11 @@ Follow these steps to enable discussion templates:
 
    | Template File | Category Name | Format | Emoji | Description |
    |---|---|---|---|---|
-   | `ideas.yml` | Ideas | Open-ended discussion | 💡 | Feature ideas and suggestions |
-   | `polls.yml` | Polls | Polls | 🗳️ | Community voting on decisions |
-   | `show-and-tell.yml` | Show and Tell | Open-ended discussion | 🎉 | Showcase community projects |
+   | `ideas.yaml` | Ideas | Open-ended discussion | 💡 | Feature ideas and suggestions |
+   | `polls.yaml` | Polls | Polls | 🗳️ | Community voting on decisions |
+   | `show-and-tell.yaml` | Show and Tell | Open-ended discussion | 🎉 | Showcase community projects |
    | `help.yml` | Q&A | Question and Answer | ❓ | Community support & questions |
-   | `announcements.yml` | Announcements | Announcement | 📢 | Project updates & news |
+   | `announcements.yaml` | Announcements | Announcement | 📢 | Project updates & news |
 
 3. **Create Each Category**
 
@@ -56,11 +56,11 @@ Follow these steps to enable discussion templates:
 
 All templates are located in `.github/DISCUSSION_TEMPLATE/`:
 
-- **ideas.yml** - Community feature ideas and improvement suggestions
-- **polls.yml** - Structured polling for community input
-- **show-and-tell.yml** - Showcase projects and achievements
+- **ideas.yaml** - Community feature ideas and improvement suggestions
+- **polls.yaml** - Structured polling for community input
+- **show-and-tell.yaml** - Showcase projects and achievements
 - **help.yml** - Q&A support with structured troubleshooting fields
-- **announcements.yml** - Official announcements with type/priority categorization
+- **announcements.yaml** - Official announcements with type/priority categorization
 
 ## Template Format
 
