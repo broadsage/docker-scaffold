@@ -4,16 +4,38 @@
 ---
 # tasks file for roles/compliance
 
-- name: Copy compliance files to project root (if not excluded)
+- name: Copy .conform.yaml (commit message validation)
   template:
-    src: "{{ item }}.j2"
-    dest: "/tmp/{{ item }}"
+    src: ".conform.yaml.j2"
+    dest: "/tmp/.conform.yaml"
     owner: "abc"
     group: "abc"
     mode: "0644"
-  loop:
-    - .conform.yaml
-    - .mega-linter.yaml
-    - publiccode.yml
-    - REUSE.toml
-  when: item not in template.exclude | default([])
+  when: compliance.conform | bool
+
+- name: Copy .mega-linter.yaml (code quality linting)
+  template:
+    src: ".mega-linter.yaml.j2"
+    dest: "/tmp/.mega-linter.yaml"
+    owner: "abc"
+    group: "abc"
+    mode: "0644"
+  when: compliance.megalinter | bool
+
+- name: Copy REUSE.toml (license compliance)
+  template:
+    src: "REUSE.toml.j2"
+    dest: "/tmp/REUSE.toml"
+    owner: "abc"
+    group: "abc"
+    mode: "0644"
+  when: compliance.reuse | bool
+
+- name: Copy publiccode.yaml (public code validation)
+  template:
+    src: "publiccode.yaml.j2"
+    dest: "/tmp/publiccode.yaml"
+    owner: "abc"
+    group: "abc"
+    mode: "0644"
+  when: compliance.publiccode | bool

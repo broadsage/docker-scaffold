@@ -36,6 +36,7 @@ features:
   github: true # Generate GitHub Actions workflow & Issue Templates
   security: true # Enable vulnerability scanning
   registry: true # Push Docker Images to registries
+  compliance: true # Enable compliance & code quality tools
 
 # Override Build Settings (uncomment if needed)
 build:

@@ -65,3 +65,10 @@ documentation:
   changelog: true
   contributing: true
   license: true
+
+# Compliance & Code Quality Defaults
+compliance:
+  conform: true        # Commit message validation (Conventional Commits)
+  megalinter: true     # Multi-language code linting
+  reuse: true          # REUSE license compliance (SPDX headers)
+  publiccode: true     # publiccode.yaml validation (optional)
