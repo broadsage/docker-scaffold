@@ -14,5 +14,5 @@
   loop:
     - .gitignore
     - requirements.txt
-    - REUSE.toml
+    - .pre-commit-config.yaml
   when: item not in template.exclude | default([])

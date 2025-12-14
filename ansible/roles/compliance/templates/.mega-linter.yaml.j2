@@ -1,0 +1,69 @@
+# SPDX-FileCopyrightText: Copyright (c) 2025 {{ metadata.maintainer.name }} <{{ metadata.maintainer.email }}>
+#
+# SPDX-License-Identifier: {{ metadata.license }}
+
+---
+# Configuration file for MegaLinter using python flavor
+# See configuration options at https://oxsecurity.github.io/megalinter/configuration/
+
+# Use python flavor - optimized for Python projects with full linting support
+FLAVOR: python
+
+# General
+PRINT_ALPACA: false
+APPLY_FIXES: all
+
+DISABLE_ERRORS: false
+SHOW_ELAPSED_TIME: true
+SHOW_SKIPPED_LINTERS: false
+VALIDATE_ALL_CODEBASE: true
+
+# Reporter options
+CLEAR_REPORT_FOLDER: true
+EMAIL_REPORTER: false
+TEXT_REPORTER: true
+SARIF_REPORTER: true
+GITHUB_COMMENT_REPORTER: true
+GITHUB_STATUS_REPORTER: true
+GITLAB_COMMENT_REPORTER: false
+UPDATED_SOURCES_REPORTER: true
+
+# Exclude directories
+EXCLUDE_DIRECTORIES:
+  - venv
+  - .venv
+  - .git
+  - .github
+  - __pycache__
+  - megalinter-reports
+  - .ruff_cache
+
+# Enable specific linters
+ENABLE_LINTERS:
+  - BASH_SHELLCHECK
+  - BASH_SHFMT
+  - JSON_JSONLINT
+  - MARKDOWN_MARKDOWNLINT
+  - YAML_PRETTIER
+  - YAML_YAMLLINT
+  - DOCKERFILE_HADOLINT
+  - ACTION_ACTIONLINT
+  - PYTHON_PYLINT
+  - PYTHON_FLAKE8
+  - PYTHON_BLACK
+
+# Linter-specific configurations
+BASH_SHFMT_ARGUMENTS: -w -i 2
+BASH_SHFMT_FILE_EXTENSIONS: [.sh]
+BASH_SHELLCHECK_FILE_EXTENSIONS: [.sh]
+
+MARKDOWN_MARKDOWNLINT_DISABLE_ERRORS: false
+
+YAML_PRETTIER_FILE_EXTENSIONS: [.yaml, .yml]
+YAML_YAMLLINT_FILE_EXTENSIONS: [.yaml, .yml]
+
+DOCKERFILE_HADOLINT_FILE_EXTENSIONS: [Dockerfile]
+
+PYTHON_PYLINT_FILE_EXTENSIONS: [.py]
+PYTHON_FLAKE8_FILE_EXTENSIONS: [.py]
+PYTHON_BLACK_FILE_EXTENSIONS: [.py]
