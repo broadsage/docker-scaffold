@@ -34,7 +34,7 @@ tasks:
   setup:
     desc: Create Python virtual environment and install dependencies
     status:
-      - test -d "{{.VENV}}" && test -f "{{.VENV}}/pyvenv.cfg"
+      - test -d "{{.VENV}}" && test -f "{{.VENV}}/pyvenv.cfg" && test -f "{{.VENV}}/bin/python3"
     cmds:
       - "{{.PYTHON}} -m venv {{.VENV}}"
       - |
@@ -43,6 +43,7 @@ tasks:
         pip3 install -r requirements.txt
         echo "✓ Virtual environment created and dependencies installed"
     aliases: [init]
+    silent: false
 
   # Quality Checks - Code Quality & Compliance
   lint:
@@ -69,13 +70,13 @@ tasks:
     desc: Validate commits with Conform (direct execution)
     deps: [setup]
     cmds:
-     - "{{.PYTHON_VENV}} scripts/compliance.py conform"
+      - "{{.PYTHON_VENV}} scripts/compliance.py conform"
 
   compliance:
     desc: Run all code quality & compliance checks
-    deps: [lint, publiccode, license, conform]
+    deps: [setup]
     cmds:
-      - echo "✓ All compliance checks passed"
+      - "{{.PYTHON_VENV}} scripts/compliance.py all"
 
   # Testing - Unit & Integration Tests
   test:
@@ -125,7 +126,7 @@ tasks:
   # Workflow Tasks - Complete Workflows
   validate:
     desc: Validate code quality (checks and tests only, no build)
-    deps: [setup, compliance, test]
+    deps: [compliance, test]
     cmds:
       - echo "✓ All validation checks passed"
 
