@@ -59,6 +59,10 @@
     - role: repository
       tags:
         - repository
+    
+    - role: compliance
+      tags:
+        - compliance
 
   post_tasks:
     - name: Display scaffold completion message

@@ -37,11 +37,11 @@
     mode: "0644"
   when: github.issues | bool
   loop:
-    - config.yml
-    - bug-report.yml
-    - documentation.yml
-    - feature-request.yml
-    - question.yml
+    - config.yaml
+    - bug-report.yaml
+    - documentation.yaml
+    - feature-request.yaml
+    - question.yaml
 
 - name: Create .github/DISCUSSION_TEMPLATE directory
   ansible.builtin.file:
@@ -63,10 +63,10 @@
     mode: "0644"
   when: github.discussions | bool
   loop:
-    - ideas.yml
-    - polls.yml
-    - show-and-tell.yml
-    - announcements.yml
+    - ideas.yaml
+    - polls.yaml
+    - show-and-tell.yaml
+    - announcements.yaml
     - README.md
 
 - name: Populate GitHub Pull Request templates

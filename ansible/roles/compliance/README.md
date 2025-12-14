@@ -4,41 +4,89 @@ SPDX-FileCopyrightText: Copyright (c) 2025 Broadsage <opensource@broadsage.com>
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Role Name
-=========
+# Compliance Role
 
-A brief description of the role goes here.
+Generates code quality and compliance configuration files for Docker scaffold projects.
 
-Requirements
-------------
+## Description
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+This role manages compliance and code quality tools configuration:
 
-Role Variables
---------------
+- **Conform**: Commit message validation (Conventional Commits)
+- **MegaLinter**: Multi-language code linting and formatting
+- **REUSE**: License compliance and SPDX header validation
+- **publiccode.yaml**: Public code metadata (optional, for Italian public code registry)
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+## Requirements
 
-Dependencies
-------------
+None. All tools run via Docker containers.
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+## Role Variables
 
-Example Playbook
-----------------
+### Feature Flags (defaults/main.yml)
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+```yaml
+compliance:
+  conform: true        # Enable commit message validation
+  megalinter: true     # Enable code linting
+  reuse: true          # Enable license compliance
+  publiccode: false    # Enable publiccode.yaml (optional)
+```
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+### Configuration Locations
 
-License
--------
+Variables are inherited from:
 
-BSD
+1. `ansible/vars/defaults.yaml` - Organization defaults
+2. `project.yaml` - Per-project overrides
 
-Author Information
-------------------
+### File Exclusion
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+Use `template.exclude` to skip individual files:
+
+```yaml
+template:
+  exclude:
+    - .mega-linter.yaml  # Skip MegaLinter config
+    - REUSE.toml         # Skip REUSE config
+```
+
+## Dependencies
+
+None.
+
+## Example Usage
+
+### Enable only specific tools
+
+```yaml
+compliance:
+  conform: true
+  megalinter: true
+  reuse: false         # Skip license compliance
+  publiccode: false    # Skip publiccode.yaml
+```
+
+### Enable publiccode.yaml for Italian projects
+
+```yaml
+compliance:
+  publiccode: true     # Enable for public code registry
+```
+
+## Generated Files
+
+| File | Purpose | Tool |
+|------|---------|------|
+| `.conform.yaml` | Commit message validation policy | Conform |
+| `.mega-linter.yaml` | Code linting configuration | MegaLinter |
+| `REUSE.toml` | License compliance rules | REUSE |
+| `publiccode.yaml` | Public code metadata | publiccode-parser-go |
+
+## License
+
+Apache-2.0
+
+## Author Information
+
+Broadsage - <opensource@broadsage.com>

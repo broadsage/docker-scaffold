@@ -4,544 +4,556 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-"""
-Code Quality & Compliance Check Script
+"""Code Quality & Compliance Check Script.
 
-Description:
-  Automated compliance checking framework for code quality assurance.
-  Runs multiple checks: linting, licensing, commit validation, and configuration.
+This script automates compliance checking for code quality assurance using:
+- MegaLinter for code linting
+- REUSE for license compliance
+- Conform for commit message validation
+- publiccode-parser for publiccode.yaml validation
 
 Requirements:
-  - Docker installed and running
-  - Network access for container images
-  - Git repository for commit checks
-  - Python 3.7+
+    - Docker installed and running
+    - Git repository for commit checks
+    - Python 3.8+
+
+Usage:
+    python compliance.py [check_name]
+
+    Available checks:
+        lint            - Run MegaLinter code quality checks
+        publiccodelint  - Validate publiccode.yaml
+        license         - Check REUSE license compliance
+        conform         - Validate commit messages
+        all             - Run all checks (default)
+
+Exit Codes:
+    0: All checks passed
+    1: One or more checks failed
+    2: Configuration or system error
 """
 
 import argparse
 import subprocess
 import sys
-from dataclasses import dataclass
 from datetime import datetime
-from enum import Enum
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Any, Final, List, Tuple
+
+# ANSI Color Codes & Python Constants
+RED: Final[str] = "\033[31m"
+GREEN: Final[str] = "\033[32m"
+YELLOW: Final[str] = "\033[33m"
+BLUE: Final[str] = "\033[34m"
+BOLD: Final[str] = "\033[1m"
+NC: Final[str] = "\033[0m"  # No Color
+
+# Symbols
+CHECKMARK: Final[str] = "✔"
+MISSING: Final[str] = "✘"
+
+# Docker Images
+MEGALINTER_IMAGE: Final[str] = "oxsecurity/megalinter:latest"
+PUBLICCODE_IMAGE: Final[str] = "italia/publiccode-parser-go"
+REUSE_IMAGE: Final[str] = "docker.io/fsfe/reuse:latest"
+CONFORM_IMAGE: Final[str] = "ghcr.io/siderolabs/conform:latest"
+
+# Container Paths
+REPO_PATH: Final[str] = "/repo"
+DATA_PATH: Final[str] = "/data"
+
+# Git Settings
+DEFAULT_BRANCH: Final[str] = "main"
+
+# Exit Codes
+EXIT_SUCCESS: Final[int] = 0
+EXIT_FAILURE: Final[int] = 1
+EXIT_ERROR: Final[int] = 2
+
+# Timeouts (seconds)
+DOCKER_VERSION_TIMEOUT: Final[int] = 5
+
+# Global State Tracking
+EXIT_CODES: List[int] = []
+SUMMARY_TABLE: List[Tuple[str, str, str]] = []  # (check, status, message)
 
 
-class CheckStatus(Enum):
-    """Enum for check status."""
+# Display Functions
+def print_header(header: str) -> None:
+    """Print a colored section header with timestamp (GitHub Actions style).
 
-    PASS = "✓ PASS"
-    FAIL = "✗ FAIL"
-    SKIP = "⊘ SKIP"
-
-
-@dataclass
-class CheckResult:
-    """Data class for individual check results."""
-
-    name: str
-    status: CheckStatus
-    message: str = ""
+    Args:
+        header: The header text to display.
+    """
+    now: str = datetime.now().strftime("%H:%M:%S")
+    print(f"\n{BLUE}▶ {header} • {now}{NC}")
 
 
-@dataclass
-class ComplianceConfig:
-    """Configuration for compliance checks."""
+def print_banner(msg: str) -> None:
+    """Print a prominent banner message with timestamp.
 
-    project_root: Path
-    container_engine: str = "docker"
-    compare_branch: str = "main"
-    debug: bool = False
+    Args:
+        msg: The message to display in the banner.
+    """
+    now: str = datetime.now().strftime("%H:%M:%S")
+    print(f"\n{BOLD}{BLUE}▶ {msg} • {now}{NC}\n")
 
 
-class Logger:
-    """Beautiful console output formatter following industry standards."""
+# Container Engine Detection
+def detect_container_engine() -> str:
+    """Detect and verify Docker availability.
 
-    # ANSI color codes
-    RESET = "\033[0m"
-    BOLD = "\033[1m"
-    DIM = "\033[2m"
+    Returns:
+        The container engine command ('docker').
 
-    # Colors
-    CYAN = "\033[36m"
-    GREEN = "\033[32m"
-    RED = "\033[31m"
-    YELLOW = "\033[33m"
-    BLUE = "\033[34m"
-    MAGENTA = "\033[35m"
-    WHITE = "\033[37m"
-
-    # Shared constants for DRY code
-    TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
-
-    @staticmethod
-    def _get_timestamp() -> str:
-        """Get formatted timestamp (DRY)."""
-        return datetime.now().strftime(Logger.TIME_FORMAT)
-
-    @staticmethod
-    def supports_color() -> bool:
-        """Check if terminal supports color."""
-        return sys.stdout.isatty() and sys.stderr.isatty()
-
-    @staticmethod
-    def colorize(text: str, color: str) -> str:
-        """Apply color to text if supported."""
-        if Logger.supports_color():
-            return f"{color}{text}{Logger.RESET}"
-        return text
-
-    @staticmethod
-    def banner(text: str) -> None:
-        """Print main banner with timestamp."""
-        colored_text = Logger.colorize(text, Logger.BOLD + Logger.CYAN)
-        colored_time = Logger.colorize(
-            Logger._get_timestamp(), Logger.DIM + Logger.CYAN
+    Raises:
+        SystemExit: If Docker is not available or not responding.
+    """
+    try:
+        result: subprocess.CompletedProcess[str] = subprocess.run(
+            ["docker", "--version"],
+            capture_output=True,
+            text=True,
+            check=True,
+            timeout=DOCKER_VERSION_TIMEOUT,
         )
-        print(f"\n➜  {colored_text} [{colored_time}]\n")
+        if "Docker version" in result.stdout:
+            return "docker"
+    except FileNotFoundError:
+        print_banner(f"{RED}Docker not found in system PATH.{NC}")
+        print("Please install Docker: https://docs.docker.com/get-docker/")
+        sys.exit(EXIT_ERROR)
+    except subprocess.TimeoutExpired:
+        print_banner(f"{RED}Docker command timed out (not responding).{NC}")
+        print("Please ensure Docker daemon is running.")
+        sys.exit(EXIT_ERROR)
+    except subprocess.CalledProcessError as e:
+        print_banner(f"{RED}Docker verification failed.{NC}")
+        print(f"Error: {e}")
+        sys.exit(EXIT_ERROR)
 
-    @staticmethod
-    def header(text: str) -> None:
-        """Print section header with timestamp."""
-        colored_text = Logger.colorize(text, Logger.BOLD + Logger.BLUE)
-        colored_time = Logger.colorize(
-            Logger._get_timestamp(), Logger.DIM + Logger.BLUE
+    # Fallback (should not reach here)
+    print_banner(f"{RED}No supported container engine found (Docker required).{NC}")
+    print("Please install Docker: https://docs.docker.com/get-docker/")
+    sys.exit(EXIT_ERROR)
+
+
+# Result Tracking
+def store_exit_code(
+    exit_code: int, check_name: str, fail_msg: str, success_msg: str
+) -> None:
+    """Store check result and display status message.
+
+    Args:
+        exit_code: The exit code from the check (0 for success, non-zero for failure).
+        check_name: Name of the check for summary table.
+        fail_msg: Message to display on failure.
+        success_msg: Message to display on success.
+    """
+    if exit_code != EXIT_SUCCESS:
+        EXIT_CODES.append(exit_code)
+        SUMMARY_TABLE.append((check_name, "FAIL", fail_msg))
+        print(f"\n{RED}{MISSING} {fail_msg}{NC}")
+    else:
+        SUMMARY_TABLE.append((check_name, "PASS", success_msg))
+        print(f"\n{GREEN}{CHECKMARK} {success_msg}{NC}")
+
+
+# Check Functions
+def lint(container_engine: str) -> None:
+    """Execute MegaLinter code quality checks.
+
+    Runs MegaLinter in a Docker container to perform comprehensive code linting
+    across multiple languages and tools.
+
+    Args:
+        container_engine: The container engine command to use (e.g., 'docker').
+    """
+    print_header("Linter Health (MegaLinter)")
+
+    project_root: str = str(Path(__file__).parent.parent)
+
+    cmd: List[str] = [
+        container_engine,
+        "run",
+        "--rm",
+        "--volume",
+        f"{project_root}:/tmp/lint",
+        "-e",
+        "DEFAULT_WORKSPACE=/tmp/lint",
+        MEGALINTER_IMAGE,
+    ]
+
+    try:
+        result: subprocess.CompletedProcess[Any] = subprocess.run(cmd, check=False)
+        exit_code: int = result.returncode
+    except subprocess.SubprocessError as e:
+        print(f"{RED}Error running MegaLinter: {e}{NC}")
+        exit_code = EXIT_FAILURE
+    except Exception as e:
+        print(f"{RED}Unexpected error during linting: {e}{NC}")
+        exit_code = EXIT_FAILURE
+
+    store_exit_code(
+        exit_code,
+        "Lint",
+        "Lint check failed. Review logs in ./megalinter-reports/",
+        "Lint check passed.",
+    )
+    print()
+
+
+def publiccodelint(container_engine: str) -> None:
+    """Validate publiccode.yaml compliance.
+
+    Validates the publiccode.yaml file using the official publiccode-parser-go tool.
+    Skips if the file doesn't exist.
+
+    Args:
+        container_engine: The container engine command to use (e.g., 'docker').
+    """
+    print_header("Publiccode Validator (publiccode.yml)")
+
+    project_root: Path = Path(__file__).parent.parent
+    publiccode_file: Path = project_root / "publiccode.yaml"
+
+    if not publiccode_file.exists():
+        store_exit_code(
+            EXIT_SUCCESS,
+            "publiccode.yml",
+            "publiccode.yaml not found, skipping.",
+            "publiccode.yaml not found, skipping.",
         )
-        print(f"  {colored_text} [{colored_time}]")
+        print()
+        return
 
-    @staticmethod
-    def info(text: str) -> None:
-        """Print info message."""
-        icon = Logger.colorize("•", Logger.BLUE)
-        print(f"{icon} {text}")
+    try:
+        with open(publiccode_file, "r", encoding="utf-8") as f:
+            publiccode_content: str = f.read()
 
-    @staticmethod
-    def ok(text: str) -> None:
-        """Print success message."""
-        icon = Logger.colorize("✓", Logger.GREEN)
-        msg = Logger.colorize(text, Logger.GREEN)
-        print(f"{icon} {msg}")
-
-    @staticmethod
-    def error(text: str) -> None:
-        """Print error message to stderr."""
-        icon = Logger.colorize("✗", Logger.RED)
-        msg = Logger.colorize(text, Logger.RED)
-        print(f"{icon} {msg}", file=sys.stderr)
-
-    @staticmethod
-    def debug(text: str, debug_mode: bool = False) -> None:
-        """Print debug message if debug mode enabled."""
-        if debug_mode:
-            icon = Logger.colorize("⚙", Logger.MAGENTA)
-            msg = Logger.colorize(text, Logger.DIM)
-            print(f"{icon} {msg}")
-
-
-class DockerCommand:
-    """Wrapper for Docker command execution."""
-
-    def __init__(self, engine: str = "docker"):
-        """Initialize Docker command wrapper."""
-        self.engine = engine
-        self._verify_engine()
-
-    def _verify_engine(self) -> None:
-        """Verify Docker/container engine is available."""
-        try:
-            subprocess.run(
-                [self.engine, "--version"], capture_output=True, check=True, timeout=5
-            )
-        except (subprocess.CalledProcessError, FileNotFoundError):
-            Logger.error(f"{self.engine} not found")
-            Logger.error("Please install Docker: https://docs.docker.com/get-docker/")
-            sys.exit(2)
-
-    def run(
-        self, image: str, *args: str, stdin_data: str | None = None, **kwargs: str
-    ) -> Tuple[int, str]:
-        """
-        Run a Docker container.
-
-        Args:
-            image: Container image name
-            *args: Additional arguments
-            stdin_data: Optional data to pass to stdin
-            **kwargs: Volume mappings (volume_name -> container_path)
-
-        Returns:
-            Tuple of (exit_code, output)
-        """
-        cmd: List[str] = [self.engine, "run", "--rm"]
-
-        # Add stdin flag if data provided
-        if stdin_data:
-            cmd.append("-i")
-
-        # Add volume mappings
-        for host_path, container_path in kwargs.items():
-            cmd.extend(["-v", f"{host_path}:{container_path}"])
-
-        cmd.append(image)
-        cmd.extend(list(args))
-
-        try:
-            result = subprocess.run(
-                cmd,
-                capture_output=False,
-                text=True,
-                input=stdin_data,
-                check=False,
-            )
-            return result.returncode, ""
-        except Exception as e:
-            Logger.error(f"Docker execution failed: {e}")
-            return 1, str(e)
-
-
-class ComplianceChecker:
-    """Main compliance checker orchestrator."""
-
-    def __init__(self, config: ComplianceConfig):
-        """Initialize compliance checker."""
-        self.config = config
-        self.docker = DockerCommand(config.container_engine)
-        self.results: List[CheckResult] = []
-
-    def _create_result(
-        self,
-        name: str,
-        exit_code: int,
-        pass_msg: str = "Check passed",
-        fail_msg: str = "Check failed, see logs above",
-    ) -> CheckResult:
-        """Create a check result from exit code."""
-        if exit_code == 0:
-            return CheckResult(name, CheckStatus.PASS, pass_msg)
-        return CheckResult(name, CheckStatus.FAIL, fail_msg)
-
-    def _run_docker_check(
-        self, name: str, image: str, *args: str, **kwargs: str
-    ) -> CheckResult:
-        """Run a Docker-based check and return result."""
-        exit_code, _ = self.docker.run(image, *args, **kwargs)
-        return self._create_result(name, exit_code)
-
-    def check_lint(self) -> CheckResult:
-        """Run MegaLinter check using official Docker image with python flavor."""
-        Logger.header("LINTER HEALTH (MEGALINTER - python flavor)")
-        # Prepare Docker volumes with Docker socket support
-        volumes = {str(self.config.project_root): "/tmp/lint"}
-        # Add Docker socket for Docker-in-Docker support
-        volumes["/var/run/docker.sock"] = "/var/run/docker.sock:rw"
-
-        return self._run_docker_check(
-            "Lint", "oxsecurity/megalinter-python:v9", "-e", "LOG_LEVEL=INFO", **volumes
-        )
-
-    def check_publiccode(self) -> CheckResult:
-        """Validate publiccode.yaml using publiccode-parser-go."""
-        Logger.header("LINTER publiccode.yaml (publiccode-parser-go)")
-
-        publiccode_path = self.config.project_root / "publiccode.yaml"
-
-        if not publiccode_path.exists():
-            return CheckResult(
-                "publiccode.yaml", CheckStatus.SKIP, "publiccode.yaml not found"
-            )
-
-        try:
-            with open(publiccode_path, "r", encoding="utf-8") as f:
-                file_content = f.read()
-
-            exit_code, _ = self.docker.run(
-                "italia/publiccode-parser-go",
-                "-no-network",
-                "/dev/stdin",
-                stdin_data=file_content,
-            )
-
-            return self._create_result(
-                "publiccode.yaml",
-                exit_code,
-                "Validation passed",
-                "Validation failed, see logs above",
-            )
-
-        except Exception as e:
-            return CheckResult("publiccode.yaml", CheckStatus.FAIL, f"Error: {e}")
-
-    def check_license(self) -> CheckResult:
-        """Run REUSE license compliance check with automatic download."""
-        Logger.header("LICENSE HEALTH (REUSE)")
-
-        # Step 1: Download missing licenses (best effort, non-blocking)
-        Logger.info("Downloading missing licenses from SPDX registry...")
-        download_exit, _ = self.docker.run(
-            "docker.io/fsfe/reuse:latest",
-            "download",
-            "--all",
-            **{str(self.config.project_root): "/data"},
-        )
-
-        if download_exit == 0:
-            Logger.ok("Licenses downloaded successfully")
-        else:
-            Logger.info(
-                "License download completed with warnings (proceeding with lint)"
-            )
-
-        # Step 2: Run lint check
-        Logger.info("Running license compliance lint check...")
-        lint_exit, _ = self.docker.run(
-            "docker.io/fsfe/reuse:latest",
-            "lint",
-            **{str(self.config.project_root): "/data"},
-        )
-
-        # Return based on lint result (download is preparation)
-        return self._create_result(
-            "License",
-            lint_exit,
-            "License compliance check passed",
-            "License check failed, see logs above",
-        )
-
-    def check_conform(self) -> CheckResult:
-        """Validate commit messages with Conform."""
-        Logger.header("COMMIT HEALTH (CONFORM)")
-
-        try:
-            # Get current branch
-            result = subprocess.run(
-                ["git", "branch", "--show-current"],
-                cwd=self.config.project_root,
-                capture_output=True,
-                text=True,
-                check=False,
-            )
-            current_branch = result.stdout.strip()
-
-            # Count commits
-            result = subprocess.run(
-                ["git", "rev-list", "--count", f"{self.config.compare_branch}.."],
-                cwd=self.config.project_root,
-                capture_output=True,
-                text=True,
-                check=False,
-            )
-            commit_count = int(result.stdout.strip()) if result.returncode == 0 else 0
-
-            if commit_count == 0:
-                Logger.info(
-                    f"No commits found in {current_branch}, "
-                    f"compared to {self.config.compare_branch}"
-                )
-                return CheckResult(
-                    "Commit", CheckStatus.SKIP, "No new commits to validate"
-                )
-
-            # Run Conform check
-            return self._run_docker_check(
-                "Commit",
-                "ghcr.io/siderolabs/conform:latest",
-                "enforce",
-                f"--base-branch={self.config.compare_branch}",
-                **{str(self.config.project_root): "/repo"},
-            )
-
-        except Exception as e:
-            return CheckResult("Commit", CheckStatus.FAIL, f"Error: {e}")
-
-    def run_all(self) -> List[CheckResult]:
-        """Run all checks."""
-        checks = [
-            self.check_lint,
-            self.check_publiccode,
-            self.check_license,
-            self.check_conform,
+        cmd: List[str] = [
+            container_engine,
+            "run",
+            "--rm",
+            "-i",
+            PUBLICCODE_IMAGE,
+            "-no-network",
+            "/dev/stdin",
         ]
 
-        results: List[CheckResult] = []
-        for check_func in checks:
-            result = check_func()
-            self.results.append(result)
-            results.append(result)
-
-        return results
-
-    def _get_status_color(self, status: CheckStatus) -> str:
-        """Get ANSI color code for a check status (DRY)."""
-        color_map = {
-            CheckStatus.PASS: Logger.GREEN,
-            CheckStatus.FAIL: Logger.RED,
-            CheckStatus.SKIP: Logger.YELLOW,
-        }
-        return color_map.get(status, Logger.WHITE)
-
-    def _build_table_borders(self) -> Dict[str, str]:
-        """Build colored unicode box-drawing border characters (DRY)."""
-        return {
-            "h": Logger.colorize("─", Logger.CYAN),
-            "v": Logger.colorize("│", Logger.CYAN),
-            "tl": Logger.colorize("┌", Logger.CYAN),
-            "tr": Logger.colorize("┐", Logger.CYAN),
-            "bl": Logger.colorize("└", Logger.CYAN),
-            "br": Logger.colorize("┘", Logger.CYAN),
-            "t": Logger.colorize("┬", Logger.CYAN),
-            "b": Logger.colorize("┴", Logger.CYAN),
-            "mid": Logger.colorize("┼", Logger.CYAN),
-            "cross": Logger.colorize("┤", Logger.CYAN),
-        }
-
-    def _format_table_row(
-        self,
-        name: str,
-        status_colored: str,
-        col1_width: int,
-        col2_width: int,
-        v_char: str,
-        status_value: str,
-    ) -> str:
-        """Format a single table row with proper alignment (DRY)."""
-        name_padded = name + " " * (col1_width - len(name))
-        status_padded = status_colored + " " * (col2_width - len(status_value))
-        return f"{v_char} {name_padded} {v_char} {status_padded} {v_char}"
-
-    def print_summary(self) -> int:
-        """Print results summary table and return exit code using stdlib only."""
-        Logger.banner("CODE QUALITY & COMPLIANCE SUMMARY")
-
-        # Calculate column widths for proper alignment
-        col1_width = max(
-            len("Check Name"), max((len(r.name) for r in self.results), default=0)
+        result: subprocess.CompletedProcess[str] = subprocess.run(
+            cmd, input=publiccode_content, text=True, check=False
         )
-        col2_width = len("Status")
+        exit_code: int = result.returncode
+    except FileNotFoundError:
+        print(f"{RED}Error: publiccode.yaml file not accessible.{NC}")
+        exit_code = EXIT_FAILURE
+    except subprocess.SubprocessError as e:
+        print(f"{RED}Error running publiccode linter: {e}{NC}")
+        exit_code = EXIT_FAILURE
+    except Exception as e:
+        print(f"{RED}Unexpected error during publiccode validation: {e}{NC}")
+        exit_code = EXIT_FAILURE
 
-        # Get colored border characters
-        borders = self._build_table_borders()
+    store_exit_code(
+        exit_code,
+        "publiccode.yml",
+        "publiccode.yaml validation failed. Review output above.",
+        "publiccode.yaml validation passed.",
+    )
+    print()
 
-        # Build table lines
-        table_lines: List[str] = []
 
-        # Top border
-        top_border = (
-            f"{borders['tl']}{borders['h'] * (col1_width + 2)}{borders['t']}"
-            f"{borders['h'] * (col2_width + 2)}{borders['tr']}"
+def license(container_engine: str) -> None:
+    """Verify license compliance using REUSE tool.
+
+    Checks that all files have proper SPDX license headers and comply with
+    REUSE specification 3.0.
+
+    Args:
+        container_engine: The container engine command to use (e.g., 'docker').
+    """
+    print_header("License Compliance (REUSE)")
+
+    project_root: str = str(Path(__file__).parent.parent)
+
+    cmd: List[str] = [
+        container_engine,
+        "run",
+        "--rm",
+        "--volume",
+        f"{project_root}:{DATA_PATH}",
+        REUSE_IMAGE,
+        "lint",
+    ]
+
+    try:
+        result: subprocess.CompletedProcess[Any] = subprocess.run(cmd, check=False)
+        exit_code: int = result.returncode
+    except subprocess.SubprocessError as e:
+        print(f"{RED}Error running REUSE: {e}{NC}")
+        exit_code = EXIT_FAILURE
+    except Exception as e:
+        print(f"{RED}Unexpected error during license check: {e}{NC}")
+        exit_code = EXIT_FAILURE
+
+    store_exit_code(
+        exit_code,
+        "License",
+        "License compliance failed. Review REUSE output above.",
+        "License compliance passed.",
+    )
+    print()
+
+
+def commit(container_engine: str) -> None:
+    """Validate commit messages using Conform.
+
+    Checks that commit messages follow conventional commit format.
+    Skips if there are no new commits compared to the main branch.
+
+    Args:
+        container_engine: The container engine command to use (e.g., 'docker').
+    """
+    print_header("Commit Validation (Conform)")
+
+    project_root: Path = Path(__file__).parent.parent
+    compare_to_branch: str = DEFAULT_BRANCH
+
+    # Get current branch name
+    try:
+        result: subprocess.CompletedProcess[str] = subprocess.run(
+            ["git", "branch", "--show-current"],
+            cwd=project_root,
+            capture_output=True,
+            text=True,
+            check=False,
         )
-        table_lines.append(top_border)
-
-        # Header row
-        name_space = " " * (col1_width - len("Check Name") + 1)
-        status_space = " " * (col2_width - len("Status") + 1)
-        header = (
-            f"{borders['v']} Check Name{name_space}"
-            f"{borders['v']} Status{status_space}{borders['v']}"
+        current_branch: str = result.stdout.strip()
+    except subprocess.SubprocessError as e:
+        print(f"{RED}Error getting current branch: {e}{NC}")
+        store_exit_code(
+            EXIT_FAILURE,
+            "Commit",
+            "Failed to get current branch.",
+            "Commit check failed.",
         )
-        table_lines.append(header)
-
-        # Separator line
-        separator = (
-            f"{borders['mid']}{borders['h'] * (col1_width + 2)}{borders['mid']}"
-            f"{borders['h'] * (col2_width + 2)}{borders['cross']}"
+        print()
+        return
+    except Exception as e:
+        print(f"{RED}Unexpected error accessing git: {e}{NC}")
+        store_exit_code(
+            EXIT_FAILURE,
+            "Commit",
+            "Failed to access git repository.",
+            "Commit check failed.",
         )
-        table_lines.append(separator)
+        print()
+        return
 
-        # Data rows
-        failed_count = 0
-        for result in self.results:
-            status_text = result.status.value
-            status_color = self._get_status_color(result.status)
-            status_colored = Logger.colorize(status_text, status_color)
-
-            if result.status == CheckStatus.FAIL:
-                failed_count += 1
-
-            row = self._format_table_row(
-                result.name,
-                status_colored,
-                col1_width,
-                col2_width,
-                borders["v"],
-                status_text,
-            )
-            table_lines.append(row)
-
-        # Bottom border
-        bottom_border = (
-            f"{borders['bl']}{borders['h'] * (col1_width + 2)}{borders['b']}"
-            f"{borders['h'] * (col2_width + 2)}{borders['br']}"
+    # Count new commits compared to base branch
+    try:
+        result = subprocess.run(
+            ["git", "rev-list", "--count", f"{compare_to_branch}.."],
+            cwd=project_root,
+            capture_output=True,
+            text=True,
+            check=False,
         )
-        table_lines.append(bottom_border)
+        commit_count: int = (
+            int(result.stdout.strip()) if result.returncode == EXIT_SUCCESS else 0
+        )
+    except (ValueError, subprocess.SubprocessError):
+        commit_count = 0
 
-        # Print table
-        print("\n".join(table_lines) + "\n")
+    # Skip if no new commits
+    if commit_count == 0:
+        print(
+            f"{YELLOW}No commits found in current branch: {current_branch}, "
+            f"compared to: {compare_to_branch}{NC}"
+        )
+        store_exit_code(
+            EXIT_SUCCESS,
+            "Commit",
+            f"Commit check skipped, no new commits in branch: {current_branch}",
+            "Commit check skipped, no new commits found.",
+        )
+        print()
+        return
 
-        return 1 if failed_count > 0 else 0
+    # Execute Conform validation
+    cmd: List[str] = [
+        container_engine,
+        "run",
+        "--rm",
+        "-i",
+        "--volume",
+        f"{project_root}:{REPO_PATH}",
+        "-w",
+        REPO_PATH,
+        CONFORM_IMAGE,
+        "enforce",
+        f"--base-branch={compare_to_branch}",
+    ]
+
+    try:
+        result = subprocess.run(cmd, check=False, text=True)
+        exit_code: int = result.returncode
+    except subprocess.SubprocessError as e:
+        print(f"{RED}Error running Conform: {e}{NC}")
+        exit_code = EXIT_FAILURE
+    except Exception as e:
+        print(f"{RED}Unexpected error during commit validation: {e}{NC}")
+        exit_code = EXIT_FAILURE
+
+    store_exit_code(
+        exit_code,
+        "Commit",
+        "Commit validation failed. Review Conform output above.",
+        "Commit validation passed.",
+    )
+    print()
 
 
-def get_project_root() -> Path:
-    """Get project root directory."""
-    script_dir = Path(__file__).parent.resolve()
-    return script_dir.parent
+# Summary and Reporting
+def check_exit_codes() -> int:
+    """Display summary table and determine overall exit code.
 
+    Prints a formatted table showing the results of all checks and returns
+    an appropriate exit code based on the results.
 
-def main():
-    """Main entry point."""
-    parser = argparse.ArgumentParser(
-        description="Compliance check runner (use 'task --help' for available checks)",
-        add_help=True,
+    Returns:
+        EXIT_SUCCESS (0) if all checks passed, EXIT_FAILURE (1) otherwise.
+    """
+    print_banner("CODE QUALITY & COMPLIANCE RUN SUMMARY")
+
+    # Define table column widths
+    check_width: int = 18
+    status_width: int = 13
+    message_width: int = 50
+
+    # Table header
+    print(
+        f"\n{BOLD}{BLUE}| {'Check':<{check_width}} | "
+        f"{'Status':<{status_width}} | {'Message':<{message_width}} |{NC}"
+    )
+    print(
+        f"{BLUE}|{'-' * (check_width + 2)}|{'-' * (status_width + 2)}|"
+        f"{'-' * (message_width + 2)}|{NC}"
     )
 
+    # Table rows
+    for check, status, msg in SUMMARY_TABLE:
+        if status == "PASS":
+            status_disp: str = f"{GREEN}PASS {CHECKMARK}{NC}"
+        else:
+            status_disp = f"{RED}FAIL {MISSING}{NC}"
+
+        # Truncate message if too long
+        msg_disp: str = (
+            msg if len(msg) <= message_width else f"{msg[:message_width - 3]}..."
+        )
+
+        print(
+            f"| {check:<{check_width}} | {status_disp:<{status_width + 10}} | "
+            f"{msg_disp:<{message_width}} |"
+        )
+
+    print()
+
+    # Determine final result
+    if EXIT_CODES:
+        print_banner(f"{RED}Some checks failed. See above for details.{NC}")
+        return EXIT_FAILURE
+    else:
+        print_banner(f"{GREEN}All checks passed!{NC}")
+        return EXIT_SUCCESS
+
+
+# Main Entry Point
+def main() -> int:
+    """Execute compliance checks based on command-line arguments.
+
+    This is the main entry point that orchestrates compliance checks:
+    1. Parses command-line arguments
+    2. Detects and verifies Docker availability
+    3. Runs requested check(s)
+    4. Displays summary and returns exit code
+
+    Returns:
+        EXIT_SUCCESS (0) if all checks pass, EXIT_FAILURE (1) otherwise,
+        or EXIT_ERROR (2) for system/configuration errors.
+    """
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(
+        description="Code Quality & Compliance Check Script",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Available checks:
+  lint            Run MegaLinter code quality checks
+  publiccodelint  Validate publiccode.yaml
+  license         Check REUSE license compliance
+  conform         Validate commit messages
+  all             Run all checks (default)
+
+Examples:
+  python compliance.py lint
+  python compliance.py license
+  python compliance.py all
+        """,
+    )
     parser.add_argument(
         "check",
         nargs="?",
         default="all",
-        metavar="CHECK",
-        help="Check to run: all|lint|publiccodelint|license|commit",
+        choices=["lint", "publiccodelint", "license", "conform", "all"],
+        help="Specific check to run (default: all)",
     )
-    parser.add_argument("--debug", action="store_true", help="Enable debug output")
-    parser.add_argument("--version", action="version", version="1.0.0")
 
     args = parser.parse_args()
 
-    # Map check names to methods
-    check_map = {
-        "lint": "check_lint",
-        "publiccodelint": "check_publiccode",
-        "license": "check_license",
-        "conform": "check_conform",
+    # Detect and verify container engine
+    container_engine: str = detect_container_engine()
+
+    # Map check names to functions
+    check_functions = {
+        "lint": lint,
+        "publiccodelint": publiccodelint,
+        "license": license,
+        "conform": commit,
     }
 
-    valid_checks = {"all"} | check_map.keys()
-
-    if args.check not in valid_checks:
-        Logger.error(f"Unknown check: {args.check}")
-        Logger.error(f"Valid checks: {', '.join(sorted(valid_checks))}")
-        return 1
-
-    # Initialize configuration
-    project_root = get_project_root()
-    config = ComplianceConfig(project_root=project_root, debug=args.debug)
-
-    Logger.banner("Starting Code Quality & Compliance Checks")
-
-    # Create checker instance
-    checker = ComplianceChecker(config)
-
-    # Run checks
+    # Execute requested check(s)
     if args.check == "all":
-        checker.results = checker.run_all()
+        # Running all checks - show banner and summary
+        print_banner("Starting Code Quality & Compliance Checks")
+        print(f"{GREEN}{CHECKMARK} Using container engine: {container_engine}{NC}")
+
+        lint(container_engine)
+        publiccodelint(container_engine)
+        license(container_engine)
+        commit(container_engine)
+
+        # Display summary table
+        return check_exit_codes()
     else:
-        check_method = getattr(checker, check_map[args.check])
-        checker.results = [check_method()]
+        # Running single check - no summary table
+        check_func = check_functions[args.check]
+        check_func(container_engine)
 
-    print()
-
-    # Print summary and return exit code
-    return checker.print_summary()
+        # Return simple exit code based on results
+        return EXIT_FAILURE if EXIT_CODES else EXIT_SUCCESS
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        sys.exit(main())
+    except KeyboardInterrupt:
+        print(f"\n{RED}Script interrupted by user (Ctrl+C). Exiting gracefully.{NC}")
+        sys.exit(EXIT_FAILURE)
+    except Exception as e:
+        print(f"\n{RED}Unexpected error: {e}{NC}")
+        import traceback
+
+        traceback.print_exc()
+        sys.exit(EXIT_ERROR)
