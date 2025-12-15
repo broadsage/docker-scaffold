@@ -22,7 +22,7 @@
 
 # Image Identity (REQUIRED - customize for each image)
 image:
-  name: {{ cookiecutter._project_slug }}
+  name: {{ cookiecutter.project_slug }}
   description: {{ cookiecutter.project_description }}
   # version: 1.0.0  # Optional: specify version (auto-generated if omitted)
 
