@@ -5,7 +5,7 @@
 version: "3"
 
 vars:
-  PROJECT_NAME: {{ cookiecutter._project_slug }}
+  PROJECT_NAME: {{ cookiecutter.project_slug }}
   ORGANIZATION: {{ cookiecutter.organization }}
   SCAFFOLD_IMAGE: {{ cookiecutter.scaffold_image }}
 
