@@ -4,7 +4,7 @@
   
   "organization": "broadsage",
   "project_name": "docker-demo",
-  "_project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '-').replace('_', '-') }}",
+  "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '-').replace('_', '-') }}",
   "_project_short_name": "{{ cookiecutter.project_name.lower().replace('docker-', '').replace(' ', '-').replace('_', '-').split('-') | map('capitalize') | join('') }}",
   "_project_full_name": "{{ cookiecutter.project_name.replace('-', ' ').replace('_', ' ').title() }}",
   "project_description": "Docker Official Image packaging for {{ cookiecutter.project_name.lower().replace('docker-', '').replace(' ', '-').replace('_', '-').split('-') | map('capitalize') | join('') }}",
