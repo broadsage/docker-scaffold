@@ -1,0 +1,81 @@
+# SPDX-FileCopyrightText: Copyright (c) 2025 {{ cookiecutter.maintainer_name }} <{{ cookiecutter.maintainer_email }}>
+#
+# SPDX-License-Identifier: {{ cookiecutter.license }}
+---
+version: "3"
+
+vars:
+  PROJECT_NAME: {{ cookiecutter.project_slug }}
+  ORGANIZATION: {{ cookiecutter.organization }}
+  SCAFFOLD_IMAGE: {{ cookiecutter.scaffold_image }}
+
+tasks:
+  default:
+    desc: Show available tasks
+    cmds:
+      - task -l
+
+  generate:
+    desc: Generate project structure using docker-scaffold
+    cmds:
+      - |
+        echo "🏗️  Generating project structure from project.yaml..."
+        docker run --rm \
+          -v $(pwd):/output \
+          -e PUID=$(id -u) \
+          -e PGID=$(id -g) \
+          {{"{{"}}{{"}}"}}{{"{{"}}{{"}}"}} .SCAFFOLD_IMAGE {{"}}"}}{{"}}"}}
+        echo "✅ Project files generated!"
+
+  build:
+    desc: Build Docker image
+    deps: [generate]
+    cmds:
+      - |
+        echo "🐳 Building Docker image..."
+        docker buildx build \
+          --platform {% raw %}{{.PLATFORMS | default "linux/amd64"}}{% endraw %} \
+          -t {{"{{"}}{{"}}"}}{{"{{"}}{{"}}"}} .ORGANIZATION {{"}}"}}{{"}}"}}/{{"{{"}}{{"}}"}}{{"{{"}}{{"}}"}} .PROJECT_NAME {{"}}"}}{{"}}"}}:latest \
+          .
+        echo "✅ Build complete!"
+
+  push:
+    desc: Push Docker image to registry
+    deps: [build]
+    cmds:
+      - |
+        echo "📦 Pushing to registry..."
+        docker push {{"{{"}}{{"}}"}}{{"{{"}}{{"}}"}} .ORGANIZATION {{"}}"}}{{"}}"}}/{{"{{"}}{{"}}"}}{{"{{"}}{{"}}"}} .PROJECT_NAME {{"}}"}}{{"}}"}}:latest
+
+  compliance:
+    desc: Run all compliance checks
+    cmds:
+      - |
+        echo "🔍 Running compliance checks..."
+        docker run --rm -v $(pwd):/src:ro,Z -w /src \
+          siderolabs/conform:latest enforce || true
+        docker run --rm -v $(pwd):/tmp/lint:rw \
+          oxsecurity/megalinter:latest || true
+        docker run --rm -v $(pwd):/data:ro,Z \
+          fsfe/reuse:4-debian lint || true
+
+  clean:
+    desc: Clean generated files and artifacts
+    cmds:
+      - |
+        echo "🧹 Cleaning build artifacts..."
+        rm -rf .ruff_cache megalinter-reports
+        echo "✅ Clean complete!"
+
+  help:
+    desc: Display help information
+    cmds:
+      - |
+        echo "📚 {{ cookiecutter.project_slug }} - Docker Image Project"
+        echo ""
+        echo "Quick Start:"
+        echo "  1. task generate  - Generate all project files"
+        echo "  2. task build     - Build Docker image"
+        echo "  3. task push      - Push to registry"
+        echo ""
+        echo "Run 'task -l' to see all available tasks"
