@@ -7,7 +7,7 @@
   "_project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '-').replace('_', '-') }}",
   "_project_short_name": "{{ cookiecutter.project_name.lower().replace('docker-', '').replace(' ', '-').replace('_', '-').split('-') | map('capitalize') | join('') }}",
   "_project_full_name": "{{ cookiecutter.project_name.replace('-', ' ').replace('_', ' ').title() }}",
-  "project_description": "Docker Official Image packaging for {{ cookiecutter._project_short_name }}",
+  "project_description": "Docker Official Image packaging for {{ cookiecutter.project_name.lower().replace('docker-', '').replace(' ', '-').replace('_', '-').split('-') | map('capitalize') | join('') }}",
   
   "maintainer_name": "Broadsage",
   "maintainer_email": "opensource@broadsage.com",
