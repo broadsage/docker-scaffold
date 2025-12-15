@@ -28,20 +28,21 @@ image:
 
 # Override Features (uncomment to change from defaults)
 features:
-  github: "{% raw %}{{ 'true' if cookiecutter.features_github == 'y' else 'false' }}{% endraw %}" # Generate GitHub Actions workflow & Issue Templates
-  security: "{% raw %}{{ 'true' if cookiecutter.features_security == 'y' else 'false' }}{% endraw %}" # Enable vulnerability scanning
-  registry: "{% raw %}{{ 'true' if cookiecutter.features_registry == 'y' else 'false' }}{% endraw %}" # Push Docker Images to registries
-  compliance: "{% raw %}{{ 'true' if cookiecutter.features_compliance == 'y' else 'false' }}{% endraw %}" # Enable compliance & code quality tools
+  github: {{ ('true' if cookiecutter.features_github == 'y' else 'false') | lower }}  # Generate GitHub Actions workflow & Issue Templates
+  security: {{ ('true' if cookiecutter.features_security == 'y' else 'false') | lower }}  # Enable vulnerability scanning
+  registry: {{ ('true' if cookiecutter.features_registry == 'y' else 'false') | lower }}  # Push Docker Images to registries
+  compliance: {{ ('true' if cookiecutter.features_compliance == 'y' else 'false') | lower }}  # Enable compliance & code quality tools
 
 # Build Configuration
 build:
   platforms: >-
     {%- if cookiecutter.build_platforms == "multi-arch" %}
-    ["linux/amd64", "linux/arm64"]
+    - linux/amd64
+    - linux/arm64
     {%- elif cookiecutter.build_platforms == "amd64-only" %}
-    ["linux/amd64"]
+    - linux/amd64
     {%- elif cookiecutter.build_platforms == "arm64-only" %}
-    ["linux/arm64"]
+    - linux/arm64
     {%- endif %}
 
 # Override GitHub Settings (uncomment if needed)
