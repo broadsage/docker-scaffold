@@ -5,8 +5,6 @@
   "organization": "broadsage",
   "project_name": "docker-demo",
   "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '-').replace('_', '-') }}",
-  "_project_short_name": "{{ cookiecutter.project_name.lower().replace('docker-', '').replace(' ', '-').replace('_', '-').split('-') | map('capitalize') | join('') }}",
-  "_project_full_name": "{{ cookiecutter.project_name.replace('-', ' ').replace('_', ' ').title() }}",
   "project_description": "Docker Official Image packaging for {{ cookiecutter.project_name.lower().replace('docker-', '').replace(' ', '-').replace('_', '-').split('-') | map('capitalize') | join('') }}",
   
   "maintainer_name": "Broadsage",
@@ -18,19 +16,20 @@
     "MIT",
     "GPL-3.0",
     "BSD-3-Clause",
-    "MPL-2.0"
+    "MPL-2.0",
+    "Not Open Source"
   ],
   
-  "build_platforms": [
+  "architectures": [
     "multi-arch",
-    "amd64-only",
-    "arm64-only"
+    "linux/amd64",
+    "linux/arm64"
   ],
   
-  "features_github": ["y", "n"],
-  "features_security": ["y", "n"],
-  "features_registry": ["y", "n"],
-  "features_compliance": ["y", "n"],
+  "github": "y",
+  "security": "y",
+  "registry": "y",
+  "compliance": "y",
   
   "scaffold_image": "ghcr.io/broadsage/scaffold:latest"
 }

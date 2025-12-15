@@ -40,7 +40,7 @@ features:
 
 # Override Build Settings (uncomment if needed)
 build:
-  platforms:
+  architectures:
     - linux/amd64 # Single platform build
   dockerfile: Dockerfile.custom
 

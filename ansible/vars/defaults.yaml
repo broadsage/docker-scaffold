@@ -27,7 +27,7 @@ template:
 build:
   context: .
   dockerfile: Dockerfile
-  platforms:
+  architectures:
     - linux/amd64
     - linux/arm64
   cache:

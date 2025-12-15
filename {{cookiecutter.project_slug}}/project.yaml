@@ -28,22 +28,15 @@ image:
 
 # Override Features (uncomment to change from defaults)
 features:
-  github: {{ ('true' if cookiecutter.features_github == 'y' else 'false') | lower }}  # Generate GitHub Actions workflow & Issue Templates
-  security: {{ ('true' if cookiecutter.features_security == 'y' else 'false') | lower }}  # Enable vulnerability scanning
-  registry: {{ ('true' if cookiecutter.features_registry == 'y' else 'false') | lower }}  # Push Docker Images to registries
-  compliance: {{ ('true' if cookiecutter.features_compliance == 'y' else 'false') | lower }}  # Enable compliance & code quality tools
+  github: {{ ('true' if cookiecutter.github == 'y' else 'false') | lower }}  # Generate GitHub Actions workflow & Issue Templates
+  security: {{ ('true' if cookiecutter.security == 'y' else 'false') | lower }}  # Enable vulnerability scanning
+  registry: {{ ('true' if cookiecutter.registry == 'y' else 'false') | lower }}  # Push Docker Images to registries
+  compliance: {{ ('true' if cookiecutter.compliance == 'y' else 'false') | lower }}  # Enable compliance & code quality tools
 
-# Build Configuration
+# Build Configuration  
 build:
-  platforms: >-
-    {%- if cookiecutter.build_platforms == "multi-arch" %}
-    - linux/amd64
-    - linux/arm64
-    {%- elif cookiecutter.build_platforms == "amd64-only" %}
-    - linux/amd64
-    {%- elif cookiecutter.build_platforms == "arm64-only" %}
-    - linux/arm64
-    {%- endif %}
+  architectures: 
+    - {{ cookiecutter.architectures | default('multi-arch') }}
 
 # Override GitHub Settings (uncomment if needed)
 github:
