@@ -4,10 +4,10 @@
   
   "organization": "broadsage",
   "project_name": "docker-demo",
-  "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '-').replace('_', '-') }}",
-  "project_short_name": "{{ cookiecutter.project_name.lower().replace('docker-', '').replace(' ', '-').replace('_', '-').split('-') | map('capitalize') | join('') }}",
-  "project_full_name": "{{ cookiecutter.project_name.replace('-', ' ').replace('_', ' ').title() }}",
-  "project_short_description": "Docker Official Image packaging for {{ project_short_name }}",
+  "_project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '-').replace('_', '-') }}",
+  "_project_short_name": "{{ cookiecutter.project_name.lower().replace('docker-', '').replace(' ', '-').replace('_', '-').split('-') | map('capitalize') | join('') }}",
+  "_project_full_name": "{{ cookiecutter.project_name.replace('-', ' ').replace('_', ' ').title() }}",
+  "project_description": "Docker Official Image packaging for {{ cookiecutter._project_short_name }}",
   
   "maintainer_name": "Broadsage",
   "maintainer_email": "opensource@broadsage.com",
