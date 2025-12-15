@@ -10,29 +10,28 @@ policies:
       gpg:
         required: true
       header:
-        length: 89
+        length: 72
         imperative: true
         case: lower
-        invalidLastCharacters: "."
+        invalidLastCharacters: ".!?"
       body:
         required: true
       conventional:
         types:
-          [
-            "build",
-            "chore",
-            "ci",
-            "deps",
-            "docs",
-            "feat",
-            "fix",
-            "perf",
-            "refactor",
-            "release",
-            "style",
-            "test",
-          ]
+          - build
+          - chore
+          - ci
+          - deps
+          - docs
+          - feat
+          - fix
+          - perf
+          - refactor
+          - release
+          - style
+          - test
         scopes: [".*"]
         descriptionLength: 72
       spellcheck:
         locale: US
+      maximumOfOneCommit: false

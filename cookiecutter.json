@@ -1,0 +1,36 @@
+{
+  "_comment": "Minimal cookiecutter config - generates only project.yaml and Taskfile.yml",
+  "_comment_workflow": "Users run 'task generate' which uses Docker image to create all other files",
+  
+  "organization": "broadsage",
+  "project_name": "docker-demo",
+  "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '-').replace('_', '-') }}",
+  "project_short_name": "{{ cookiecutter.project_name.lower().replace('docker-', '').replace(' ', '-').replace('_', '-').split('-') | map('capitalize') | join('') }}",
+  "project_full_name": "{{ cookiecutter.project_name.replace('-', ' ').replace('_', ' ').title() }}",
+  "project_short_description": "Docker Official Image packaging for {{ project_short_name }}",
+  
+  "maintainer_name": "Broadsage",
+  "maintainer_email": "opensource@broadsage.com",
+  "vendor": "Broadsage Corporation Limited",
+  
+  "license": [
+    "Apache-2.0",
+    "MIT",
+    "GPL-3.0",
+    "BSD-3-Clause",
+    "MPL-2.0"
+  ],
+  
+  "build_platforms": [
+    "multi-arch",
+    "amd64-only",
+    "arm64-only"
+  ],
+  
+  "features_github": ["y", "n"],
+  "features_security": ["y", "n"],
+  "features_registry": ["y", "n"],
+  "features_compliance": ["y", "n"],
+  
+  "scaffold_image": "ghcr.io/broadsage/scaffold:latest"
+}

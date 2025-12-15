@@ -59,7 +59,7 @@
     - role: repository
       tags:
         - repository
-    
+
     - role: compliance
       tags:
         - compliance
