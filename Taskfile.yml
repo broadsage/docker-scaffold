@@ -52,12 +52,6 @@ tasks:
     cmds:
       - "{{.PYTHON_VENV}} scripts/compliance.py lint"
 
-  publiccode:
-    desc: Validate publiccode.yml configuration
-    deps: [setup]
-    cmds:
-      - "{{.PYTHON_VENV}} scripts/compliance.py publiccodelint"
-
   license:
     desc: |
       Check REUSE license compliance

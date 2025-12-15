@@ -10,7 +10,6 @@ This script automates compliance checking for code quality assurance using:
 - MegaLinter for code linting
 - REUSE for license compliance
 - Conform for commit message validation
-- publiccode-parser for publiccode.yaml validation
 
 Requirements:
     - Docker installed and running
@@ -22,7 +21,6 @@ Usage:
 
     Available checks:
         lint            - Run MegaLinter code quality checks
-        publiccodelint  - Validate publiccode.yaml
         license         - Check REUSE license compliance
         conform         - Validate commit messages
         all             - Run all checks (default)
@@ -54,7 +52,6 @@ MISSING: Final[str] = "✘"
 
 # Docker Images
 MEGALINTER_IMAGE: Final[str] = "oxsecurity/megalinter:latest"
-PUBLICCODE_IMAGE: Final[str] = "italia/publiccode-parser-go"
 REUSE_IMAGE: Final[str] = "docker.io/fsfe/reuse:latest"
 CONFORM_IMAGE: Final[str] = "ghcr.io/siderolabs/conform:latest"
 
@@ -199,67 +196,6 @@ def lint(container_engine: str) -> None:
         "Lint",
         "Lint check failed. Review logs in ./megalinter-reports/",
         "Lint check passed.",
-    )
-    print()
-
-
-def publiccodelint(container_engine: str) -> None:
-    """Validate publiccode.yaml compliance.
-
-    Validates the publiccode.yaml file using the official publiccode-parser-go tool.
-    Skips if the file doesn't exist.
-
-    Args:
-        container_engine: The container engine command to use (e.g., 'docker').
-    """
-    print_header("Publiccode Validator (publiccode.yml)")
-
-    project_root: Path = Path(__file__).parent.parent
-    publiccode_file: Path = project_root / "publiccode.yaml"
-
-    if not publiccode_file.exists():
-        store_exit_code(
-            EXIT_SUCCESS,
-            "publiccode.yml",
-            "publiccode.yaml not found, skipping.",
-            "publiccode.yaml not found, skipping.",
-        )
-        print()
-        return
-
-    try:
-        with open(publiccode_file, "r", encoding="utf-8") as f:
-            publiccode_content: str = f.read()
-
-        cmd: List[str] = [
-            container_engine,
-            "run",
-            "--rm",
-            "-i",
-            PUBLICCODE_IMAGE,
-            "-no-network",
-            "/dev/stdin",
-        ]
-
-        result: subprocess.CompletedProcess[str] = subprocess.run(
-            cmd, input=publiccode_content, text=True, check=False
-        )
-        exit_code: int = result.returncode
-    except FileNotFoundError:
-        print(f"{RED}Error: publiccode.yaml file not accessible.{NC}")
-        exit_code = EXIT_FAILURE
-    except subprocess.SubprocessError as e:
-        print(f"{RED}Error running publiccode linter: {e}{NC}")
-        exit_code = EXIT_FAILURE
-    except Exception as e:
-        print(f"{RED}Unexpected error during publiccode validation: {e}{NC}")
-        exit_code = EXIT_FAILURE
-
-    store_exit_code(
-        exit_code,
-        "publiccode.yml",
-        "publiccode.yaml validation failed. Review output above.",
-        "publiccode.yaml validation passed.",
     )
     print()
 
@@ -491,7 +427,6 @@ def main() -> int:
         epilog="""
 Available checks:
   lint            Run MegaLinter code quality checks
-  publiccodelint  Validate publiccode.yaml
   license         Check REUSE license compliance
   conform         Validate commit messages
   all             Run all checks (default)
@@ -506,7 +441,7 @@ Examples:
         "check",
         nargs="?",
         default="all",
-        choices=["lint", "publiccodelint", "license", "conform", "all"],
+        choices=["lint", "license", "conform", "all"],
         help="Specific check to run (default: all)",
     )
 
@@ -518,7 +453,6 @@ Examples:
     # Map check names to functions
     check_functions = {
         "lint": lint,
-        "publiccodelint": publiccodelint,
         "license": license,
         "conform": commit,
     }
@@ -530,7 +464,6 @@ Examples:
         print(f"{GREEN}{CHECKMARK} Using container engine: {container_engine}{NC}")
 
         lint(container_engine)
-        publiccodelint(container_engine)
         license(container_engine)
         commit(container_engine)
 

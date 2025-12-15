@@ -15,7 +15,6 @@ This role manages compliance and code quality tools configuration:
 - **Conform**: Commit message validation (Conventional Commits)
 - **MegaLinter**: Multi-language code linting and formatting
 - **REUSE**: License compliance and SPDX header validation
-- **publiccode.yaml**: Public code metadata (optional, for Italian public code registry)
 
 ## Requirements
 
@@ -30,7 +29,6 @@ compliance:
   conform: true        # Enable commit message validation
   megalinter: true     # Enable code linting
   reuse: true          # Enable license compliance
-  publiccode: false    # Enable publiccode.yaml (optional)
 ```
 
 ### Configuration Locations
@@ -64,14 +62,6 @@ compliance:
   conform: true
   megalinter: true
   reuse: false         # Skip license compliance
-  publiccode: false    # Skip publiccode.yaml
-```
-
-### Enable publiccode.yaml for Italian projects
-
-```yaml
-compliance:
-  publiccode: true     # Enable for public code registry
 ```
 
 ## Generated Files
@@ -81,7 +71,6 @@ compliance:
 | `.conform.yaml` | Commit message validation policy | Conform |
 | `.mega-linter.yaml` | Code linting configuration | MegaLinter |
 | `REUSE.toml` | License compliance rules | REUSE |
-| `publiccode.yaml` | Public code metadata | publiccode-parser-go |
 
 ## License
 

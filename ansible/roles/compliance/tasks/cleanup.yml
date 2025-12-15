@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: Copyright (c) 2025 Broadsage <opensource@broadsage.com>
+#
+# SPDX-License-Identifier: Apache-2.0
+---
+# tasks file for roles/compliance
+
+- name: Remove .conform.yaml when disabled (commit message validation)
+  ansible.builtin.file:
+    path: "/tmp/.conform.yaml"
+    state: absent
+  when: not compliance.conform | bool
+
+- name: Remove .mega-linter.yaml when disabled (code quality linting)
+  ansible.builtin.file:
+    path: "/tmp/.mega-linter.yaml"
+    state: absent
+  when: not compliance.megalinter | bool
+
+- name: Remove REUSE.toml when disabled (license compliance)
+  ansible.builtin.file:
+    path: "/tmp/REUSE.toml"
+    state: absent
+  when: not compliance.reuse | bool
