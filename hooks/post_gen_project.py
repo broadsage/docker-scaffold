@@ -15,7 +15,7 @@ import sys
 
 def display_next_steps() -> None:
     """Display instructions for completing project setup."""
-    project_slug = '{{ cookiecutter._project_slug }}'
+    project_slug = '{{ cookiecutter.project_slug }}'
     organization = '{{ cookiecutter.organization }}'
     scaffold_image = '{{ cookiecutter.scaffold_image }}'
     
