@@ -14,7 +14,6 @@ project setup.
 import sys
 from datetime import datetime
 from pathlib import Path
-import os
 
 
 def get_timestamp() -> str:
@@ -30,43 +29,33 @@ def print_event(emoji: str, message: str) -> None:
 
 def handle_license_file() -> None:
     """Handle license file selection and setup.
-
-    Reads selected license template from templates/licenses/ and creates LICENSE file.
-    Supports Jinja2 variable substitution for year and maintainer name.
+    
+    Copies the selected license template file to LICENSE if not "Not Open Source".
+    Removes all other license template files after selection.
     """
     selected_license: str = "{{ cookiecutter.license }}"
-
+    
     if selected_license == "Not Open Source":  # type: ignore[comparison-overlap]
+        # Remove all license templates for closed source projects
+        for license_file in Path(".").glob("LICENSE.*"):
+            license_file.unlink()
         print_event("📋", "No open source license selected")
         return
-
-    # Get the template directory - Cookiecutter sets COOKIECUTTER_TEMPLATE_FOLDER env var
-    template_folder: str = os.environ.get(
-        "COOKIECUTTER_TEMPLATE_FOLDER", str(Path(__file__).parent.parent)
-    )
-    license_template: Path = (
-        Path(template_folder) / "templates" / "licenses" / selected_license
-    )
+    
+    # Copy selected license template to LICENSE
+    license_source: Path = Path(f"LICENSE.{selected_license}")
     license_dest: Path = Path("LICENSE")
-
-    # Debug: print paths for troubleshooting
-    print_event(
-        "🔍",
-        f"Looking for license in: {license_template}",
-    )
-
-    if not license_template.exists():
-        print_event("⚠️ ", f"License template not found: {selected_license}")
-        print_event("💡", f"Expected path: {license_template}")
-        return
-
-    try:
-        # Read template content and write to LICENSE
-        content: str = license_template.read_text(encoding="utf-8")
-        license_dest.write_text(content, encoding="utf-8")
+    
+    if license_source.exists():
+        license_dest.write_text(license_source.read_text(encoding="utf-8"), encoding="utf-8")
         print_event("📜", f"License file created: {selected_license}")
-    except Exception as e:
-        print_event("❌", f"Error creating license file: {e}")
+    else:
+        print_event("⚠️ ", f"License template not found: LICENSE.{selected_license}")
+        return
+    
+    # Remove all license template files
+    for license_file in Path(".").glob("LICENSE.*"):
+        license_file.unlink()
 
 
 def display_next_steps() -> None:
