@@ -4,6 +4,24 @@
 ---
 # tasks file for roles/compliance
 
+- name: Create scripts directory in project
+  ansible.builtin.file:
+    path: "/tmp/scripts"
+    state: directory
+    owner: "abc"
+    group: "abc"
+    mode: "0755"
+  when: features.compliance | bool
+
+- name: Copy compliance.py script for compliance checks
+  template:
+    src: "compliance.py.j2"
+    dest: "/tmp/scripts/compliance.py"
+    owner: "abc"
+    group: "abc"
+    mode: "0755"
+  when: features.compliance | bool
+
 - name: Copy .conform.yaml (commit message validation)
   template:
     src: ".conform.yaml.j2"

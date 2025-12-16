@@ -5,77 +5,106 @@
 version: "3"
 
 vars:
-  PROJECT_NAME: { { cookiecutter.project_slug } }
-  ORGANIZATION: { { cookiecutter.organization } }
-  SCAFFOLD_IMAGE: { { cookiecutter.scaffold_image } }
+  PYTHON: python3
+  VENV: venv
+  PYTHON_VENV: "{{.VENV}}/bin/python3"
 
 tasks:
+  # Default Task - Show Help
   default:
     desc: Show available tasks
     cmds:
       - task -l
 
-  generate:
-    desc: Generate project structure using docker-scaffold
+  # Utility Tasks - System & Environment Checks
+  docker:
+    desc: Verify Docker is installed and available
     cmds:
       - |
-        echo "🏗️  Generating project structure from project.yaml..."
-        docker run --rm \
-          -v $(pwd):/output \
-          -e PUID=$(id -u) \
-          -e PGID=$(id -g) \
-          {{"{{"}}{{"}}"}}{{"{{"}}{{"}}"}} .SCAFFOLD_IMAGE {{"}}"}}{{"}}"}}
-        echo "✅ Project files generated!"
+        if command -v docker >/dev/null 2>&1; then
+          echo "✓ Docker is available"
+          docker --version
+        else
+          echo "✗ Docker is NOT installed"
+          exit 1
+        fi
+    aliases: [verify-docker-installation]
 
-  build:
-    desc: Build Docker image
-    deps: [generate]
+  # Setup Tasks - Environment Initialization
+  setup:
+    desc: Create Python virtual environment and install dependencies
+    status:
+      - test -d "{{.VENV}}" && test -f "{{.VENV}}/pyvenv.cfg" && test -f "{{.VENV}}/bin/python3"
     cmds:
+      - "{{.PYTHON}} -m venv {{.VENV}}"
       - |
-        echo "🐳 Building Docker image..."
-        docker buildx build \
-          --platform {% raw %}{{.PLATFORMS | default "linux/amd64"}}{% endraw %} \
-          -t {{"{{"}}{{"}}"}}{{"{{"}}{{"}}"}} .ORGANIZATION {{"}}"}}{{"}}"}}/{{"{{"}}{{"}}"}}{{"{{"}}{{"}}"}} .PROJECT_NAME {{"}}"}}{{"}}"}}:latest \
-          .
-        echo "✅ Build complete!"
+        source {{.VENV}}/bin/activate
+        pip3 install --upgrade pip
+        pip3 install -r requirements.txt
+        echo "✓ Virtual environment created and dependencies installed"
+    aliases: [init]
+    silent: false
 
-  push:
-    desc: Push Docker image to registry
-    deps: [build]
+  # Quality Checks - Code Quality & Compliance
+  lint:
+    desc: Run linting checks (MegaLinter)
+    deps: [setup]
     cmds:
-      - |
-        echo "📦 Pushing to registry..."
-        docker push {{"{{"}}{{"}}"}}{{"{{"}}{{"}}"}} .ORGANIZATION {{"}}"}}{{"}}"}}/{{"{{"}}{{"}}"}}{{"{{"}}{{"}}"}} .PROJECT_NAME {{"}}"}}{{"}}"}}:latest
+      - "{{.PYTHON_VENV}} scripts/compliance.py lint"
+
+  license:
+    desc: |
+      Check REUSE license compliance
+      Automatically downloads missing licenses before linting
+    deps: [setup]
+    cmds:
+      - "{{.PYTHON_VENV}} scripts/compliance.py license"
+
+  conform:
+    desc: Validate commits with Conform (direct execution)
+    deps: [setup]
+    cmds:
+      - "{{.PYTHON_VENV}} scripts/compliance.py conform"
 
   compliance:
-    desc: Run all compliance checks
+    desc: Run all code quality & compliance checks
+    deps: [setup]
+    cmds:
+      - "{{.PYTHON_VENV}} scripts/compliance.py all"
+
+  generate:
+    desc: Generate project files using docker-scaffold container
+    deps: [docker]
     cmds:
       - |
-        echo "🔍 Running compliance checks..."
-        docker run --rm -v $(pwd):/src:ro,Z -w /src \
-          siderolabs/conform:latest enforce || true
-        docker run --rm -v $(pwd):/tmp/lint:rw \
-          oxsecurity/megalinter:latest || true
-        docker run --rm -v $(pwd):/data:ro,Z \
-          fsfe/reuse:4-debian lint || true
+        echo "Generating project files using docker-scaffold..."
+        docker run --rm \
+          -v "$(pwd):/tmp" \
+          -e PUID=$(id -u) \
+          -e PGID=$(id -g) \
+          ghcr.io/broadsage/scaffold:latest
+        echo "✓ Project files generated successfully"
+        echo "Review generated files in the current directory"
 
+  # Cleanup Tasks - Environment Cleanup
   clean:
-    desc: Clean generated files and artifacts
+    desc: Remove Python virtual environment and cached files
     cmds:
       - |
-        echo "🧹 Cleaning build artifacts..."
-        rm -rf .ruff_cache megalinter-reports
-        echo "✅ Clean complete!"
+        if [ -d "{{.VENV}}" ]; then
+          rm -rf {{.VENV}}
+          echo "✓ Virtual environment removed"
+        else
+          echo "⚠ No virtual environment found to clean up"
+        fi
+      - |
+        find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
+        find . -type f -name "*.pyc" -delete 2>/dev/null || true
+        echo "✓ Cached files cleaned"
 
-  help:
-    desc: Display help information
+  # Workflow Tasks - Complete Workflows
+  pipeline:
+    desc: Complete CI pipeline (checks, tests, and docker build)
+    deps: [generate, compliance]
     cmds:
-      - |
-        echo "📚 {{ cookiecutter.project_slug }} - Docker Image Project"
-        echo ""
-        echo "Quick Start:"
-        echo "  1. task generate  - Generate all project files"
-        echo "  2. task build     - Build Docker image"
-        echo "  3. task push      - Push to registry"
-        echo ""
-        echo "Run 'task -l' to see all available tasks"
+      - echo "✓ CI pipeline completed successfully"

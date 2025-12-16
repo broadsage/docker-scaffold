@@ -4,6 +4,12 @@
 ---
 # tasks file for roles/compliance
 
+- name: Remove compliance scripts if compliance features is disabled
+  ansible.builtin.file:
+    path: "/tmp/scripts"
+    state: absent
+  when: not features.compliance | bool
+
 - name: Remove .conform.yaml when disabled (commit message validation)
   ansible.builtin.file:
     path: "/tmp/.conform.yaml"
