@@ -14,6 +14,15 @@ project setup.
 import sys
 from datetime import datetime
 from pathlib import Path
+from typing import Final
+
+# ANSI Color Codes
+GREEN: Final[str] = "\033[32m"
+CYAN: Final[str] = "\033[36m"
+YELLOW: Final[str] = "\033[33m"
+BLUE: Final[str] = "\033[34m"
+BOLD: Final[str] = "\033[1m"
+NC: Final[str] = "\033[0m"  # No Color
 
 
 def get_timestamp() -> str:
@@ -21,10 +30,17 @@ def get_timestamp() -> str:
     return datetime.now().strftime("%H:%M:%S")
 
 
-def print_event(emoji: str, message: str) -> None:
-    """Print formatted event message with timestamp."""
+def print_event(emoji: str, message: str, color: str = "") -> None:
+    """Print formatted event message with timestamp and optional color.
+    
+    Args:
+        emoji: The emoji to display
+        message: The message text
+        color: ANSI color code (optional)
+    """
     timestamp = get_timestamp()
-    print(f"{emoji} {message} • {timestamp}")
+    colored_msg = f"{color}{message}{NC}" if color else message
+    print(f"{emoji} {colored_msg} • {timestamp}")
 
 
 def handle_license_file() -> None:
@@ -48,7 +64,7 @@ def handle_license_file() -> None:
     
     if license_source.exists():
         license_dest.write_text(license_source.read_text(encoding="utf-8"), encoding="utf-8")
-        print_event("📜", f"License file created: {selected_license}")
+        print_event("📜", f"License file created: {YELLOW}{selected_license}{NC}", YELLOW)
     else:
         print_event("⚠️ ", f"License template not found: LICENSE.{selected_license}")
         return
@@ -63,23 +79,31 @@ def display_next_steps() -> None:
     project_slug = "{{ cookiecutter.project_slug }}"
 
     print()
-    print_event("✅", f"Project '{project_slug}' initialized successfully")
+    print_event("✅", f"Project {GREEN}{project_slug}{NC} initialized successfully", GREEN)
     print_event(
-        "📦", "Generated: project.yaml, Taskfile.yml, README.md, .gitignore, LICENSE"
+        "📦",
+        f"Generated: {CYAN}project.yaml, Taskfile.yml, README.md, .gitignore, LICENSE{NC}",
+        CYAN,
     )
-    print_event("📝", f"Configuration: {project_slug}/project.yaml")
+    print_event("📝", f"Configuration: {BLUE}{project_slug}/project.yaml{NC}", BLUE)
     print()
-    print_event("🚀", "Next Steps:")
+    print_event("🚀", f"{BOLD}{CYAN}Next Steps:{NC}", CYAN)
     print()
-    print(f"  1. cd {project_slug}")
-    print("  2. task generate           # Generate full project with Docker")
-    print("  3. task build              # Build Docker image")
-    print("  4. task compliance         # Run code quality checks")
+    print(f"  1. cd {CYAN}{project_slug}{NC}")
+    print(f"  2. {CYAN}task generate{NC}           # Generate full project with Docker")
+    print(f"  3. {CYAN}task build{NC}              # Build Docker image")
+    print(f"  4. {CYAN}task compliance{NC}         # Run code quality checks")
     print()
-    print_event("💡", "Customize: Edit project.yaml and run 'task generate' again")
-    print_event("❓", "Help: https://github.com/broadsage/docker-scaffold/discussions")
+    print_event("💡", f"Customize: Edit project.yaml and run {CYAN}task generate{NC} again", YELLOW)
     print_event(
-        "📚", "Docs: https://github.com/broadsage/docker-scaffold/blob/main/README.md"
+        "❓",
+        f"Help: {BLUE}https://github.com/broadsage/docker-scaffold/discussions{NC}",
+        BLUE,
+    )
+    print_event(
+        "📚",
+        f"Docs: {BLUE}https://github.com/broadsage/docker-scaffold/blob/main/README.md{NC}",
+        BLUE,
     )
     print()
 
