@@ -17,6 +17,7 @@ metadata:
     name: Broadsage
     email: opensource@broadsage.com
   vendor: Broadsage Corporation Limited
+  coc: conduct@broadsage.com
   license: Apache-2.0
 
 # Template Configuration (Files to exclude from generated projects)
