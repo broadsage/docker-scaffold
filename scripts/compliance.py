@@ -203,7 +203,7 @@ def lint(container_engine: str) -> None:
 def license(container_engine: str) -> None:
     """Verify license compliance using REUSE tool.
 
-    Downloads missing licenses and checks that all files have proper SPDX 
+    Downloads missing licenses and checks that all files have proper SPDX
     license headers and comply with REUSE specification 3.0.
 
     Args:

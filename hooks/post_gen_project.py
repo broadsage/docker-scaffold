@@ -29,25 +29,25 @@ def print_event(emoji: str, message: str) -> None:
 
 def handle_license_file() -> None:
     """Handle license file selection and setup.
-    
+
     Reads selected license template from templates/licenses/ and creates LICENSE file.
     Supports Jinja2 variable substitution for year and maintainer name.
     """
     selected_license: str = "{{ cookiecutter.license }}"
-    
+
     if selected_license == "Not Open Source":  # type: ignore[comparison-overlap]
         print_event("📋", "No open source license selected")
         return
-    
+
     # Read license template from templates/licenses/ directory
     template_root: Path = Path(__file__).parent.parent
     license_template: Path = template_root / "templates" / "licenses" / selected_license
     license_dest: Path = Path("LICENSE")
-    
+
     if not license_template.exists():
         print_event("⚠️ ", f"License template not found: {selected_license}")
         return
-    
+
     try:
         # Read template content and write to LICENSE
         content: str = license_template.read_text(encoding="utf-8")
@@ -63,7 +63,9 @@ def display_next_steps() -> None:
 
     print()
     print_event("✅", f"Project '{project_slug}' initialized successfully")
-    print_event("📦", "Generated: project.yaml, Taskfile.yml, README.md, .gitignore, LICENSE")
+    print_event(
+        "📦", "Generated: project.yaml, Taskfile.yml, README.md, .gitignore, LICENSE"
+    )
     print_event("📝", f"Configuration: {project_slug}/project.yaml")
     print()
     print_event("🚀", "Next Steps:")
