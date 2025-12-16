@@ -26,8 +26,8 @@ NC: Final[str] = "\033[0m"  # No Color
 
 
 def get_timestamp() -> str:
-    """Get current time in HH:MM:SS format."""
-    return datetime.now().strftime("%H:%M:%S")
+    """Get current date and time in DD-Mmm-YYYY HH:MM:SS format."""
+    return datetime.now().strftime("%d-%b-%Y %H:%M:%S")
 
 
 def print_event(emoji: str, message: str, color: str = "") -> None:
