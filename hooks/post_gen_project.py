@@ -91,7 +91,7 @@ def display_next_steps() -> None:
     print()
     print(f"  1. cd {CYAN}{project_slug}{NC}")
     print(f"  2. {CYAN}task generate{NC}           # Generate full project with Docker")
-    print(f"  3. {CYAN}task build{NC}              # Build Docker image")
+    print(f"  3. {CYAN}task setup{NC}              # Setup development environment")
     print(f"  4. {CYAN}task compliance{NC}         # Run code quality checks")
     print()
     print_event("💡", f"Customize: Edit project.yaml and run {CYAN}task generate{NC} again", YELLOW)
