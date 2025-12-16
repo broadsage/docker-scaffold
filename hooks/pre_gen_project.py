@@ -75,6 +75,7 @@ def main() -> None:
         # Display info
         print()
         print("✅ Pre-generation validation successful!")
+        print()
         print(f"  Project:     {project_name}")
         print(f"  Email:       {maintainer_email}")
         print(f"  Organization: {organization or 'Not specified'}")
