@@ -4,11 +4,6 @@
 ---
 version: "3"
 
-vars:
-  PYTHON: python3
-  VENV: venv
-  PYTHON_VENV: "{{ cookiecutter._python_virtual_env }}"
-
 tasks:
   # Default Task - Show Help
   default:
@@ -34,11 +29,11 @@ tasks:
   setup:
     desc: Create Python virtual environment and install dependencies
     status:
-      - test -d "{{.VENV}}" && test -f "{{.VENV}}/pyvenv.cfg" && test -f "{{.VENV}}/bin/python3"
+      - test -d "{{ cookiecutter._python_venv_dir }}" && test -f "{{ cookiecutter._python_venv_dir }}/pyvenv.cfg" && test -f "{{ cookiecutter._python_venv_dir }}/bin/python3"
     cmds:
-      - "{{.PYTHON}} -m venv {{.VENV}}"
+      - "python3 -m venv {{ cookiecutter._python_venv_dir }}"
       - |
-        source {{.VENV}}/bin/activate
+        source {{ cookiecutter._python_venv_dir }}/bin/activate
         pip3 install --upgrade pip
         pip3 install -r requirements.txt
         echo "✓ Virtual environment created and dependencies installed"
@@ -50,7 +45,7 @@ tasks:
     desc: Run linting checks (MegaLinter)
     deps: [setup]
     cmds:
-      - "{{.PYTHON_VENV}} scripts/compliance.py lint"
+      - "{{ _python_executable }} scripts/compliance.py lint"
 
   license:
     desc: |
@@ -58,19 +53,19 @@ tasks:
       Automatically downloads missing licenses before linting
     deps: [setup]
     cmds:
-      - "{{.PYTHON_VENV}} scripts/compliance.py license"
+      - "{{ _python_executable}} scripts/compliance.py license"
 
   conform:
     desc: Validate commits with Conform (direct execution)
     deps: [setup]
     cmds:
-      - "{{.PYTHON_VENV}} scripts/compliance.py conform"
+      - "{{ _python_executable}} scripts/compliance.py conform"
 
   compliance:
     desc: Run all code quality & compliance checks
     deps: [setup]
     cmds:
-      - "{{.PYTHON_VENV}} scripts/compliance.py all"
+      - "{{ _python_executable}} scripts/compliance.py all"
 
   generate:
     desc: Generate project files using docker-scaffold container
@@ -91,8 +86,8 @@ tasks:
     desc: Remove Python virtual environment and cached files
     cmds:
       - |
-        if [ -d "{{.VENV}}" ]; then
-          rm -rf {{.VENV}}
+        if [ -d "{{ cookiecutter._python_venv_dir}}" ]; then
+          rm -rf {{ cookiecutter._python_venv_dir }}
           echo "✓ Virtual environment removed"
         else
           echo "⚠ No virtual environment found to clean up"
