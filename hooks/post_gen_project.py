@@ -14,6 +14,7 @@ project setup.
 import sys
 from datetime import datetime
 from pathlib import Path
+import os
 
 
 def get_timestamp() -> str:
@@ -39,13 +40,24 @@ def handle_license_file() -> None:
         print_event("📋", "No open source license selected")
         return
 
-    # Read license template from templates/licenses/ directory
-    template_root: Path = Path(__file__).parent.parent
-    license_template: Path = template_root / "templates" / "licenses" / selected_license
+    # Get the template directory - Cookiecutter sets COOKIECUTTER_TEMPLATE_FOLDER env var
+    template_folder: str = os.environ.get(
+        "COOKIECUTTER_TEMPLATE_FOLDER", str(Path(__file__).parent.parent)
+    )
+    license_template: Path = (
+        Path(template_folder) / "templates" / "licenses" / selected_license
+    )
     license_dest: Path = Path("LICENSE")
+
+    # Debug: print paths for troubleshooting
+    print_event(
+        "🔍",
+        f"Looking for license in: {license_template}",
+    )
 
     if not license_template.exists():
         print_event("⚠️ ", f"License template not found: {selected_license}")
+        print_event("💡", f"Expected path: {license_template}")
         return
 
     try:
