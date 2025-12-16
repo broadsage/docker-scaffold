@@ -81,8 +81,6 @@ to the whole community may be part of a mutually agreed upon resolution.
 
 ## Addressing and Repairing Harm
 
-****
-
 If an investigation by the Community Moderators finds that this Code of Conduct has been violated, the following enforcement ladder may be used to determine how best to repair harm, based on the incident's impact on the individuals involved and the community as a whole. Depending on the severity of a violation, lower rungs on the ladder may be skipped.
 
 1) Warning
