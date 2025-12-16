@@ -5,9 +5,9 @@
 version: "3"
 
 vars:
-  PROJECT_NAME: {{ cookiecutter.project_slug }}
-  ORGANIZATION: {{ cookiecutter.organization }}
-  SCAFFOLD_IMAGE: {{ cookiecutter.scaffold_image }}
+  PROJECT_NAME: { { cookiecutter.project_slug } }
+  ORGANIZATION: { { cookiecutter.organization } }
+  SCAFFOLD_IMAGE: { { cookiecutter.scaffold_image } }
 
 tasks:
   default:

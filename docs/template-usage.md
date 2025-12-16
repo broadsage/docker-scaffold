@@ -430,4 +430,4 @@ cookiecutter gh:broadsage/docker-scaffold \
 
 - **Issues**: [GitHub Issues](https://github.com/broadsage/docker-scaffold/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/broadsage/docker-scaffold/discussions)
-- **Email**: opensource@broadsage.com
+- **Email**: <opensource@broadsage.com>

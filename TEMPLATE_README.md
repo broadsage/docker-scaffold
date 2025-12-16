@@ -366,7 +366,7 @@ task clean               # Clean build artifacts
 
 - **GitHub Issues**: [Report bugs or request features](https://github.com/broadsage/docker-scaffold/issues)
 - **GitHub Discussions**: [Ask questions or share ideas](https://github.com/broadsage/docker-scaffold/discussions)
-- **Email**: opensource@broadsage.com
+- **Email**: <opensource@broadsage.com>
 
 ---
 
