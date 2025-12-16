@@ -45,7 +45,7 @@ tasks:
     desc: Run linting checks (MegaLinter)
     deps: [setup]
     cmds:
-      - "{{ _python_executable }} scripts/compliance.py lint"
+      - "{{ cookiecutter._python_executable }} scripts/compliance.py lint"
 
   license:
     desc: |
@@ -53,19 +53,19 @@ tasks:
       Automatically downloads missing licenses before linting
     deps: [setup]
     cmds:
-      - "{{ _python_executable}} scripts/compliance.py license"
+      - "{{ cookiecutter._python_executable }} scripts/compliance.py license"
 
   conform:
     desc: Validate commits with Conform (direct execution)
     deps: [setup]
     cmds:
-      - "{{ _python_executable}} scripts/compliance.py conform"
+      - "{{ cookiecutter._python_executable }} scripts/compliance.py conform"
 
   compliance:
     desc: Run all code quality & compliance checks
     deps: [setup]
     cmds:
-      - "{{ _python_executable}} scripts/compliance.py all"
+      - "{{ cookiecutter._python_executable }} scripts/compliance.py all"
 
   generate:
     desc: Generate project files using docker-scaffold container
