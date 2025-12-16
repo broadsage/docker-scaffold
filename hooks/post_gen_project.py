@@ -11,7 +11,6 @@ Handles license file selection and displays progress events for completing
 project setup.
 """
 
-import shutil
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -31,32 +30,31 @@ def print_event(emoji: str, message: str) -> None:
 def handle_license_file() -> None:
     """Handle license file selection and setup.
     
-    Copies the selected license template file to LICENSE if not "Not Open Source".
-    Removes all other license template files after selection.
+    Reads selected license template from templates/licenses/ and creates LICENSE file.
+    Supports Jinja2 variable substitution for year and maintainer name.
     """
     selected_license: str = "{{ cookiecutter.license }}"
     
     if selected_license == "Not Open Source":  # type: ignore[comparison-overlap]
-        # Remove all license templates for closed source projects
-        for license_file in Path(".").glob("LICENSE.*"):
-            license_file.unlink()
         print_event("📋", "No open source license selected")
         return
     
-    # Copy selected license template to LICENSE
-    license_source: Path = Path(f"LICENSE.{selected_license}")
+    # Read license template from templates/licenses/ directory
+    template_root: Path = Path(__file__).parent.parent
+    license_template: Path = template_root / "templates" / "licenses" / selected_license
     license_dest: Path = Path("LICENSE")
     
-    if license_source.exists():
-        shutil.copy(license_source, license_dest)
-        print_event("📜", f"License file created: {selected_license}")
-    else:
-        print_event("⚠️ ", f"License template not found: LICENSE.{selected_license}")
+    if not license_template.exists():
+        print_event("⚠️ ", f"License template not found: {selected_license}")
         return
     
-    # Remove all license template files
-    for license_file in Path(".").glob("LICENSE.*"):
-        license_file.unlink()
+    try:
+        # Read template content and write to LICENSE
+        content: str = license_template.read_text(encoding="utf-8")
+        license_dest.write_text(content, encoding="utf-8")
+        print_event("📜", f"License file created: {selected_license}")
+    except Exception as e:
+        print_event("❌", f"Error creating license file: {e}")
 
 
 def display_next_steps() -> None:
