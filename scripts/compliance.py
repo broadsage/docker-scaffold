@@ -381,19 +381,28 @@ def check_exit_codes() -> int:
     # Table rows
     for check, status, msg in SUMMARY_TABLE:
         if status == "PASS":
-            status_disp: str = f"{GREEN}PASS {CHECKMARK}{NC}"
+            status_symbol: str = f"PASS {CHECKMARK}"
+            status_color: str = GREEN
         else:
-            status_disp = f"{RED}FAIL {MISSING}{NC}"
+            status_symbol = f"FAIL {MISSING}"
+            status_color = RED
 
         # Truncate message if too long
         msg_disp: str = (
             msg if len(msg) <= message_width else f"{msg[:message_width - 3]}..."
         )
 
-        print(
-            f"| {check:<{check_width}} | {status_disp:<{status_width + 10}} | "
+        # Format row with proper spacing (without ANSI codes in width calculation)
+        row: str = (
+            f"| {check:<{check_width}} | "
+            f"{status_symbol:<{status_width}} | "
             f"{msg_disp:<{message_width}} |"
         )
+        # Apply colors to status part
+        row_colored: str = row.replace(
+            status_symbol, f"{status_color}{status_symbol}{NC}"
+        )
+        print(row_colored)
 
     print()
 
