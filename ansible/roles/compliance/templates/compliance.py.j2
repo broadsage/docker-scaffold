@@ -4,6 +4,7 @@
 #
 # SPDX-License-Identifier: {{ metadata.license }}
 
+
 """Code Quality & Compliance Check Script.
 
 This script automates compliance checking for code quality assurance using:
@@ -203,8 +204,8 @@ def lint(container_engine: str) -> None:
 def license(container_engine: str) -> None:
     """Verify license compliance using REUSE tool.
 
-    Checks that all files have proper SPDX license headers and comply with
-    REUSE specification 3.0.
+    Downloads missing licenses and checks that all files have proper SPDX 
+    license headers and comply with REUSE specification 3.0.
 
     Args:
         container_engine: The container engine command to use (e.g., 'docker').
@@ -213,7 +214,33 @@ def license(container_engine: str) -> None:
 
     project_root: str = str(Path(__file__).parent.parent)
 
-    cmd: List[str] = [
+    # Step 1: Download missing licenses
+    print(f"{BLUE}Downloading missing licenses...{NC}")
+    download_cmd: List[str] = [
+        container_engine,
+        "run",
+        "--rm",
+        "--volume",
+        f"{project_root}:{DATA_PATH}",
+        REUSE_IMAGE,
+        "download",
+        "--all",
+    ]
+
+    try:
+        download_result: subprocess.CompletedProcess[Any] = subprocess.run(
+            download_cmd, check=False
+        )
+        if download_result.returncode != EXIT_SUCCESS:
+            print(f"{YELLOW}Warning: License download completed with issues.{NC}")
+    except subprocess.SubprocessError as e:
+        print(f"{YELLOW}Warning: Error downloading licenses: {e}{NC}")
+    except Exception as e:
+        print(f"{YELLOW}Warning: Unexpected error during license download: {e}{NC}")
+
+    # Step 2: Lint licenses
+    print(f"\n{BLUE}Linting license compliance...{NC}")
+    lint_cmd: List[str] = [
         container_engine,
         "run",
         "--rm",
@@ -224,10 +251,10 @@ def license(container_engine: str) -> None:
     ]
 
     try:
-        result: subprocess.CompletedProcess[Any] = subprocess.run(cmd, check=False)
+        result: subprocess.CompletedProcess[Any] = subprocess.run(lint_cmd, check=False)
         exit_code: int = result.returncode
     except subprocess.SubprocessError as e:
-        print(f"{RED}Error running REUSE: {e}{NC}")
+        print(f"{RED}Error running REUSE lint: {e}{NC}")
         exit_code = EXIT_FAILURE
     except Exception as e:
         print(f"{RED}Unexpected error during license check: {e}{NC}")
