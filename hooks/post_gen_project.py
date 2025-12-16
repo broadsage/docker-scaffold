@@ -32,7 +32,7 @@ def get_timestamp() -> str:
 
 def print_event(emoji: str, message: str, color: str = "") -> None:
     """Print formatted event message with timestamp and optional color.
-    
+
     Args:
         emoji: The emoji to display
         message: The message text
@@ -45,30 +45,34 @@ def print_event(emoji: str, message: str, color: str = "") -> None:
 
 def handle_license_file() -> None:
     """Handle license file selection and setup.
-    
+
     Copies the selected license template file to LICENSE if not "Not Open Source".
     Removes all other license template files after selection.
     """
     selected_license: str = "{{ cookiecutter.license }}"
-    
+
     if selected_license == "Not Open Source":  # type: ignore[comparison-overlap]
         # Remove all license templates for closed source projects
         for license_file in Path(".").glob("LICENSE.*"):
             license_file.unlink()
         print_event("📋", "No open source license selected")
         return
-    
+
     # Copy selected license template to LICENSE
     license_source: Path = Path(f"LICENSE.{selected_license}")
     license_dest: Path = Path("LICENSE")
-    
+
     if license_source.exists():
-        license_dest.write_text(license_source.read_text(encoding="utf-8"), encoding="utf-8")
-        print_event("📜", f"License file created: {YELLOW}{selected_license}{NC}", YELLOW)
+        license_dest.write_text(
+            license_source.read_text(encoding="utf-8"), encoding="utf-8"
+        )
+        print_event(
+            "📜", f"License file created: {YELLOW}{selected_license}{NC}", YELLOW
+        )
     else:
         print_event("⚠️ ", f"License template not found: LICENSE.{selected_license}")
         return
-    
+
     # Remove all license template files
     for license_file in Path(".").glob("LICENSE.*"):
         license_file.unlink()
@@ -79,10 +83,13 @@ def display_next_steps() -> None:
     project_slug = "{{ cookiecutter.project_slug }}"
 
     print()
-    print_event("✅", f"Project {GREEN}{project_slug}{NC} initialized successfully", GREEN)
+    print_event(
+        "✅", f"Project {GREEN}{project_slug}{NC} initialized successfully", GREEN
+    )
     print_event(
         "📦",
-        f"Generated: {CYAN}project.yaml, Taskfile.yml, README.md, .gitignore, LICENSE{NC}",
+        f"Generated: {CYAN}project.yaml, Taskfile.yml, README.md, .gitignore, "
+        f"LICENSE{NC}",
         CYAN,
     )
     print_event("📝", f"Configuration: {BLUE}{project_slug}/project.yaml{NC}", BLUE)
@@ -94,7 +101,11 @@ def display_next_steps() -> None:
     print(f"  3. {CYAN}task setup{NC}              # Setup development environment")
     print(f"  4. {CYAN}task compliance{NC}         # Run code quality checks")
     print()
-    print_event("💡", f"Customize: Edit project.yaml and run {CYAN}task generate{NC} again", YELLOW)
+    print_event(
+        "💡",
+        f"Customize: Edit project.yaml and run {CYAN}task generate{NC} again",
+        YELLOW,
+    )
     print_event(
         "❓",
         f"Help: {BLUE}https://github.com/broadsage/docker-scaffold/discussions{NC}",
@@ -102,7 +113,8 @@ def display_next_steps() -> None:
     )
     print_event(
         "📚",
-        f"Docs: {BLUE}https://github.com/broadsage/docker-scaffold/blob/main/README.md{NC}",
+        f"Docs: {BLUE}https://github.com/broadsage/docker-scaffold/blob/main/"
+        f"README.md{NC}",
         BLUE,
     )
     print()

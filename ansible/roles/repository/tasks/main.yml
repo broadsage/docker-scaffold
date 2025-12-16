@@ -15,4 +15,5 @@
     - .gitignore
     - requirements.txt
     - .pre-commit-config.yaml
+    - CODE_OF_CONDUCT.md
   when: item not in template.exclude | default([])
