@@ -7,7 +7,7 @@ version: "3"
 vars:
   PYTHON: python3
   VENV: venv
-  PYTHON_VENV: "{{.VENV}}/bin/python3"
+  PYTHON_VENV: "{{ cookiecutter._python_virtual_env }}"
 
 tasks:
   # Default Task - Show Help

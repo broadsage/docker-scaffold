@@ -10,6 +10,7 @@
   "maintainer_name": "Broadsage",
   "maintainer_email": "opensource@broadsage.com",
   "vendor": "Broadsage Corporation Limited",
+  "_python_virtual_env": "{{.VENV}}/bin/python3",
   
   "license": [
     "Apache-2.0",
@@ -29,7 +30,5 @@
   "github": "y",
   "security": "y",
   "registry": "y",
-  "compliance": "y",
-  
-  "scaffold_image": "ghcr.io/broadsage/scaffold:latest"
+  "compliance": "y"
 }
