@@ -51,7 +51,7 @@ CHECKMARK: Final[str] = "✔"
 MISSING: Final[str] = "✘"
 
 # Docker Images
-MEGALINTER_IMAGE: Final[str] = "oxsecurity/megalinter:latest"
+MEGALINTER_IMAGE: Final[str] = "oxsecurity/megalinter-cupcake:v9.2.0"
 REUSE_IMAGE: Final[str] = "docker.io/fsfe/reuse:latest"
 CONFORM_IMAGE: Final[str] = "ghcr.io/siderolabs/conform:latest"
 

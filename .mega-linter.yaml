@@ -3,11 +3,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 ---
-# Configuration file for MegaLinter using python flavor
+# Configuration file for MegaLinter using cupcake flavor
 # See configuration options at https://oxsecurity.github.io/megalinter/configuration/
 
-# Use python flavor - optimized for Python projects with full linting support
-FLAVOR: python
+# Use cupcake flavor - optimized for Python projects with full linting support
+FLAVOR: cupcake
 
 # General
 PRINT_ALPACA: false
@@ -59,7 +59,8 @@ BASH_SHELLCHECK_FILE_EXTENSIONS: [.sh]
 
 MARKDOWN_MARKDOWNLINT_DISABLE_ERRORS: false
 
-YAML_PRETTIER_FILE_EXTENSIONS: [.yaml, .yml]
+# Exclude cookiecutter template YAML from PRETTIER (keep YAMLLINT validation)
+YAML_PRETTIER_FILTER_REGEX_EXCLUDE: .*{{cookiecutter.*
 YAML_YAMLLINT_FILE_EXTENSIONS: [.yaml, .yml]
 
 DOCKERFILE_HADOLINT_FILE_EXTENSIONS: [Dockerfile]

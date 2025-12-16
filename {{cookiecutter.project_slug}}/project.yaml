@@ -22,27 +22,21 @@
 
 # Image Identity (REQUIRED - customize for each image)
 image:
-  name: { { cookiecutter.project_slug } }
-  description: { { cookiecutter.project_description } }
+  name: {{ cookiecutter.project_slug }}
+  description: {{ cookiecutter.project_description }}
   # version: 1.0.0  # Optional: specify version (auto-generated if omitted)
 
 # Override Features (uncomment to change from defaults)
 features:
-  github: { { ('true' if cookiecutter.github == 'y' else 'false') | lower } } # Generate GitHub Actions workflow & Issue Templates
-  security: {
-      { ('true' if cookiecutter.security == 'y' else 'false') | lower },
-    } # Enable vulnerability scanning
-  registry: {
-      { ('true' if cookiecutter.registry == 'y' else 'false') | lower },
-    } # Push Docker Images to registries
-  compliance: {
-      { ('true' if cookiecutter.compliance == 'y' else 'false') | lower },
-    } # Enable compliance & code quality tools
+  github: {{ ('true' if cookiecutter.github == 'y' else 'false') | lower }}  # Generate GitHub Actions workflow & Issue Templates
+  security: {{ ('true' if cookiecutter.security == 'y' else 'false') | lower }}  # Enable vulnerability scanning
+  registry: {{ ('true' if cookiecutter.registry == 'y' else 'false') | lower }}  # Push Docker Images to registries
+  compliance: {{ ('true' if cookiecutter.compliance == 'y' else 'false') | lower }}  # Enable compliance & code quality tools
 
 # Build Configuration
 build:
   architectures:
-    - { { cookiecutter.architectures | default('multi-arch') } }
+    - {{ cookiecutter.architectures | default('multi-arch') }}
 
 # Override GitHub Settings (uncomment if needed)
 github:

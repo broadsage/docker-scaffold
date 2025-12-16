@@ -231,7 +231,7 @@ cookiecutter gh:broadsage/docker-scaffold \
 
 ### Template Structure
 
-```
+```text
 docker-scaffold/
 ├── cookiecutter.json              # Template configuration
 ├── hooks/                         # Generation hooks

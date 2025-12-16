@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+
+# SPDX-FileCopyrightText: Copyright (c) 2025 Broadsage <opensource@broadsage.com>
+#
+# SPDX-License-Identifier: Apache-2.0
+
 """
 Pre-generation hook for cookiecutter template.
 Validates inputs before project generation.
@@ -68,13 +73,12 @@ def main() -> None:
         validate_email(maintainer_email)
 
         # Display info
-        print("\n" + "=" * 60)
+        print()
         print("✅ Pre-generation validation successful!")
-        print("=" * 60)
         print(f"  Project:     {project_name}")
         print(f"  Email:       {maintainer_email}")
         print(f"  Organization: {organization or 'Not specified'}")
-        print("=" * 60 + "\n")
+        print()
 
     except ValueError as e:
         print(f"\n❌ ERROR: {e}\n", file=sys.stderr)

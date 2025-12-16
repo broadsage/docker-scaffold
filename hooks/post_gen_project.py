@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+
+# SPDX-FileCopyrightText: Copyright (c) 2025 Broadsage <opensource@broadsage.com>
+#
+# SPDX-License-Identifier: Apache-2.0
+
 """Post-generation hook for cookiecutter template.
 
 This hook runs AFTER project.yaml and Taskfile.yml are generated.
@@ -28,8 +33,6 @@ def print_event(emoji: str, message: str) -> None:
 def display_next_steps() -> None:
     """Display instructions for completing project setup."""
     project_slug = "{{ cookiecutter.project_slug }}"
-    organization = "{{ cookiecutter.organization }}"
-    scaffold_image = "{{ cookiecutter.scaffold_image }}"
 
     print()
     print_event("✅", f"Project '{project_slug}' initialized successfully")
@@ -39,13 +42,15 @@ def display_next_steps() -> None:
     print_event("🚀", "Next Steps:")
     print()
     print(f"  1. cd {project_slug}")
-    print(f"  2. task generate           # Generate full project with Docker")
-    print(f"  3. task build              # Build Docker image")
-    print(f"  4. task compliance         # Run code quality checks")
+    print("  2. task generate           # Generate full project with Docker")
+    print("  3. task build              # Build Docker image")
+    print("  4. task compliance         # Run code quality checks")
     print()
     print_event("💡", "Customize: Edit project.yaml and run 'task generate' again")
     print_event("❓", "Help: https://github.com/broadsage/docker-scaffold/discussions")
-    print_event("📚", "Docs: https://github.com/broadsage/docker-scaffold/blob/main/README.md")
+    print_event(
+        "📚", "Docs: https://github.com/broadsage/docker-scaffold/blob/main/README.md"
+    )
     print()
 
 
