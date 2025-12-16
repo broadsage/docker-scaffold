@@ -82,7 +82,7 @@ def print_header(header: str) -> None:
     Args:
         header: The header text to display.
     """
-    now: str = datetime.now().strftime("%H:%M:%S")
+    now: str = datetime.now().strftime("%d-%b-%Y %H:%M:%S")
     print(f"\n{BLUE}▶ {header} • {now}{NC}")
 
 
@@ -92,7 +92,7 @@ def print_banner(msg: str) -> None:
     Args:
         msg: The message to display in the banner.
     """
-    now: str = datetime.now().strftime("%H:%M:%S")
+    now: str = datetime.now().strftime("%d-%b-%Y %H:%M:%S")
     print(f"\n{BOLD}{BLUE}▶ {msg} • {now}{NC}\n")
 
 
