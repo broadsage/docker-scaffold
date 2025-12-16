@@ -26,6 +26,10 @@ image:
   description: Ansible-powered scaffolding tool for Docker image repositories
   # version: 1.0.0  # Optional: specify version (auto-generated if omitted)
 
+# Metadata (REQUIRED - must be set for each project)
+metadata:
+  license: Apache-2.0
+
 # Template Configuration (Files to exclude from generated projects)
 template:
   exclude:

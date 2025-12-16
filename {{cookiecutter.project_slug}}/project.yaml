@@ -8,6 +8,7 @@
 # REQUIRED FIELDS (must customize for each image):
 #   - image.name: Unique identifier for this Docker image
 #   - image.description: Brief description of image purpose
+#   - metadata.license: License for this project (set during project creation)
 #
 # OPTIONAL OVERRIDES (uncomment to override defaults.yml):
 #   - build.platforms: If different from org default
@@ -25,6 +26,10 @@ image:
   name: {{ cookiecutter.project_slug }}
   description: {{ cookiecutter.project_description }}
   # version: 1.0.0  # Optional: specify version (auto-generated if omitted)
+
+# Metadata (REQUIRED - must be set for each project)
+metadata:
+  license: {{ cookiecutter.license }}  # MANDATORY: License must be specified
 
 # Override Features (uncomment to change from defaults)
 features:

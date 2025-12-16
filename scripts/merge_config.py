@@ -162,6 +162,14 @@ def validate_config(config: Dict[str, Any]) -> List[str]:
         if not image_name or not isinstance(image_name, str):
             errors.append("image.name must be a non-empty string")
 
+    # Validate metadata.license (MANDATORY)
+    if "metadata" in config:
+        license_value = config["metadata"].get("license")
+        if not license_value or not isinstance(license_value, str):
+            errors.append("metadata.license must be a non-empty string")
+    else:
+        errors.append("metadata section is required with license field")
+
     # Validate build.platforms if present
     if "build" in config and "platforms" in config["build"]:
         platforms = config["build"]["platforms"]
