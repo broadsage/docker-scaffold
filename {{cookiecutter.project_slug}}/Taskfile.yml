@@ -86,7 +86,7 @@ tasks:
     desc: Remove Python virtual environment and cached files
     cmds:
       - |
-        if [ -d "{{ cookiecutter._python_venv_dir}}" ]; then
+        if [ -d "{{ cookiecutter._python_venv_dir }}" ]; then
           rm -rf {{ cookiecutter._python_venv_dir }}
           echo "✓ Virtual environment removed"
         else

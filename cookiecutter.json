@@ -11,7 +11,7 @@
   "maintainer_email": "opensource@broadsage.com",
   "vendor": "Broadsage Corporation Limited",
   "_python_venv_dir": "venv",
-  "_python_executable": "{{ cookiecutter._python_venv_dir }}/bin/python3",
+  "_python_executable": "venv/bin/python3",
   
   "license": [
     "Apache-2.0",
