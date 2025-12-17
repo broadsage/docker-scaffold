@@ -17,8 +17,6 @@ We are committed to:
 - Maintaining transparency with our community
 - Providing timely security updates
 
----
-
 ## Supported Versions
 
 We provide security updates for the following versions of docker-scaffold:
@@ -29,8 +27,6 @@ We provide security updates for the following versions of docker-scaffold:
 | 1.x | ✅ Active | TBD |
 
 For optimal security, we recommend always using the latest stable release. Check the [Releases](https://github.com/broadsage/docker-scaffold/releases) page for version information.
-
----
 
 ## Reporting a Vulnerability
 
@@ -89,8 +85,6 @@ Report a vulnerability if:
 - ❌ Vulnerabilities in dependencies without reproducible impact on docker-scaffold
 - ❌ Theoretical vulnerabilities without proof-of-concept demonstration
 
----
-
 ## Vulnerability Severity Classification
 
 We use CVSS v3.1 for scoring to determine response priority:
@@ -101,8 +95,6 @@ We use CVSS v3.1 for scoring to determine response priority:
 | **High** | 7.0 - 8.9 | Significant security risk | 3-7 days |
 | **Medium** | 4.0 - 6.9 | Moderate security concern | 7-30 days |
 | **Low** | 0.1 - 3.9 | Minor security issue | 30-90 days |
-
----
 
 ## Response & Resolution Timeline
 
@@ -162,8 +154,6 @@ We do not address the following through the security disclosure process:
 
 For these cases, please use [GitHub Issues](https://github.com/broadsage/docker-scaffold/issues) or [Discussions](https://github.com/broadsage/docker-scaffold/discussions)
 
----
-
 ## Security Best Practices
 
 ### For Generated Docker Images
@@ -216,8 +206,6 @@ Security updates will be provided for all architectures:
 - Linux/ARM64 (arm64v8)
 - Linux/ARM (armv7)
 
----
-
 ## Contact Information
 
 ### Security Issues
@@ -234,8 +222,6 @@ For non-security questions:
 - 💬 **Discussions**: [GitHub Discussions](https://github.com/broadsage/docker-scaffold/discussions)
 - 🌐 **Website**: [broadsage.com](https://broadsage.com)
 
----
-
 ## Security Advisory Archive
 
 We maintain a public archive of security advisories and responses in accordance with OpenSSF best practices:
@@ -243,8 +229,6 @@ We maintain a public archive of security advisories and responses in accordance 
 - **Location**: [GitHub Security Advisories](https://github.com/broadsage/docker-scaffold/security/advisories)
 - **Details**: Date, description, investigation steps, resolution, and remediation
 - **Transparency**: No sensitive or private information is included
-
----
 
 ## Compliance & Standards
 
@@ -255,8 +239,6 @@ Docker-scaffold follows:
 - **OWASP Guidelines**: Container security recommendations
 - **NIST Cybersecurity Framework**: Risk management principles
 - **REUSE Compliance**: License compliance and attribution
-
----
 
 ## Bug Bounty Program
 
@@ -272,13 +254,9 @@ We ask security researchers to:
 - Avoid privacy violations and destruction of data
 - Conduct vulnerability research in good faith
 
----
-
 ## Acknowledgments
 
 We thank the security researchers and community members who help improve docker-scaffold's security through responsible disclosure. Their contributions make our open-source docker image safer for everyone.
-
----
 
 ## Additional Resources
 
@@ -288,8 +266,6 @@ We thank the security researchers and community members who help improve docker-
 - [REUSE.toml](./REUSE.toml) - License compliance configuration
 - [OpenSSF Security Best Practices](https://best.openssf.org/)
 - [OWASP Docker Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html)
-
----
 
 **Last Updated**: December 2025  
 **Policy Version**: 1.0
