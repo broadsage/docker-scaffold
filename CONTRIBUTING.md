@@ -1,0 +1,236 @@
+<!--
+SPDX-FileCopyrightText: Copyright (c) 2025 Broadsage <opensource@broadsage.com>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+# Contributing to docker-scaffold
+
+Thank you for your interest in contributing to docker-scaffold! We welcome contributions from the community.
+
+This document provides guidelines and instructions for contributing to this project.
+
+---
+
+## Code of Conduct
+
+Please read our [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) before contributing. We are committed to providing a welcoming and inclusive environment for all contributors.
+
+---
+
+## How to Contribute
+
+### Reporting Bugs
+
+Found a bug? Please open a [GitHub Issue](https://github.com/broadsage/docker-scaffold/issues) with:
+
+- **Clear description** of the problem
+- **Steps to reproduce** the issue
+- **Expected behavior** vs actual behavior
+- **Environment details**: Docker version, OS, architecture
+- **Example Dockerfile** or configuration if relevant
+
+### Reporting Security Issues
+
+⚠️ **Do NOT file public issues for security vulnerabilities**
+
+Please report security issues privately via [SECURITY.md](./SECURITY.md).
+
+### Feature Requests
+
+Have an idea for a new feature? Share it on [GitHub Discussions](https://github.com/broadsage/docker-scaffold/discussions) or open an [Issue](https://github.com/broadsage/docker-scaffold/issues):
+
+- **Describe the feature** and use case
+- **Explain the benefit** for Docker image development
+- **Provide examples** if possible
+
+### Improving Documentation
+
+Documentation improvements are always welcome! Please:
+
+- Fix typos and clarify confusing sections
+- Add examples and use cases
+- Update outdated information
+- Document Docker best practices
+
+### Code Contributions
+
+#### Types of Changes
+
+We welcome:
+
+- ✅ Bug fixes
+- ✅ New Docker image features
+- ✅ Dockerfile optimizations
+- ✅ Multi-architecture build improvements
+- ✅ Security enhancements
+- ✅ Template improvements
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+**Required:**
+
+- [Git](https://git-scm.com/downloads)
+- [Docker](https://docs.docker.com/get-docker/)
+- [Cookiecutter](https://github.com/cookiecutter/cookiecutter)
+- [Task Runner](https://taskfile.dev/installation/)
+
+### Development Setup
+
+1. **Fork & Clone**
+
+   ```bash
+   git clone https://github.com/YOUR-USERNAME/docker-scaffold.git
+   cd docker-scaffold
+   git remote add upstream https://github.com/broadsage/docker-scaffold.git
+   ```
+
+2. **Create a Feature Branch**
+
+   ```bash
+   git fetch upstream
+   git checkout upstream/main
+   git checkout -b feature/your-feature-name
+   ```
+
+   **Branch naming:** `feature/`, `fix/`, `docs/`, `refactor/`, `test/`
+
+3. **Make Your Changes**
+
+   Follow these guidelines:
+   - Keep changes focused and single-purpose
+   - Follow [Conventional Commits](https://www.conventionalcommits.org/)
+   - Test all changes locally
+   - Update documentation as needed
+
+4. **Test Your Changes**
+
+   **Build the Docker image:**
+
+   ```bash
+   docker build -t docker-scaffold .
+   docker run --rm docker-scaffold
+   ```
+
+   **Scan for vulnerabilities:**
+
+   ```bash
+   docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+     aquasec/trivy image docker-scaffold
+   ```
+
+   **Test multi-architecture builds:**
+
+   ```bash
+   docker buildx build \
+     --platform linux/amd64,linux/arm64,linux/armv7 .
+   ```
+
+5. **Commit Your Changes**
+
+   Use clear, descriptive commit messages:
+
+   ```bash
+   feat(docker): add health check support
+
+   - Add HEALTHCHECK instruction
+   - Configure health check endpoint
+   - Document in README
+
+   Closes #123
+   ```
+
+   **Format:** `<type>(<scope>): <description>`
+   - **Types:** `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+   - **Scope:** Optional (docker, template, build, etc.)
+   - **Description:** What changed and why
+
+6. **Push and Create Pull Request**
+
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+
+   Then open a [Pull Request](https://github.com/broadsage/docker-scaffold/pulls) on GitHub:
+   - **Title:** Clear and descriptive
+   - **Description:** Explain changes and why they're needed
+   - **Reference issues:** "Closes #123"
+   - **Testing:** Describe how you tested
+
+---
+
+## Pull Request Process
+
+1. **Automated Checks**
+   - GitHub Actions runs tests and linters
+   - All checks must pass
+
+2. **Code Review**
+   - Maintainers review your PR
+   - Respond to feedback constructively
+   - Update code as requested
+
+3. **Approval & Merge**
+   - Once approved, your PR will be merged
+   - Your contribution will be acknowledged
+
+---
+
+## Getting Help
+
+### Questions & Discussions
+
+- **GitHub Issues**: [Report bugs](https://github.com/broadsage/docker-scaffold/issues)
+- **GitHub Discussions**: [Ask questions](https://github.com/broadsage/docker-scaffold/discussions)
+- **Documentation**: [README.md](./README.md) and [docs/](./docs/)
+
+### Helpful Resources
+
+**Docker:**
+
+- [Docker Documentation](https://docs.docker.com/)
+- [Docker Best Practices](https://docs.docker.com/develop/dev-best-practices/)
+
+**Development Tools:**
+
+- [Cookiecutter Documentation](https://cookiecutter.readthedocs.io/)
+- [Conventional Commits](https://www.conventionalcommits.org/)
+
+**Security & Best Practices:**
+
+- [OpenSSF Best Practices](https://best.openssf.org/)
+- [OWASP Container Security](https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html)
+
+---
+
+## Recognition
+
+We deeply appreciate all contributions! You will be:
+
+- ✨ Recognized in release notes
+- 📝 Acknowledged in project documentation
+- 🎉 Credited in git history
+
+---
+
+## License
+
+By contributing to docker-scaffold, you agree your contributions will be licensed under the [Apache 2.0 License](./LICENSE).
+
+---
+
+## Additional Resources
+
+- [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) - Community standards
+- [SECURITY.md](./SECURITY.md) - Security policy and reporting
+- [LICENSE](./LICENSE) - Apache 2.0 License
+- [README.md](./README.md) - Project overview
+
+---
+
+**Last Updated**: December 2025  
+**Version**: 1.0
