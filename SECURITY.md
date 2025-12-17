@@ -86,6 +86,8 @@ Report a vulnerability if:
 
 - ❌ Non-security bugs or issues (use [GitHub Issues](https://github.com/broadsage/docker-scaffold/issues) instead)
 - ❌ Requests for help with configuration or usage
+- ❌ Vulnerabilities in dependencies without reproducible impact on docker-scaffold
+- ❌ Theoretical vulnerabilities without proof-of-concept demonstration
 
 ---
 
@@ -148,6 +150,17 @@ Critical vulnerabilities with active exploitation may be expedited:
 - Security patches may be released immediately for critical issues
 - Coordination continues with reporter throughout the process
 - Public disclosure may occur before the 90-day window if actively exploited
+
+### Out-of-Scope Vulnerabilities
+
+We do not address the following through the security disclosure process:
+
+- **Dependency vulnerabilities without impact**: CVEs in transitive dependencies that don't affect docker-scaffold functionality
+- **Configuration-related issues**: Security concerns arising from improper user configuration
+- **Outdated information**: Documentation or guidance that reflects older practices
+- **Feature requests disguised as security**: Enhancement requests framed as security improvements
+
+For these cases, please use [GitHub Issues](https://github.com/broadsage/docker-scaffold/issues) or [Discussions](https://github.com/broadsage/docker-scaffold/discussions)
 
 ---
 
@@ -247,7 +260,17 @@ Docker-scaffold follows:
 
 ## Bug Bounty Program
 
-Currently, `Broadsage` does not operate a formal bug bounty program. However, we deeply appreciate security researchers who responsibly disclose vulnerabilities. We may offer recognition, swag, or other forms of gratitude at our discretion.
+Currently, Broadsage does not operate a formal bug bounty program. However, we deeply appreciate security researchers who responsibly disclose vulnerabilities. We may offer recognition, swag, or other forms of gratitude at our discretion.
+
+### Researcher Expectations
+
+We ask security researchers to:
+
+- Allow us reasonable time to develop and release a fix before public disclosure
+- Not perform testing on systems you don't own or have permission to test
+- Not cause intentional damage or data destruction
+- Avoid privacy violations and destruction of data
+- Conduct vulnerability research in good faith
 
 ---
 
