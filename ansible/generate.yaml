@@ -64,6 +64,10 @@
       tags:
         - compliance
 
+    - role: documentation
+      tags:
+        - documentation
+
   post_tasks:
     - name: Display scaffold completion message
       tags: always

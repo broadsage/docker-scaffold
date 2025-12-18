@@ -3,3 +3,11 @@
 # SPDX-License-Identifier: Apache-2.0
 ---
 # defaults file for documentation
+
+# List of documentation files to include
+documentation_files:
+  - conform-guide.md
+  - template-usage.md
+
+# Documentation directory path
+documentation_dir: "/tmp/docs"
