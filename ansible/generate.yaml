@@ -69,6 +69,12 @@
         - documentation
 
   post_tasks:
+    - name: Clean up temporary merged configuration
+      tags: always
+      ansible.builtin.file:
+        path: /tmp/merged_config.yaml
+        state: absent
+
     - name: Display scaffold completion message
       tags: always
       ansible.builtin.debug:

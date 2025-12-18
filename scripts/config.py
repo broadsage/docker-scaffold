@@ -315,6 +315,7 @@ def main() -> None:
     # Summary
     print_header(f"🎉 Configuration ready for: {image_name}")
     print(f"\nNext: Ansible will use {output_file} to generate scaffold")
+    print(f"Note: {output_file} will be automatically cleaned up after generation")
 
 
 if __name__ == "__main__":
