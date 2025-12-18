@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 ---
-name: Conform DCO & Conventional Commits
+name: Conform DCO & Commit Policy
 
 on:
   pull_request:
