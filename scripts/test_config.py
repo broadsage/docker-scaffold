@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 """
-Unit tests for merge_config.py
+Unit tests for config.py
 
 Test Coverage:
   - Deep merge functionality with nested dicts
@@ -13,13 +13,13 @@ Test Coverage:
   - Safe default generation for disabled features
   - Configuration validation
 
-Run with: python3 test_merge_config.py
+Run with: python3 test_config.py
 """
 
 import unittest
 from typing import Any, Dict, List
 
-from merge_config import (
+from config import (
     deep_merge,
     get_feature_bundles,
     make_safe_default,

@@ -12,8 +12,8 @@ Python scripts that handle the complex configuration merging logic for docker-sc
 
 ## Files
 
-- **`merge_config.py`** - Main configuration merger script
-- **`test_merge_config.py`** - Unit tests for the merger
+- **`config.py`** - Main configuration merger script
+- **`test_config.py`** - Unit tests for the merger
 - **`requirements.txt`** - Python dependencies
 
 ## Installation
@@ -41,16 +41,16 @@ docker run -v $(pwd)/project.yaml:/tmp/project.yaml ghcr.io/broadsage/scaffold
 ```bash
 # Run unit tests
 cd ansible/scripts
-python3 test_merge_config.py
+python3 test_config.py
 
 # Test merge manually
-python3 merge_config.py
+python3 config.py
 ```
 
 ## How It Works
 
 ```text
-defaults.yaml + project.yaml → merge_config.py → merged_config.yaml → Ansible
+defaults.yaml + project.yaml → config.py → merged_config.yaml → Ansible
 ```
 
 ### Feature Activation Logic
@@ -127,11 +127,6 @@ Valid platforms:
 
 - `linux/amd64`
 - `linux/arm64`
-- `linux/arm/v7`
-- `linux/arm/v6`
-- `linux/386`
-- `linux/ppc64le`
-- `linux/s390x`
 
 ## Error Handling
 
@@ -151,7 +146,7 @@ The script provides clear error messages:
 Run all tests:
 
 ```bash
-python3 test_merge_config.py
+python3 test_config.py
 ```
 
 Tests cover:
@@ -173,7 +168,7 @@ pip install pyyaml
 ### Script not executable
 
 ```bash
-chmod +x merge_config.py
+chmod +x config.py
 ```
 
 ### Tests failing
@@ -182,5 +177,5 @@ Check you're in the correct directory:
 
 ```bash
 cd ansible/scripts
-python3 test_merge_config.py
+python3 test_config.py
 ```

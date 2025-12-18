@@ -77,7 +77,7 @@ tasks:
     desc: Run all unit tests
     deps: [setup]
     cmds:
-      - "{{.PYTHON_VENV}} scripts/test_merge_config.py"
+      - "{{.PYTHON_VENV}} scripts/test_config.py"
 
   # Build Tasks - Docker Image Building
   build:

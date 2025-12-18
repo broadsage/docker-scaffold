@@ -15,7 +15,7 @@
     - name: Merge configuration files (defaults.yaml + project.yaml)
       tags: always
       ansible.builtin.command:
-        cmd: python3 scripts/merge_config.py
+        cmd: python3 scripts/config.py
         chdir: /app
       changed_when: false
       register: merge_result
