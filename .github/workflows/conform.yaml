@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 ---
-name: Conform DCO (--Sign-off)
+name: Conform DCO & Conventional Commits
 
 on:
   pull_request:
@@ -14,9 +14,11 @@ concurrency:
 
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
-  signoff:
+  dco-signoff:
+    name: DCO Sign-off Check
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -37,3 +39,33 @@ jobs:
         uses: siderolabs/conform@a316d3d13e82ac5f8d2eae42a734f8a885cddb15 # v0.1.0-alpha.29
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+
+  conventional-commits:
+    name: Conventional Commits Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Validate PR title follows Conventional Commits
+        uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            docs
+            chore
+            refactor
+            test
+            ci
+            build
+            perf
+            revert
+          requireScope: false
+          subjectPattern: ^[A-Z].+$
+          subjectPatternError: |
+            The subject "{subject}" found in the pull request title "{title}"
+            didn't match the configured pattern. Please ensure that the subject
+            starts with an uppercase character.
+          validateSingleCommit: true
+          validateSingleCommitMatchesPrTitle: true
