@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: Copyright (c) 2025 {{ cookiecutter.maintainer_name }} <{{ cookiecutter.maintainer_email }}>
+#
+# SPDX-License-Identifier: {{ cookiecutter.license }}
+
+# Python dependencies for {{ cookiecutter.project_name }}
+
+# Required for YAML configuration parsing
+PyYAML>=6.0.1
+
+# Required for format-preserving YAML updates
+ruamel.yaml>=0.18.0

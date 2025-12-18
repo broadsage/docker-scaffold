@@ -27,7 +27,7 @@ except ImportError:
 
 class TemplateVersionManager:
     """Manages template version operations."""
-    
+
     def __init__(
         self,
         project_file: str = "project.yaml",
@@ -35,7 +35,7 @@ class TemplateVersionManager:
     ):
         """
         Initialize the version manager.
-        
+
         Args:
             project_file: Path to project.yaml
             docker_image: Docker image name
@@ -47,17 +47,17 @@ class TemplateVersionManager:
         self.yaml.default_flow_style = False
         self.yaml.width = 4096
         self.yaml.indent(mapping=2, sequence=2, offset=0)  # type: ignore[attr-defined]
-    
+
     def get_current_version(self) -> str:
         """
         Read current template version from project.yaml.
-        
+
         Returns:
             Current version string or "unknown" if not found
         """
         if not self.project_file.exists():
             return "unknown"
-        
+
         try:
             data: Any = self.yaml.load(self.project_file)  # type: ignore[assignment]
             if "template" in data and "version" in data["template"]:
@@ -65,11 +65,11 @@ class TemplateVersionManager:
             return "unknown"
         except Exception:
             return "unknown"
-    
+
     def get_latest_version(self) -> str:
         """
         Fetch latest template version from Docker image.
-        
+
         Returns:
             Latest version string or "latest" if cannot determine
         """
@@ -81,7 +81,7 @@ class TemplateVersionManager:
                 stderr=subprocess.DEVNULL,
                 check=False,
             )
-            
+
             # Read VERSION file from image
             result = subprocess.run(
                 [
@@ -96,57 +96,55 @@ class TemplateVersionManager:
                 text=True,
                 check=False,
             )
-            
+
             if result.returncode == 0 and result.stdout.strip():
                 return result.stdout.strip()
-            
+
             return "latest"
         except Exception:
             return "latest"
-    
+
     def check_update(self) -> Dict[str, Any]:
         """
         Compare current and latest versions.
-        
+
         Returns:
             Dict with current, latest, and update_available status
         """
         current = self.get_current_version()
         latest = self.get_latest_version()
-        
+
         update_available = (
-            current != latest
-            and current != "latest"
-            and latest != "latest"
+            current != latest and current != "latest" and latest != "latest"
         )
-        
+
         return {
             "current": current,
             "latest": latest,
             "update_available": update_available,
         }
-    
+
     def update_version(self, version: Optional[str] = None) -> None:
         """
         Update template version in project.yaml.
-        
+
         Args:
             version: Version to set, or None to use latest
         """
         if version is None:
             version = self.get_latest_version()
-        
+
         if not self.project_file.exists():
             print(f"Error: File '{self.project_file}' not found", file=sys.stderr)
             sys.exit(1)
-        
+
         try:
             data: Any = self.yaml.load(self.project_file)  # type: ignore[assignment]
-            
+
             if "template" not in data or "version" not in data["template"]:
                 print("Error: template.version not found in YAML", file=sys.stderr)
                 sys.exit(1)
-            
+
             data["template"]["version"] = version
             self.yaml.dump(data, self.project_file)  # type: ignore[arg-type]
             print(f"✓ Updated template version to {version}")
@@ -161,34 +159,42 @@ def main() -> None:
         print("Usage: bump_version.py <command> [args]", file=sys.stderr)
         print("", file=sys.stderr)
         print("Commands:", file=sys.stderr)
-        print("  check                Compare current vs latest (exit 1 if update available)", file=sys.stderr)
-        print("  update [version]     Update to version (or latest if not specified)", file=sys.stderr)
+        print(
+            "  check                Compare current vs latest "
+            "(exit 1 if update available)",
+            file=sys.stderr,
+        )
+        print(
+            "  update [version]     Update to version "
+            "(or latest if not specified)",
+            file=sys.stderr,
+        )
         print("", file=sys.stderr)
         print("Examples:", file=sys.stderr)
         print("  bump_version.py check", file=sys.stderr)
         print("  bump_version.py update", file=sys.stderr)
         print("  bump_version.py update 1.2.0", file=sys.stderr)
         sys.exit(1)
-    
+
     command = sys.argv[1]
     manager = TemplateVersionManager()
-    
+
     # Internal commands (not documented, used by Taskfile)
     if command == "current":
         print(manager.get_current_version())
-    
+
     elif command == "latest":
         print(manager.get_latest_version())
-    
+
     # Public commands
     elif command == "check":
         print(manager.get_latest_version())
-    
+
     elif command == "check":
         result = manager.check_update()
         print(f"Current template version: {result['current']}")
         print(f"Latest template version:  {result['latest']}")
-        
+
         if result["update_available"]:
             print("")
             print("⚠️  Updates available! Run 'task template:update' to upgrade")
@@ -197,11 +203,11 @@ def main() -> None:
             print("")
             print("✓ Template is up to date")
             sys.exit(0)
-    
+
     elif command == "update":
         version = sys.argv[2] if len(sys.argv) > 2 else None
         manager.update_version(version)
-    
+
     else:
         print(f"Error: Unknown command '{command}'", file=sys.stderr)
         sys.exit(1)
