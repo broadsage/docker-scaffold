@@ -51,6 +51,7 @@ SPDX-License-Identifier = "Apache-2.0"
 path = [
   "cookiecutter.json",
   "{{cookiecutter.project_slug}}/**",
+  "VERSION",
 ]
 precedence = "override"
 SPDX-FileCopyrightText = "Copyright (c) 2025 Broadsage <opensource@broadsage.com>"
