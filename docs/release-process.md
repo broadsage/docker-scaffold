@@ -59,7 +59,7 @@ All commits to `main` must follow the [Conventional Commits](https://www.convent
 ```bash
 git commit -m "feat: add Python-based version management
 
-- Consolidate version logic into bump_version.py
+- Consolidate version logic into release.py
 - Use ruamel.yaml for format-preserving updates
 - Support Docker-based version checking"
 ```

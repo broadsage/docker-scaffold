@@ -72,7 +72,7 @@ tasks:
     deps: [docker]
     vars:
       VERSION:
-        sh: "{{ cookiecutter._python_executable }} scripts/bump_version.py current"
+        sh: "{{ cookiecutter._python_executable }} scripts/release.py template current"
     cmds:
       - |
         echo "Generating project files using docker-scaffold:{{ cookiecutter._template_current_version }}..."
@@ -90,7 +90,7 @@ tasks:
     aliases: [check-updates]
     deps: [docker]
     cmds:
-      - "{{ cookiecutter._python_executable }} scripts/bump_version.py check"
+      - "{{ cookiecutter._python_executable }} scripts/release.py template check"
 
   template:update:
     desc: Update to latest template version (interactive, uses git for safety)
@@ -99,7 +99,7 @@ tasks:
     interactive: true
     vars:
       LATEST_VERSION:
-        sh: "{{ cookiecutter._python_executable }} scripts/bump_version.py latest"
+        sh: "{{ cookiecutter._python_executable }} scripts/release.py template latest"
     cmds:
       # Check git status and warn user
       - |
@@ -130,7 +130,7 @@ tasks:
           exit 1
         fi
       # Perform update
-      - "{{ cookiecutter._python_executable }} scripts/bump_version.py update"
+      - "{{ cookiecutter._python_executable }} scripts/release.py template update"
       - task: generate
       - |
         echo ""
