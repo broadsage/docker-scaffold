@@ -5,7 +5,7 @@
 # tasks file for documentation
 
 - name: Create docs directory
-  file:
+  ansible.builtin.file:
     path: "/tmp/docs"
     state: directory
     owner: "abc"
@@ -13,7 +13,7 @@
     mode: "0755"
 
 - name: Copy documentation files to docs directory
-  template:
+  ansible.builtin.template:
     src: "{{ item }}.j2"
     dest: "/tmp/docs/{{ item }}"
     owner: "abc"

@@ -12,8 +12,8 @@
   "vendor": "Broadsage Corporation Limited",
   "_python_venv_dir": "venv",
   "_python_executable": "venv/bin/python3",
-  "_template_current_version": "{{.TEMPLATE_CURRENT_VERSION}}",
-  "_template_latest_version": "{{.TEMPLATE_LATEST_VERSION}}",
+  "_template_current_version": "{{.VERSION}}",
+  "_template_latest_version": "{{.LATEST_VERSION}}",
   
   "license": [
     "Apache-2.0",

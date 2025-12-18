@@ -4,17 +4,8 @@
 ---
 # tasks file for roles/compliance
 
-- name: Create scripts directory in project
-  ansible.builtin.file:
-    path: "/tmp/scripts"
-    state: directory
-    owner: "abc"
-    group: "abc"
-    mode: "0755"
-  when: features.compliance | bool
-
 - name: Copy compliance.py script for compliance checks
-  template:
+  ansible.builtin.template:
     src: "compliance.py.j2"
     dest: "/tmp/scripts/compliance.py"
     owner: "abc"
@@ -23,7 +14,7 @@
   when: features.compliance | bool
 
 - name: Copy .conform.yaml (commit message validation)
-  template:
+  ansible.builtin.template:
     src: ".conform.yaml.j2"
     dest: "/tmp/.conform.yaml"
     owner: "abc"
@@ -32,7 +23,7 @@
   when: compliance.conform | bool
 
 - name: Copy .mega-linter.yaml (code quality linting)
-  template:
+  ansible.builtin.template:
     src: ".mega-linter.yaml.j2"
     dest: "/tmp/.mega-linter.yaml"
     owner: "abc"
@@ -41,7 +32,7 @@
   when: compliance.megalinter | bool
 
 - name: Copy REUSE.toml (license compliance)
-  template:
+  ansible.builtin.template:
     src: "REUSE.toml.j2"
     dest: "/tmp/REUSE.toml"
     owner: "abc"

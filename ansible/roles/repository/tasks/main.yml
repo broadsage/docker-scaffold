@@ -5,7 +5,7 @@
 # tasks file for repository
 
 - name: Copy template files to project root (if not excluded)
-  template:
+  ansible.builtin.template:
     src: "{{ item }}.j2"
     dest: "/tmp/{{ item }}"
     owner: "abc"
@@ -20,3 +20,21 @@
     - SECURITY.md
     - CONTRIBUTING.md
   when: item not in template.exclude | default([])
+
+- name: Create scripts directory
+  ansible.builtin.file:
+    path: "/tmp/scripts"
+    state: directory
+    owner: "abc"
+    group: "abc"
+    mode: "0755"
+
+- name: Copy repository scripts (always deployed)
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "/tmp/scripts/{{ item }}"
+    owner: "abc"
+    group: "abc"
+    mode: "0755"
+  loop:
+    - bump_version.py

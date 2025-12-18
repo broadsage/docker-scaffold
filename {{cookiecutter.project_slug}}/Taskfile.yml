@@ -4,20 +4,6 @@
 ---
 version: "3"
 
-vars:
-  # Template version tracking
-  TEMPLATE_CURRENT_VERSION:
-    sh: |
-      if command -v yq >/dev/null 2>&1 && [ -f project.yaml ]; then
-        yq '.template.version // "unknown"' project.yaml
-      else
-        echo "unknown"
-      fi
-  TEMPLATE_LATEST_VERSION:
-    sh: |
-      docker pull ghcr.io/broadsage/scaffold:latest >/dev/null 2>&1
-      docker run --rm ghcr.io/broadsage/scaffold:latest cat /app/VERSION 2>/dev/null || echo "latest"
-
 tasks:
   # Default Task - Show Help
   default:
@@ -84,6 +70,9 @@ tasks:
   generate:
     desc: Generate project files using docker-scaffold container
     deps: [docker]
+    vars:
+      VERSION:
+        sh: "{{ cookiecutter._python_executable }} scripts/bump_version.py current"
     cmds:
       - |
         echo "Generating project files using docker-scaffold:{{ cookiecutter._template_current_version }}..."
@@ -96,52 +85,22 @@ tasks:
         echo "Review generated files in the current directory"
 
   # Template Version Tasks
-  template:version:
-    desc: Show current template version
-    aliases: [version]
-    cmds:
-      - |
-        if [ "{{ cookiecutter._template_current_version }}" = "unknown" ]; then
-          echo "⚠️  Cannot determine version (yq not installed or project.yaml missing)"
-        else
-          echo "Current template version: {{ cookiecutter._template_current_version }}"
-        fi
-
   template:check:
     desc: Check for template updates (non-destructive)
     aliases: [check-updates]
     deps: [docker]
     cmds:
-      - |
-        echo "Checking for template updates..."
-        echo "Current template version: {{ cookiecutter._template_current_version }}"
-        echo "Latest template version:  {{ cookiecutter._template_latest_version }}"
-        
-        if [ "{{ cookiecutter._template_current_version }}" != "{{ cookiecutter._template_latest_version }}" ] && [ "{{ cookiecutter._template_current_version }}" != "latest" ]; then
-          echo ""
-          echo "⚠️  Updates available! Run 'task template:update' to upgrade"
-          exit 1
-        else
-          echo ""
-          echo "✓ Template is up to date"
-          exit 0
-        fi
+      - "{{ cookiecutter._python_executable }} scripts/bump_version.py check"
 
   template:update:
     desc: Update to latest template version (interactive, uses git for safety)
     aliases: [update-template]
     deps: [docker]
     interactive: true
+    vars:
+      LATEST_VERSION:
+        sh: "{{ cookiecutter._python_executable }} scripts/bump_version.py latest"
     cmds:
-      # First check if updates are available
-      - |
-        if [ "{{ cookiecutter._template_current_version }}" = "{{ cookiecutter._template_latest_version }}" ] || [ "{{ cookiecutter._template_latest_version }}" = "latest" ]; then
-          echo "✓ Already on latest version ({{ cookiecutter._template_current_version }})"
-          exit 0
-        fi
-        
-        echo "Template update available: {{ cookiecutter._template_current_version }} → {{ cookiecutter._template_latest_version }}"
-        echo ""
       # Check git status and warn user
       - |
         if git rev-parse --git-dir > /dev/null 2>&1; then
@@ -171,24 +130,21 @@ tasks:
           exit 1
         fi
       # Perform update
+      - "{{ cookiecutter._python_executable }} scripts/bump_version.py update"
+      - task: generate
       - |
-        echo "Updating to template version {{ cookiecutter._template_latest_version }}..."
-        
-        # Update version in project.yaml if yq is available
-        if command -v yq >/dev/null 2>&1; then
-          yq -i '.template.version = "{{ cookiecutter._template_latest_version }}"' project.yaml
-          echo "Updated project.yaml to version: {{ cookiecutter._template_latest_version }}"
-        fi
-        
-        # Regenerate files
-        echo "Regenerating project files..."
-        task generate
-        
         echo ""
         echo "✓ Template updated to version: {{ cookiecutter._template_latest_version }}"
         echo ""
         if git rev-parse --git-dir > /dev/null 2>&1; then
           echo "Next steps:"
+          echo "  1. Review changes: git diff"
+          echo "  2. Test changes: task compliance"
+          echo "  3. Commit: git add . && git commit -m 'chore: update template to v{{.LATEST_VERSION}}'"
+          echo "  4. Rollback if needed: git checkout ."
+        else
+          echo "Review the changes in your editor"
+        fi
           echo "  1. Review changes: git diff"
           echo "  2. Test changes: task compliance"
           echo "  3. Commit: git add . && git commit -m 'chore: update template to v{{ cookiecutter._template_latest_version }}'"
