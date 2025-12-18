@@ -31,6 +31,14 @@ image:
 metadata:
   license: {{ cookiecutter.license }}
 
+# Template Configuration (tracks template version for updates)
+template:
+  version: "1.0.0"  # Docker scaffold template version
+  source: "https://github.com/broadsage/docker-scaffold"
+  protected_files: []  # List files that should not be overwritten during updates
+    # - README.md
+    # - custom-script.sh
+
 # Override Features (uncomment to change from defaults)
 features:
   github: {{ ('true' if cookiecutter.github == 'y' else 'false') | lower }} # Generate GitHub Actions workflow & Issue Templates

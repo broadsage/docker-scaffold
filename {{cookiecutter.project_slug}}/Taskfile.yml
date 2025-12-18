@@ -70,16 +70,161 @@ tasks:
   generate:
     desc: Generate project files using docker-scaffold container
     deps: [docker]
+    vars:
+      SCAFFOLD_VERSION:
+        sh: |
+          if command -v yq >/dev/null 2>&1 && [ -f project.yaml ]; then
+            yq '.template.version // "latest"' project.yaml
+          else
+            echo "latest"
+          fi
     cmds:
       - |
-        echo "Generating project files using docker-scaffold..."
+        echo "Generating project files using docker-scaffold:{{.SCAFFOLD_VERSION}}..."
         docker run --rm \
           -v "$(pwd):/tmp" \
           -e PUID=$(id -u) \
           -e PGID=$(id -g) \
-          ghcr.io/broadsage/scaffold:latest
+          ghcr.io/broadsage/scaffold:{{.SCAFFOLD_VERSION}}
         echo "✓ Project files generated successfully"
         echo "Review generated files in the current directory"
+
+  # Template Version Tasks
+  template:version:
+    desc: Show current template version
+    aliases: [version]
+    vars:
+      CURRENT_VERSION:
+        sh: |
+          if command -v yq >/dev/null 2>&1 && [ -f project.yaml ]; then
+            yq '.template.version // "unknown"' project.yaml
+          else
+            echo "unknown"
+          fi
+    cmds:
+      - |
+        if [ "{{.CURRENT_VERSION}}" = "unknown" ]; then
+          echo "⚠️  Cannot determine version (yq not installed or project.yaml missing)"
+        else
+          echo "Current template version: {{.CURRENT_VERSION}}"
+        fi
+
+  template:check:
+    desc: Check for template updates (non-destructive)
+    aliases: [check-updates]
+    deps: [docker]
+    vars:
+      CURRENT_VERSION:
+        sh: |
+          if command -v yq >/dev/null 2>&1 && [ -f project.yaml ]; then
+            yq '.template.version // "unknown"' project.yaml
+          else
+            echo "unknown"
+          fi
+      LATEST_VERSION:
+        sh: |
+          docker pull ghcr.io/broadsage/scaffold:latest >/dev/null 2>&1
+          docker run --rm ghcr.io/broadsage/scaffold:latest cat /app/VERSION 2>/dev/null || echo "latest"
+    cmds:
+      - |
+        echo "Checking for template updates..."
+        echo "Current template version: {{.CURRENT_VERSION}}"
+        echo "Latest template version:  {{.LATEST_VERSION}}"
+        
+        if [ "{{.CURRENT_VERSION}}" != "{{.LATEST_VERSION}}" ] && [ "{{.CURRENT_VERSION}}" != "latest" ]; then
+          echo ""
+          echo "⚠️  Updates available! Run 'task template:update' to upgrade"
+          exit 1
+        else
+          echo ""
+          echo "✓ Template is up to date"
+          exit 0
+        fi
+
+  template:update:
+    desc: Update to latest template version (interactive, uses git for safety)
+    aliases: [update-template]
+    deps: [docker]
+    interactive: true
+    vars:
+      CURRENT_VERSION:
+        sh: |
+          if command -v yq >/dev/null 2>&1 && [ -f project.yaml ]; then
+            yq '.template.version // "unknown"' project.yaml
+          else
+            echo "unknown"
+          fi
+      LATEST_VERSION:
+        sh: |
+          docker pull ghcr.io/broadsage/scaffold:latest >/dev/null 2>&1
+          docker run --rm ghcr.io/broadsage/scaffold:latest cat /app/VERSION 2>/dev/null || echo "latest"
+    cmds:
+      # First check if updates are available
+      - |
+        if [ "{{.CURRENT_VERSION}}" = "{{.LATEST_VERSION}}" ] || [ "{{.LATEST_VERSION}}" = "latest" ]; then
+          echo "✓ Already on latest version ({{.CURRENT_VERSION}})"
+          exit 0
+        fi
+        
+        echo "Template update available: {{.CURRENT_VERSION}} → {{.LATEST_VERSION}}"
+        echo ""
+      # Check git status and warn user
+      - |
+        if git rev-parse --git-dir > /dev/null 2>&1; then
+          if ! git diff-index --quiet HEAD -- 2>/dev/null; then
+            echo "⚠️  You have uncommitted changes!"
+            echo "It's recommended to commit or stash changes before updating."
+            echo ""
+            read -p "Continue anyway? (y/N) " -n 1 -r
+            echo
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+              echo "Update cancelled. Commit your changes and try again."
+              exit 1
+            fi
+          fi
+        else
+          echo "⚠️  Not a git repository!"
+          echo "Consider initializing git for safer template updates: git init"
+          echo ""
+        fi
+      # Confirm with user
+      - |
+        echo "This will regenerate files from the template."
+        echo "Protected files in project.yaml will be preserved."
+        echo ""
+        read -p "Continue? (y/N) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+          echo "Update cancelled"
+          exit 1
+        fi
+      # Perform update
+      - |
+        echo "Updating to template version {{.LATEST_VERSION}}..."
+        
+        # Update version in project.yaml if yq is available
+        if command -v yq >/dev/null 2>&1; then
+          yq -i '.template.version = "{{.LATEST_VERSION}}"' project.yaml
+          echo "Updated project.yaml to version: {{.LATEST_VERSION}}"
+        fi
+        
+        # Regenerate files
+        echo "Regenerating project files..."
+        task generate
+        
+        echo ""
+        echo "✓ Template updated to version: {{.LATEST_VERSION}}"
+        echo ""
+        if git rev-parse --git-dir > /dev/null 2>&1; then
+          echo "Next steps:"
+          echo "  1. Review changes: git diff"
+          echo "  2. Test changes: task compliance"
+          echo "  3. Commit: git add . && git commit -m 'chore: update template to v{{.LATEST_VERSION}}'"
+          echo "  4. Rollback if needed: git checkout ."
+        else
+          echo "Review the changes in your editor"
+        fi
+
 
   # Cleanup Tasks - Environment Cleanup
   clean:

@@ -29,6 +29,7 @@ RUN \
 
 COPY ansible /app
 COPY scripts /app/scripts
+COPY VERSION /app/VERSION
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
