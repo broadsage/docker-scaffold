@@ -5,16 +5,10 @@
 name: Build and Push Docker Image
 
 on:
+  # Only build on version tags (releases)
   push:
-    branches:
-      - main
     tags:
       - "v*"
-  pull_request:
-    branches:
-      - main
-  workflow_dispatch:
-  workflow_call:
 
 env:
   REGISTRY: ghcr.io
