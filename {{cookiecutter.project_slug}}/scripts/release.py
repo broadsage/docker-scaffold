@@ -216,8 +216,14 @@ def print_usage() -> None:
     print("Commands:", file=sys.stderr)
     print("  current              Show current version", file=sys.stderr)
     print("  latest               Show latest available version", file=sys.stderr)
-    print("  check                Compare current vs latest (exit 1 if update available)", file=sys.stderr)
-    print("  update [version]     Update to version (or latest if not specified)", file=sys.stderr)
+    print(
+        "  check                Compare current vs latest (exit 1 if update available)",
+        file=sys.stderr,
+    )
+    print(
+        "  update [version]     Update to version (or latest if not specified)",
+        file=sys.stderr,
+    )
     print("", file=sys.stderr)
     print("Examples:", file=sys.stderr)
     print("  release.py template check", file=sys.stderr)

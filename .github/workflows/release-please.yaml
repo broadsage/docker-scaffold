@@ -22,12 +22,12 @@ jobs:
       release_created: ${{ steps.release.outputs.release_created }}
       tag_name: ${{ steps.release.outputs.tag_name }}
       version: ${{ steps.release.outputs.version }}
-      
+
     steps:
       - name: Run Release Please
         id: release
         uses: googleapis/release-please-action@v4
-      
+
       - name: Release Summary
         if: ${{ steps.release.outputs.release_created }}
         run: |
@@ -37,4 +37,3 @@ jobs:
           echo "Release URL: ${{ steps.release.outputs.html_url }}"
           echo ""
           echo "Docker build will be triggered automatically by the tag push."
-

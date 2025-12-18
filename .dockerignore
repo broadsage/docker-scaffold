@@ -111,7 +111,6 @@ megalinter-reports/
 hooks/
 cookiecutter.json
 Taskfile.yml
-merged_config.yaml
 project.yaml
 LICENSES/
 LICENSE*

@@ -90,7 +90,6 @@ db.sqlite3-journal
 .~*
 
 # Generated files
-merged_config.yaml
 megalinter-reports
 /tmp/
 

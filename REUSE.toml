@@ -46,12 +46,14 @@ precedence = "override"
 SPDX-FileCopyrightText = "Copyright (c) 2025 Broadsage <opensource@broadsage.com>"
 SPDX-License-Identifier = "Apache-2.0"
 
-# Cookiecutter source files exclude from license
+# Cookiecutter & Project source files exclude from license
 [[annotations]]
 path = [
   "cookiecutter.json",
   "{{cookiecutter.project_slug}}/**",
   "VERSION",
+  "release-please-config.json",
+  ".release-please-manifest.json",
 ]
 precedence = "override"
 SPDX-FileCopyrightText = "Copyright (c) 2025 Broadsage <opensource@broadsage.com>"
