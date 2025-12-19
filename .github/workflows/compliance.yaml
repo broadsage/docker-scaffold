@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 ---
-name: Code Quality & Compliance
+name: Pre-merge Validation & Compliance
 
 on:
   pull_request:
@@ -11,7 +11,6 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 env:
   # MegaLinter Configuration
@@ -35,7 +34,7 @@ jobs:
     outputs:
       should-skip: ${{ steps.check.outputs.should-skip }}
     steps:
-      - name: Check If Draft PR
+      - name: Check Draft PR Status
         id: check
         run: |
           if [[ "${{ github.event.pull_request.draft }}" == "true" ]]; then
@@ -45,7 +44,7 @@ jobs:
           fi
 
   megalinter:
-    name: MegaLinter Code Quality
+    name: MegaLinter
     runs-on: ubuntu-latest
     needs: [check-skip]
     if: needs.check-skip.outputs.should-skip != 'true'
@@ -334,7 +333,7 @@ jobs:
         uses: fsfe/reuse-action@bb774aa972c2a89ff34781233d275075cbddf542 # v5.0.0
 
   commit-validation:
-    name: Commit & PR Validation
+    name: Conform DCO & Commit Policy
     runs-on: ubuntu-latest
     needs: [check-skip]
     if: github.event_name == 'pull_request' && needs.check-skip.outputs.should-skip != 'true'

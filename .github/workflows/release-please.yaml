@@ -2,9 +2,9 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 ---
-name: Release Please
+name: Release Automation
 
-"on":
+on:
   push:
     branches:
       - main
