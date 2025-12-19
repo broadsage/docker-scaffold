@@ -4,7 +4,7 @@
 ---
 name: Conform DCO & Commit Policy
 
-on:
+"on":
   pull_request:
     types: [opened, synchronize, reopened]
 

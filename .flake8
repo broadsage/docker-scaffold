@@ -1,0 +1,32 @@
+# SPDX-FileCopyrightText: Copyright (c) 2025 Broadsage <opensource@broadsage.com>
+#
+# SPDX-License-Identifier: Apache-2.0
+
+[flake8]
+# Maximum line length
+max-line-length = 120
+
+# Exclude patterns
+exclude =
+    .git,
+    __pycache__,
+    .venv,
+    venv,
+    build,
+    dist,
+    *.egg-info,
+    .tox,
+    .pytest_cache,
+    node_modules,
+    .mypy_cache
+
+# Ignore specific errors
+# E501: line too long (handled by max-line-length)
+# W503: line break before binary operator (conflicts with black)
+# E203: whitespace before ':' (conflicts with black)
+ignore = W503,E203
+
+# Per-file ignores
+# Ignore E501 in cookiecutter templates (Jinja2 expressions can be long)
+per-file-ignores =
+    {{cookiecutter.project_slug}}/**:E501

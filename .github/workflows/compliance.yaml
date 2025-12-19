@@ -13,30 +13,59 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  # MegaLinter Configuration
+  APPLY_FIXES: all
+  APPLY_FIXES_EVENT: pull_request
+  APPLY_FIXES_MODE: pull_request
+  MEGALINTER_FLAVOR: cupcake
+
 concurrency:
-  group: compliance-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.ref }}-${{ github.workflow }}
   cancel-in-progress: true
 
-permissions:
-  contents: read
-  issues: write
-  pull-requests: write
-  statuses: write
+# Workflow-level permissions - minimal by default following principle of least privilege
+permissions: {}
 
 jobs:
+  # Skip workflow on draft PRs to save resources
+  check-skip:
+    name: Check if workflow should run
+    runs-on: ubuntu-latest
+    outputs:
+      should-skip: ${{ steps.check.outputs.should-skip }}
+    steps:
+      - name: Check if draft PR
+        id: check
+        run: |
+          if [[ "${{ github.event.pull_request.draft }}" == "true" ]]; then
+            echo "should-skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "should-skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
   megalinter:
     name: MegaLinter Code Quality
     runs-on: ubuntu-latest
+    needs: [check-skip]
+    if: needs.check-skip.outputs.should-skip != 'true'
     timeout-minutes: 30
 
+    outputs:
+      has-errors: ${{ steps.ml-check.outputs.has-errors }}
+      has-warnings: ${{ steps.ml-check.outputs.has-warnings }}
+
+    # Job-level permissions - minimal set required for the workflow
     permissions:
-      contents: read
-      issues: write
-      pull-requests: write
-      statuses: write
+      contents: write # Required: peter-evans/create-pull-request to create branches/commits
+      pull-requests: write # Required: peter-evans/create-pull-request + GITHUB_COMMENT_REPORTER
+      issues: write # Required: GITHUB_COMMENT_REPORTER
+      statuses: write # Required: GITHUB_STATUS_REPORTER in MegaLinter config
+      security-events: write # Required: SARIF_REPORTER in MegaLinter config
+      actions: read # Required: ACTION_ACTIONLINT to read workflow files
 
     steps:
-      - name: Harden GitHub runner
+      - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
         with:
           egress-policy: audit
@@ -44,27 +73,222 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
+          token: ${{ secrets.AUTOBOT_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
-      - name: MegaLinter
-        uses: oxsecurity/megalinter@c217fe8f7bc9207062a084e989bd97efd56e7b9a # v8.0.0
-        env:
-          VALIDATE_ALL_CODEBASE: true
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          FLAVOR_SUGGESTIONS: false
-          PRINT_ALPACA: false
-          APPLY_FIXES: none
+      # Import GPG key for signing commits (conditional on secrets availability)
+      - name: Check GPG secrets availability
+        id: check-gpg
+        run: |
+          if [ -n "${{ secrets.AUTOBOT_GITHUB_GPG_PRIVATE_KEY }}" ]; then
+            echo "gpg_available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "gpg_available=false" >> "$GITHUB_OUTPUT"
+          fi
 
-      - name: Archive MegaLinter reports
-        if: always()
-        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+      - name: Import GPG key
+        if: steps.check-gpg.outputs.gpg_available == 'true'
+        uses: crazy-max/ghaction-import-gpg@e89d40939c28e39f97cf32126055eeae86ba74ec # v6.3.0
         with:
-          name: megalinter-reports
-          path: |
-            megalinter-reports/
-            mega-linter.log
-          retention-days: 14
+          gpg_private_key: ${{ secrets.AUTOBOT_GITHUB_GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.AUTOBOT_GITHUB_GPG_PASSPHRASE }}
+          fingerprint: ${{ secrets.AUTOBOT_GITHUB_GPG_FINGERPRINT }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+          git_config_global: true
+          trust_level: 5
 
+      - name: Configure Git for broadsage-autobot
+        run: |
+          git config --global user.name "broadsage-autobot"
+          git config --global user.email "broadsage-autobot@broadsage.com"
+          # Only configure GPG signing if GPG key was imported successfully
+          if [ "${{ steps.check-gpg.outputs.gpg_available }}" == "true" ]; then
+            echo "GPG signing configured"
+          fi
+
+      # Cache MegaLinter plugins and dependencies
+      - name: Cache MegaLinter
+        uses: actions/cache@1a9e2138d905efd099035b49d8b7a3888c653ca8 # v4.2.0
+        with:
+          path: |
+            ~/.cache/megalinter
+            megalinter-reports
+          key: megalinter-${{ runner.os }}-${{ hashFiles('**/*.yaml', '**/*.json', '**/*.md', '**/*.sh') }}
+          restore-keys: |
+            megalinter-${{ runner.os }}-
+            megalinter-
+
+      # MegaLinter - Flavor controlled by MEGALINTER_FLAVOR env var
+      - name: MegaLinter
+        id: ml
+        uses: oxsecurity/megalinter@62c799d895af9bcbca5eacfebca29d527f125a57 # v9.1.0
+        continue-on-error: false
+        env:
+          VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          GITHUB_TOKEN: ${{ secrets.AUTOBOT_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
+
+      # Upload MegaLinter artifacts
+      - name: Archive production artifacts
+        if: success() || failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: MegaLinter reports
+          path: |
+            megalinter-reports
+            mega-linter.log
+
+      # Show MegaLinter summary
+      - name: MegaLinter Summary
+        if: always()
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        env:
+          MEGALINTER_REPORTS_PATH: megalinter-reports
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            try {
+              // Read MegaLinter summary
+              const reportsPath = process.env.MEGALINTER_REPORTS_PATH || 'megalinter-reports';
+              const summaryPath = path.join(reportsPath, 'megalinter-report.json');
+
+              console.log('🔍 MegaLinter Summary');
+              console.log('===================');
+
+              if (fs.existsSync(summaryPath)) {
+                const summary = JSON.parse(fs.readFileSync(summaryPath, 'utf8'));
+
+                console.log(`✅ Linters run: ${summary.total_linters || 'N/A'}`);
+                console.log(`❌ Errors found: ${summary.total_errors || 0}`);
+                console.log(`⚠️  Warnings: ${summary.total_warnings || 0}`);
+                console.log(`🔧 Files fixed: ${summary.total_fixed || 0}`);
+
+                // Create GitHub summary
+                await core.summary
+                  .addHeading('MegaLinter Results')
+                  .addTable([
+                    ['Metric', 'Count'],
+                    ['Linters Run', (summary.total_linters || 'N/A').toString()],
+                    ['Errors', (summary.total_errors || 0).toString()],
+                    ['Warnings', (summary.total_warnings || 0).toString()],
+                    ['Files Fixed', (summary.total_fixed || 0).toString()]
+                  ])
+                  .write();
+              } else {
+              console.log('📄 MegaLinter report not found, checking for log file...');
+
+                const logPath = 'mega-linter.log';
+                if (fs.existsSync(logPath)) {
+                  console.log('📋 MegaLinter completed - check artifacts for detailed results');
+                  await core.summary
+                    .addHeading('MegaLinter Results')
+                    .addRaw('MegaLinter execution completed. Check the uploaded artifacts for detailed results.')
+                    .write();
+                } else {
+                  console.log('⚠️  No MegaLinter output found');
+                }
+              }
+            } catch (error) {
+              console.log(`❌ Error reading MegaLinter summary: ${error.message}`);
+              await core.summary
+                .addHeading('MegaLinter Results')
+                .addRaw('Error reading MegaLinter results. Check the uploaded artifacts for details.')
+                .write();
+            }
+
+      # Create pull request if applicable (for now works only on PR from same repository, not from forks)
+      - name: Create Pull Request with applied fixes
+        id: cpr
+        if: steps.ml.outputs.has_updated_sources == 1 && (env.APPLY_FIXES_EVENT == 'all' || env.APPLY_FIXES_EVENT == github.event_name) && env.APPLY_FIXES_MODE == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
+        with:
+          base: ${{ github.event.pull_request.base.ref }}
+          branch: megalinter-fixes-${{ github.event.pull_request.number }}
+          token: ${{ secrets.AUTOBOT_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
+          commit-message: |
+            style: apply linter automatic fixes
+
+            Signed-off-by: Broadsage AutoBot <broadsage-autobot@broadsage.com>
+          committer: Broadsage AutoBot <broadsage-autobot@broadsage.com>
+          author: Broadsage AutoBot <broadsage-autobot@broadsage.com>
+          title: "style: apply mega-linter automatic fixes for PR #${{ github.event.pull_request.number }}"
+          labels: megalinter
+          body: |
+            This PR contains automatic fixes applied by MegaLinter for PR #${{ github.event.pull_request.number }}.
+
+            **Changes:**
+            - Automatic code formatting fixes
+            - Linter compliance fixes
+
+            **Next Steps:**
+            📋 **Please apply these fixes to your original PR**
+            1. Merge this branch into your original PR branch
+            2. Close this MegaLinter PR
+            3. Continue with your original PR review process
+
+            ⚠️ **Important**: Do not merge this PR directly - apply the fixes to your original PR instead.
+
+      - name: Comment on original PR
+        if: steps.cpr.outputs.pull-request-number && github.event_name == 'pull_request'
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        continue-on-error: true
+        env:
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        with:
+          github-token: ${{ secrets.AUTOBOT_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
+          script: |
+            try {
+              const fixPrUrl = "${{ steps.cpr.outputs.pull-request-url }}";
+              const fixPrNumber = "${{ steps.cpr.outputs.pull-request-number }}";
+              const originalPrNumber = context.payload.pull_request.number;
+              const prHeadRef = process.env.PR_HEAD_REF;
+
+              const comment = `## 🤖 MegaLinter Auto-Fix Available
+
+              Hi @${{ github.event.pull_request.user.login }}! 👋
+
+              MegaLinter found some linting issues in your PR and has created an auto-fix PR: **#${fixPrNumber}**
+
+              ### 📋 Required Action:
+                **Please merge the fixes into your original PR:**
+                \`\`\`bash
+                # Fetch and merge the linter fixes
+                git fetch origin megalinter-fixes-${originalPrNumber}
+                git checkout ${prHeadRef}
+                git merge origin/megalinter-fixes-${originalPrNumber}
+                git push origin ${prHeadRef}
+
+              After merging the fixes, please close the auto-fix PR #${fixPrNumber}.
+
+              ### 🔗 Links:
+                - **Auto-fix PR**: ${fixPrUrl}
+                - **MegaLinter Report**: [View artifacts](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+              ---
+                *This comment was automatically generated by MegaLinter*`;
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: originalPrNumber,
+                body: comment
+              });
+
+              console.log(`✅ Successfully commented on PR #${originalPrNumber}`);
+              console.log(`✅ Successfully commented on PR #${originalPrNumber}`);
+            } catch (error) {
+              console.log(`❌ Failed to comment on PR: ${error.message}`);
+              core.setFailed(`Failed to comment on original PR: ${error.message}`);
+            }
+
+      - name: Create PR output
+        if: steps.ml.outputs.has_updated_sources == 1 && (env.APPLY_FIXES_EVENT == 'all' || env.APPLY_FIXES_EVENT == github.event_name) && env.APPLY_FIXES_MODE == 'pull_request' && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository)
+        run: |
+          echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
+          echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
+
+      # Upload SARIF report for GitHub Security
       - name: Upload SARIF report
         if: always()
         uses: github/codeql-action/upload-sarif@v3
@@ -72,9 +296,26 @@ jobs:
           sarif_file: megalinter-reports/megalinter-report.sarif
         continue-on-error: true
 
+      # Set job outputs for summary
+      - name: Check MegaLinter results
+        id: ml-check
+        if: always()
+        run: |
+          if [[ -f "megalinter-reports/megalinter-report.json" ]]; then
+            errors=$(jq -r '.total_errors // 0' megalinter-reports/megalinter-report.json)
+            warnings=$(jq -r '.total_warnings // 0' megalinter-reports/megalinter-report.json)
+            echo "has-errors=$errors" >> "$GITHUB_OUTPUT"
+            echo "has-warnings=$warnings" >> "$GITHUB_OUTPUT"
+          else
+            echo "has-errors=0" >> "$GITHUB_OUTPUT"
+            echo "has-warnings=0" >> "$GITHUB_OUTPUT"
+          fi
+
   license-compliance:
     name: REUSE License Compliance
     runs-on: ubuntu-latest
+    needs: [check-skip]
+    if: needs.check-skip.outputs.should-skip != 'true'
     timeout-minutes: 10
 
     permissions:
@@ -93,10 +334,11 @@ jobs:
         uses: fsfe/reuse-action@bb774aa972c2a89ff34781233d275075cbddf542 # v5.0.0
 
   commit-validation:
-    name: Commit Validation (DCO & Conventional)
+    name: Commit & PR Validation
     runs-on: ubuntu-latest
+    needs: [check-skip]
+    if: github.event_name == 'pull_request' && needs.check-skip.outputs.should-skip != 'true'
     timeout-minutes: 10
-    if: github.event_name == 'pull_request'
 
     permissions:
       contents: read
@@ -147,39 +389,140 @@ jobs:
             starts with an uppercase character.
 
   compliance-summary:
-    name: Compliance Summary
+    name: Compliance Report
     runs-on: ubuntu-latest
-    needs: [megalinter, license-compliance, commit-validation]
-    if: always()
+    needs: [check-skip, megalinter, license-compliance, commit-validation]
+    if: always() && needs.check-skip.outputs.should-skip != 'true'
+    timeout-minutes: 5
 
     permissions:
       contents: read
 
     steps:
-      - name: Check compliance status
+      - name: Generate compliance summary
         run: |
-          echo "## 📋 Compliance Check Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| 🔍 MegaLinter | ${{ needs.megalinter.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| ⚖️ License Compliance | ${{ needs.license-compliance.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| ✍️ Commit Validation | ${{ needs.commit-validation.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "# 📋 Code Quality & Compliance Report"
+            echo ""
 
-          if [[ "${{ needs.megalinter.result }}" != "success" ]] || \
-             [[ "${{ needs.license-compliance.result }}" != "success" ]] || \
-             [[ "${{ needs.commit-validation.result }}" != "success" && "${{ needs.commit-validation.result }}" != "skipped" ]]; then
-            echo "❌ **Compliance checks failed. Please review the errors above.**" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "### 🔧 Next Steps:" >> $GITHUB_STEP_SUMMARY
-            echo "- Review failed job logs for specific errors" >> $GITHUB_STEP_SUMMARY
-            echo "- Download MegaLinter artifacts for detailed reports" >> $GITHUB_STEP_SUMMARY
-            echo "- Fix issues and push changes to re-trigger checks" >> $GITHUB_STEP_SUMMARY
+            # Add workflow information
+            echo "**Workflow:** ${{ github.workflow }}"
+            echo "**Triggered by:** ${{ github.event_name }}"
+            echo "**Run number:** #${{ github.run_number }}"
+
+            # Results table
+            echo "## 📊 Check Results"
+            echo ""
+            echo "| Check | Status | Details |"
+            echo "|-------|--------|---------|"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          # MegaLinter status
+          ML_STATUS="${{ needs.megalinter.result }}"
+          if [[ "$ML_STATUS" == "success" ]]; then
+            ML_ICON="✅"
+            ML_DETAIL="No issues found"
+          elif [[ "$ML_STATUS" == "failure" ]]; then
+            ML_ICON="❌"
+            ML_DETAIL="Errors: ${{ needs.megalinter.outputs.has-errors }}, Warnings: ${{ needs.megalinter.outputs.has-warnings }}"
+          else
+            ML_ICON="⚠️"
+            ML_DETAIL="Status: $ML_STATUS"
+          fi
+          echo "| $ML_ICON MegaLinter | $ML_STATUS | $ML_DETAIL |" >> "$GITHUB_STEP_SUMMARY"
+
+          # License compliance status
+          LC_STATUS="${{ needs.license-compliance.result }}"
+          if [[ "$LC_STATUS" == "success" ]]; then
+            LC_ICON="✅"
+            LC_DETAIL="All files compliant"
+          elif [[ "$LC_STATUS" == "failure" ]]; then
+            LC_ICON="❌"
+            LC_DETAIL="License headers missing"
+          else
+            LC_ICON="⚠️"
+            LC_DETAIL="Status: $LC_STATUS"
+          fi
+          echo "| $LC_ICON License Compliance | $LC_STATUS | $LC_DETAIL |" >> "$GITHUB_STEP_SUMMARY"
+
+          # Commit validation status
+          CV_STATUS="${{ needs.commit-validation.result }}"
+          if [[ "$CV_STATUS" == "success" ]]; then
+            CV_ICON="✅"
+            CV_DETAIL="All commits valid"
+          elif [[ "$CV_STATUS" == "failure" ]]; then
+            CV_ICON="❌"
+            CV_DETAIL="DCO or format issues"
+          elif [[ "$CV_STATUS" == "skipped" ]]; then
+            CV_ICON="⏭️"
+            CV_DETAIL="Not applicable (push event)"
+          else
+            CV_ICON="⚠️"
+            CV_DETAIL="Status: $CV_STATUS"
+          fi
+          echo "| $CV_ICON Commit Validation | $CV_STATUS | $CV_DETAIL |" >> "$GITHUB_STEP_SUMMARY"
+
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          # Overall status
+          if [[ "$ML_STATUS" != "success" ]] || \
+             [[ "$LC_STATUS" != "success" ]] || \
+             [[ "$CV_STATUS" != "success" && "$CV_STATUS" != "skipped" ]]; then
+            {
+              echo "## ❌ Compliance Checks Failed"
+              echo ""
+              echo "Please review the failures above and address the issues."
+              echo ""
+              echo "### 🔧 Recommended Actions:"
+              echo ""
+            } >> "$GITHUB_STEP_SUMMARY"
+
+            if [[ "$ML_STATUS" != "success" ]]; then
+              {
+                echo "#### MegaLinter Issues"
+                echo "- Review the [MegaLinter job](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details"
+                echo "- Download MegaLinter artifacts for comprehensive reports"
+                echo "- Check if an auto-fix PR was created"
+                echo ""
+              } >> "$GITHUB_STEP_SUMMARY"
+            fi
+
+            if [[ "$LC_STATUS" != "success" ]]; then
+              {
+                echo "#### License Compliance Issues"
+                echo "- Ensure all files have proper SPDX license headers"
+                echo "- Review REUSE.toml configuration"
+                echo "- Run \`reuse lint\` locally to identify issues"
+                echo ""
+              } >> "$GITHUB_STEP_SUMMARY"
+            fi
+
+            if [[ "$CV_STATUS" != "success" && "$CV_STATUS" != "skipped" ]]; then
+              {
+                echo "#### Commit Validation Issues"
+                echo "- Ensure all commits are signed with DCO (\`Signed-off-by\`)"
+                echo "- Verify PR title follows [Conventional Commits](https://www.conventionalcommits.org/)"
+                echo "- PR title must start with an uppercase letter"
+                echo ""
+              } >> "$GITHUB_STEP_SUMMARY"
+            fi
+
+            {
+              echo "### 📚 Resources"
+              echo "- [Contributing Guidelines](../../CONTRIBUTING.md)"
+              echo "- [Code of Conduct](../../CODE_OF_CONDUCT.md)"
+              echo ""
+            } >> "$GITHUB_STEP_SUMMARY"
             exit 1
           else
-            echo "✅ **All compliance checks passed!**" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "_This PR meets all quality and compliance standards._" >> $GITHUB_STEP_SUMMARY
+            {
+              echo "## ✅ All Compliance Checks Passed"
+              echo ""
+              echo "This pull request meets all quality and compliance standards!"
+              echo ""
+              echo "### 🎉 What's Next?"
+              echo "- Wait for code review from maintainers"
+              echo "- Address any review comments"
+              echo "- Your PR is ready to merge once approved"
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
-    

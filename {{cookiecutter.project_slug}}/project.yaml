@@ -36,8 +36,8 @@ template:
   version: "1.0.0"  # Docker scaffold template version
   source: "https://github.com/broadsage/docker-scaffold"
   protected_files: []  # List files that should not be overwritten during updates
-    # - README.md
-    # - custom-script.sh
+  # - README.md
+  # - custom-script.sh
 
 # Override Features (uncomment to change from defaults)
 features:
