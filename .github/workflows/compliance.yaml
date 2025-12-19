@@ -176,7 +176,7 @@ jobs:
                   ])
                   .write();
               } else {
-              console.log('📄 MegaLinter report not found, checking for log file...');
+                console.log('📄 MegaLinter report not found, checking for log file...');
 
                 const logPath = 'mega-linter.log';
                 if (fs.existsSync(logPath)) {
