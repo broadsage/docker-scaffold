@@ -30,12 +30,12 @@ permissions: {}
 jobs:
   # Skip workflow on draft PRs to save resources
   check-skip:
-    name: Check if workflow should run
+    name: Check Workflow
     runs-on: ubuntu-latest
     outputs:
       should-skip: ${{ steps.check.outputs.should-skip }}
     steps:
-      - name: Check if draft PR
+      - name: Check If Draft PR
         id: check
         run: |
           if [[ "${{ github.event.pull_request.draft }}" == "true" ]]; then
@@ -65,7 +65,7 @@ jobs:
       actions: read # Required: ACTION_ACTIONLINT to read workflow files
 
     steps:
-      - name: Harden the runner (Audit all outbound calls)
+      - name: Harden Runner
         uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
         with:
           egress-policy: audit
@@ -77,7 +77,7 @@ jobs:
           fetch-depth: 0
 
       # Import GPG key for signing commits (conditional on secrets availability)
-      - name: Check GPG secrets availability
+      - name: Check GPG Secrets Availability
         id: check-gpg
         run: |
           if [ -n "${{ secrets.AUTOBOT_GITHUB_GPG_PRIVATE_KEY }}" ]; then
@@ -86,7 +86,7 @@ jobs:
             echo "gpg_available=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Import GPG key
+      - name: Import GPG Key
         if: steps.check-gpg.outputs.gpg_available == 'true'
         uses: crazy-max/ghaction-import-gpg@e89d40939c28e39f97cf32126055eeae86ba74ec # v6.3.0
         with:
@@ -98,7 +98,7 @@ jobs:
           git_config_global: true
           trust_level: 5
 
-      - name: Configure Git for broadsage-autobot
+      - name: Configure Git for Broadsage-Autobot
         run: |
           git config --global user.name "broadsage-autobot"
           git config --global user.email "broadsage-autobot@broadsage.com"
@@ -129,7 +129,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.AUTOBOT_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
 
       # Upload MegaLinter artifacts
-      - name: Archive production artifacts
+      - name: Archive Production Artifacts
         if: success() || failure()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
@@ -198,7 +198,7 @@ jobs:
             }
 
       # Create pull request if applicable (for now works only on PR from same repository, not from forks)
-      - name: Create Pull Request with applied fixes
+      - name: Create Pull Request With Applied Fixes
         id: cpr
         if: steps.ml.outputs.has_updated_sources == 1 && (env.APPLY_FIXES_EVENT == 'all' || env.APPLY_FIXES_EVENT == github.event_name) && env.APPLY_FIXES_MODE == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
@@ -229,7 +229,7 @@ jobs:
 
             ⚠️ **Important**: Do not merge this PR directly - apply the fixes to your original PR instead.
 
-      - name: Comment on original PR
+      - name: Comment On Original PR
         if: steps.cpr.outputs.pull-request-number && github.event_name == 'pull_request'
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
         continue-on-error: true
@@ -282,14 +282,14 @@ jobs:
               core.setFailed(`Failed to comment on original PR: ${error.message}`);
             }
 
-      - name: Create PR output
+      - name: Create PR Output
         if: steps.ml.outputs.has_updated_sources == 1 && (env.APPLY_FIXES_EVENT == 'all' || env.APPLY_FIXES_EVENT == github.event_name) && env.APPLY_FIXES_MODE == 'pull_request' && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository)
         run: |
           echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
           echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
 
       # Upload SARIF report for GitHub Security
-      - name: Upload SARIF report
+      - name: Upload SARIF Report
         if: always()
         uses: github/codeql-action/upload-sarif@v3
         with:
@@ -297,7 +297,7 @@ jobs:
         continue-on-error: true
 
       # Set job outputs for summary
-      - name: Check MegaLinter results
+      - name: Check MegaLinter Results
         id: ml-check
         if: always()
         run: |
@@ -322,7 +322,7 @@ jobs:
       contents: read
 
     steps:
-      - name: Harden GitHub runner
+      - name: Harden GitHub Runner
         uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
         with:
           egress-policy: audit
@@ -345,7 +345,7 @@ jobs:
       pull-requests: read
 
     steps:
-      - name: Harden GitHub runner
+      - name: Harden GitHub Runner
         uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
         with:
           egress-policy: audit
@@ -356,7 +356,7 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
 
-      - name: Setup main branch without switching current branch
+      - name: Setup Main Branch Without Switching Current Branch
         run: git fetch origin main:main
 
       - name: Conform Action (DCO & Commit Policy)
@@ -364,7 +364,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Validate PR title follows Conventional Commits
+      - name: Validate PR Title Follows Conventional Commits
         uses: amannn/action-semantic-pull-request@0723387faaf9b38adef4775cd42cfd5155ed6017 # v5.5.3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -399,7 +399,7 @@ jobs:
       contents: read
 
     steps:
-      - name: Generate compliance summary
+      - name: Generate Compliance Summary
         run: |
           {
             echo "# 📋 Code Quality & Compliance Report"

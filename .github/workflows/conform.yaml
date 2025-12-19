@@ -32,7 +32,7 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
 
-      - name: Setup main branch without switching current branch
+      - name: Setup Main Branch Without Switching Current Branch
         run: git fetch origin main:main
 
       - name: Conform Action
@@ -45,7 +45,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Validate PR title follows Conventional Commits
+      - name: Validate PR Title Follows Conventional Commits
         uses: amannn/action-semantic-pull-request@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
