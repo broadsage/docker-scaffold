@@ -4,7 +4,7 @@
 
 # syntax=docker/dockerfile:1
 
-FROM alpine:3.22
+FROM alpine:3.23
 
 LABEL org.opencontainers.image.authors="Broadsage <opensource@broadsage.com>" \
       org.opencontainers.image.url="https://github.com/broadsage/docker-scaffold" \
