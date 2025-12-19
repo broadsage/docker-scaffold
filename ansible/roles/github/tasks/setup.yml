@@ -79,3 +79,14 @@
   when: github.pull_requests | bool
   loop:
     - PULL_REQUEST_TEMPLATE.md
+
+- name: Populate GitHub Dependabot configuration
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "/tmp/.github/{{ item }}"
+    owner: "abc"
+    group: "abc"
+    mode: "0644"
+  when: github.dependabot | bool
+  loop:
+    - dependabot.yaml

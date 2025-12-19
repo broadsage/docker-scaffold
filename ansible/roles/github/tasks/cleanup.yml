@@ -30,9 +30,16 @@
     state: absent
   when: not github.pull_requests | bool
 
+# Remove dependabot config only if dependabot disabled
+- name: Remove GitHub Dependabot configuration when disabled
+  ansible.builtin.file:
+    path: /tmp/.github/dependabot.yaml
+    state: absent
+  when: not github.dependabot | bool
+
 # Remove entire .github if nothing is left
 - name: Remove empty .github directory
   ansible.builtin.file:
     path: /tmp/.github
     state: absent
-  when: not github.issues | bool and not github.workflows | bool and not github.discussions | bool and not github.pull_requests | bool
+  when: not github.issues | bool and not github.workflows | bool and not github.discussions | bool and not github.pull_requests | bool and not github.dependabot | bool
