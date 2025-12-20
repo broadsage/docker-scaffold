@@ -43,3 +43,8 @@ updates:
       - python
     commit-message:
       prefix: "chore(deps)"
+
+  - package-ecosystem: pip
+    directory: /{{cookiecutter.project_slug}}
+    schedule:
+      interval: daily

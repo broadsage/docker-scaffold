@@ -34,6 +34,11 @@ jobs:
     outputs:
       should-skip: ${{ steps.check.outputs.should-skip }}
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@20cf305ff2072d973412fa9b1e3a4f227bda3c76 # v2.14.0
+        with:
+          egress-policy: audit
+
       - name: Check Draft PR Status
         id: check
         run: |
@@ -108,7 +113,7 @@ jobs:
 
       # Cache MegaLinter plugins and dependencies
       - name: Cache MegaLinter
-        uses: actions/cache@v5
+        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
         with:
           path: |
             ~/.cache/megalinter
@@ -290,7 +295,7 @@ jobs:
       # Upload SARIF report for GitHub Security
       - name: Upload SARIF Report
         if: always()
-        uses: github/codeql-action/upload-sarif@v4
+        uses: github/codeql-action/upload-sarif@5d4e8d1aca955e8d8589aabd499c5cae939e33c7 # v4.31.9
         with:
           sarif_file: megalinter-reports/megalinter-report.sarif
         continue-on-error: true
@@ -397,6 +402,11 @@ jobs:
       contents: read
 
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@20cf305ff2072d973412fa9b1e3a4f227bda3c76 # v2.14.0
+        with:
+          egress-policy: audit
+
       - name: Generate Compliance Summary
         run: |
           {
