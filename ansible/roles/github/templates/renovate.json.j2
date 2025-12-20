@@ -1,0 +1,176 @@
+# SPDX-FileCopyrightText: Copyright (c) 2025 {{ metadata.maintainer.name }} <{{ metadata.maintainer.email }}>
+#
+# SPDX-License-Identifier: {{ metadata.license }}
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Renovate configuration for {{ metadata.maintainer.name }} Docker base image",
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard",
+    ":semanticCommits",
+    ":maintainLockFilesWeekly"
+  ],
+  "timezone": "UTC",
+  "schedule": [
+    "after 10pm every weekend"
+  ],
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 0,
+  "prCreation": "immediate",
+  "rebaseWhen": "conflicted",
+  "labels": [
+    "dependencies",
+    "renovate"
+  ],
+  "commitMessagePrefix": "chore(deps):",
+  "commitMessageAction": "update",
+  "commitMessageTopic": "{{{{depName}}}}",
+  "assigneesFromCodeOwners": true,
+  "reviewersFromCodeOwners": true,
+  "packageRules": [
+    {
+      "description": "Docker base images - patch and minor auto-merge",
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "groupName": "Docker base images (non-major)",
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "squash",
+      "platformAutomerge": true,
+      "minimumReleaseAge": "3 days"
+    },
+    {
+      "description": "Docker major updates - require manual review",
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "groupName": "Docker base images (major)",
+      "automerge": false,
+      "labels": [
+        "dependencies",
+        "docker",
+        "major-update",
+        "requires-review"
+      ]
+    },
+    {
+      "description": "GitHub Actions - auto-merge all updates with SHA pinning",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "groupName": "GitHub Actions",
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "squash",
+      "platformAutomerge": true,
+      "pinDigests": true,
+      "minimumReleaseAge": "1 day"
+    },
+    {
+      "description": "Python packages - conservative auto-merge (patch only)",
+      "matchManagers": [
+        "pip_requirements",
+        "pip_setup",
+        "pipenv",
+        "poetry"
+      ],
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "groupName": "Python ecosystem (patch)",
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "squash",
+      "platformAutomerge": true,
+      "minimumReleaseAge": "3 days"
+    },
+    {
+      "description": "Python minor/major - manual review for compatibility",
+      "matchManagers": [
+        "pip_requirements",
+        "pip_setup",
+        "pipenv",
+        "poetry"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "major"
+      ],
+      "groupName": "Python ecosystem (minor/major)",
+      "automerge": false,
+      "labels": [
+        "dependencies",
+        "python",
+        "requires-review"
+      ]
+    },
+    {
+      "description": "Security scanning tools - always auto-merge",
+      "matchPackagePatterns": [
+        "^step-security/harden-runner",
+        "^github/codeql-action",
+        "^ossf/scorecard-action",
+        "^aquasecurity/trivy",
+        "^anchore/grype"
+      ],
+      "groupName": "Security tools",
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "squash",
+      "minimumReleaseAge": "0 days",
+      "schedule": [
+        "at any time"
+      ]
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "schedule": [
+      "at any time"
+    ]
+  },
+  "osvVulnerabilityAlerts": true,
+  "dependencyDashboard": true,
+  "dependencyDashboardTitle": "🤖 Renovate Dependency Dashboard",
+  "separateMinorPatch": true,
+  "separateMajorMinor": true,
+  "rangeStrategy": "pin",
+  "digest": {
+    "enabled": true,
+    "automerge": true
+  },
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true,
+    "schedule": [
+      "before 5am on monday"
+    ]
+  },
+  "dockerfile": {
+    "enabled": true,
+    "pinDigests": true
+  },
+  "docker": {
+    "enabled": true,
+    "pinDigests": true
+  },
+  "python": {
+    "enabled": true
+  },
+  "ignorePaths": [
+    "**/node_modules/**",
+    "**/bower_components/**",
+    "**/vendor/**",
+    "**/__pycache__/**",
+    "**/megalinter-reports/**",
+    "**/LICENSES/**"
+  ]
+}

@@ -54,7 +54,7 @@ github:
   issues: true
   workflows: true
   discussions: true
-  dependabot: true
+  renovate: true
   pull_requests: true
   projects:
     enabled: false

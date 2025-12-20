@@ -80,13 +80,13 @@
   loop:
     - PULL_REQUEST_TEMPLATE.md
 
-- name: Populate GitHub Dependabot configuration
+- name: Populate Renovate configuration
   ansible.builtin.template:
     src: "{{ item }}.j2"
-    dest: "/tmp/.github/{{ item }}"
+    dest: "/tmp/{{ item }}"
     owner: "abc"
     group: "abc"
     mode: "0644"
-  when: github.dependabot | bool
+  when: github.renovate | bool
   loop:
-    - dependabot.yaml
+    - renovate.json
