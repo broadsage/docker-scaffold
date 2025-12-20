@@ -3,13 +3,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 ---
-name: "GitHub CodeQL"
+name: "CodeQL Advanced Security Scan"
 
 "on":
-  push:
-    branches: ["main"]
   pull_request:
-    branches: ["main"]
+    types: [opened, synchronize, reopened]
   schedule:
     # Run weekly on Mondays at midnight UTC for comprehensive security scanning
     - cron: "0 0 * * 1"
@@ -21,7 +19,7 @@ permissions:
 jobs:
   # CodeQL deep security analysis for Python
   codeql-analysis:
-    name: CodeQL Python Security Scan
+    name: CodeQL
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
