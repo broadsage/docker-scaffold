@@ -21,13 +21,11 @@ policies:
           - build
           - chore
           - ci
-          - deps
           - docs
           - feat
           - fix
           - perf
           - refactor
-          - release
           - style
           - test
         scopes: [".*"]

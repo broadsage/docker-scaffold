@@ -369,17 +369,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           types: |
+            build
+            chore
+            ci
+            docs
             feat
             fix
-            docs
-            chore
-            refactor
-            test
-            ci
-            build
             perf
-            revert
+            refactor
             style
+            test
           requireScope: false
           subjectPattern: ^[A-Z].*$|^(bump|update) .*$
           subjectPatternError: |
