@@ -184,7 +184,7 @@ jobs:
         run: |
           echo "Created PR #${{ steps.cpr.outputs.pull-request-number }}"
           echo "PR URL: ${{ steps.cpr.outputs.pull-request-url }}"
-          echo "PR_NUMBER=${{ steps.cpr.outputs.pull-request-number }}" >> $GITHUB_ENV
+          echo "PR_NUMBER=${{ steps.cpr.outputs.pull-request-number }}" >> "$GITHUB_ENV"
 
       - name: Check MegaLinter Results
         id: ml-check
