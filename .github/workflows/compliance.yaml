@@ -65,7 +65,6 @@ jobs:
       pull-requests: write # Required: peter-evans/create-pull-request + GITHUB_COMMENT_REPORTER
       issues: write # Required: GITHUB_COMMENT_REPORTER
       statuses: write # Required: GITHUB_STATUS_REPORTER in MegaLinter config
-      security-events: write # Required: SARIF_REPORTER in MegaLinter config
       actions: read # Required: ACTION_ACTIONLINT to read workflow files
 
     steps:
@@ -89,9 +88,7 @@ jobs:
       - name: Cache MegaLinter
         uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
         with:
-          path: |
-            ~/.cache/megalinter
-            megalinter-reports
+          path: ~/.cache/megalinter
           key: megalinter-${{ runner.os }}-${{ hashFiles('**/*.yaml', '**/*.json', '**/*.md', '**/*.sh') }}
           restore-keys: |
             megalinter-${{ runner.os }}-
@@ -120,65 +117,38 @@ jobs:
       - name: MegaLinter Summary
         if: always()
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
-        env:
-          MEGALINTER_REPORTS_PATH: megalinter-reports
         with:
           script: |
             const fs = require('fs');
             const path = require('path');
-            try {
-              // Read MegaLinter summary
-              const reportsPath = process.env.MEGALINTER_REPORTS_PATH || 'megalinter-reports';
-              const summaryPath = path.join(reportsPath, 'megalinter-report.json');
+            const summaryPath = path.join('megalinter-reports', 'megalinter-report.json');
 
-              console.log('🔍 MegaLinter Summary');
-              console.log('===================');
-
-              if (fs.existsSync(summaryPath)) {
-                const summary = JSON.parse(fs.readFileSync(summaryPath, 'utf8'));
-
-                console.log(`✅ Linters run: ${summary.total_linters || 'N/A'}`);
-                console.log(`❌ Errors found: ${summary.total_errors || 0}`);
-                console.log(`⚠️  Warnings: ${summary.total_warnings || 0}`);
-                console.log(`🔧 Files fixed: ${summary.total_fixed || 0}`);
-
-                // Create GitHub summary
-                await core.summary
-                  .addHeading('MegaLinter Results')
-                  .addTable([
-                    ['Metric', 'Count'],
-                    ['Linters Run', (summary.total_linters || 'N/A').toString()],
-                    ['Errors', (summary.total_errors || 0).toString()],
-                    ['Warnings', (summary.total_warnings || 0).toString()],
-                    ['Files Fixed', (summary.total_fixed || 0).toString()]
-                  ])
-                  .write();
-              } else {
-                console.log('📄 MegaLinter report not found, checking for log file...');
-
-                const logPath = 'mega-linter.log';
-                if (fs.existsSync(logPath)) {
-                  console.log('📋 MegaLinter completed - check artifacts for detailed results');
-                  await core.summary
-                    .addHeading('MegaLinter Results')
-                    .addRaw('MegaLinter execution completed. Check the uploaded artifacts for detailed results.')
-                    .write();
-                } else {
-                  console.log('⚠️  No MegaLinter output found');
-                }
-              }
-            } catch (error) {
-              console.log(`❌ Error reading MegaLinter summary: ${error.message}`);
-              await core.summary
-                .addHeading('MegaLinter Results')
-                .addRaw('Error reading MegaLinter results. Check the uploaded artifacts for details.')
-                .write();
+            let summary = {};
+            if (fs.existsSync(summaryPath)) {
+              summary = JSON.parse(fs.readFileSync(summaryPath, 'utf8'));
             }
 
-      # Create pull request if applicable (for now works only on PR from same repository, not from forks)
+            const results = [
+              ['Metric', 'Count'],
+              ['Linters Run', (summary.total_linters || 'N/A').toString()],
+              ['Errors', (summary.total_errors || 0).toString()],
+              ['Warnings', (summary.total_warnings || 0).toString()],
+              ['Files Fixed', (summary.total_fixed || 0).toString()]
+            ];
+
+            await core.summary
+              .addHeading('🔍 MegaLinter Results')
+              .addTable(results)
+              .addRaw('📦 Full reports available in workflow artifacts')
+              .write();
+
       - name: Create Pull Request With Applied Fixes
         id: cpr
-        if: steps.ml.outputs.has_updated_sources == 1 && (env.APPLY_FIXES_EVENT == 'all' || env.APPLY_FIXES_EVENT == github.event_name) && env.APPLY_FIXES_MODE == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        if: |
+          steps.ml.outputs.has_updated_sources == 1 &&
+          env.APPLY_FIXES_EVENT == github.event_name &&
+          env.APPLY_FIXES_MODE == 'pull_request' &&
+          github.event.pull_request.head.repo.full_name == github.repository
         uses: peter-evans/create-pull-request@98357b18bf14b5342f975ff684046ec3b2a07725 # v8.0.0
         with:
           base: ${{ github.event.pull_request.base.ref }}
@@ -199,74 +169,23 @@ jobs:
             - Automatic code formatting fixes
             - Linter compliance fixes
 
-            **Next Steps:**
-            📋 **Please apply these fixes to your original PR**
-            1. Merge this branch into your original PR branch
-            2. Close this MegaLinter PR
-            3. Continue with your original PR review process
+            **Required Action:**
+            Please merge this branch into your original PR branch:
+            ```bash
+            git fetch origin megalinter-fixes-${{ github.event.pull_request.number }}
+            git merge origin/megalinter-fixes-${{ github.event.pull_request.number }}
+            git push
+            ```
 
-            ⚠️ **Important**: Do not merge this PR directly - apply the fixes to your original PR instead.
+            Then close this PR.
 
-      - name: Comment On Original PR
-        if: steps.cpr.outputs.pull-request-number && github.event_name == 'pull_request'
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
-        continue-on-error: true
-        env:
-          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
-        with:
-          github-token: ${{ secrets.AUTOBOT_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
-          script: |
-            try {
-              const fixPrUrl = "${{ steps.cpr.outputs.pull-request-url }}";
-              const fixPrNumber = "${{ steps.cpr.outputs.pull-request-number }}";
-              const originalPrNumber = context.payload.pull_request.number;
-              const prHeadRef = process.env.PR_HEAD_REF;
-
-              const comment = `## 🤖 MegaLinter Auto-Fix Available
-
-              Hi @${{ github.event.pull_request.user.login }}! 👋
-
-              MegaLinter found some linting issues in your PR and has created an auto-fix PR: **#${fixPrNumber}**
-
-              ### 📋 Required Action:
-                **Please merge the fixes into your original PR:**
-                \`\`\`bash
-                # Fetch and merge the linter fixes
-                git fetch origin megalinter-fixes-${originalPrNumber}
-                git checkout ${prHeadRef}
-                git merge origin/megalinter-fixes-${originalPrNumber}
-                git push origin ${prHeadRef}
-
-              After merging the fixes, please close the auto-fix PR #${fixPrNumber}.
-
-              ### 🔗 Links:
-                - **Auto-fix PR**: ${fixPrUrl}
-                - **MegaLinter Report**: [View artifacts](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
-
-              ---
-                *This comment was automatically generated by MegaLinter*`;
-
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: originalPrNumber,
-                body: comment
-              });
-
-              console.log(`✅ Successfully commented on PR #${originalPrNumber}`);
-              console.log(`✅ Successfully commented on PR #${originalPrNumber}`);
-            } catch (error) {
-              console.log(`❌ Failed to comment on PR: ${error.message}`);
-              core.setFailed(`Failed to comment on original PR: ${error.message}`);
-            }
-
-      - name: Create PR Output
-        if: steps.ml.outputs.has_updated_sources == 1 && (env.APPLY_FIXES_EVENT == 'all' || env.APPLY_FIXES_EVENT == github.event_name) && env.APPLY_FIXES_MODE == 'pull_request' && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository)
+      - name: Log Pull Request Output
+        if: steps.cpr.outputs.pull-request-number
         run: |
-          echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
-          echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
+          echo "Created PR #${{ steps.cpr.outputs.pull-request-number }}"
+          echo "PR URL: ${{ steps.cpr.outputs.pull-request-url }}"
+          echo "PR_NUMBER=${{ steps.cpr.outputs.pull-request-number }}" >> $GITHUB_ENV
 
-      # Set job outputs for summary
       - name: Check MegaLinter Results
         id: ml-check
         if: always()
@@ -274,12 +193,12 @@ jobs:
           if [[ -f "megalinter-reports/megalinter-report.json" ]]; then
             errors=$(jq -r '.total_errors // 0' megalinter-reports/megalinter-report.json)
             warnings=$(jq -r '.total_warnings // 0' megalinter-reports/megalinter-report.json)
-            echo "has-errors=$errors" >> "$GITHUB_OUTPUT"
-            echo "has-warnings=$warnings" >> "$GITHUB_OUTPUT"
           else
-            echo "has-errors=0" >> "$GITHUB_OUTPUT"
-            echo "has-warnings=0" >> "$GITHUB_OUTPUT"
+            errors=0
+            warnings=0
           fi
+          echo "has-errors=$errors" >> "$GITHUB_OUTPUT"
+          echo "has-warnings=$warnings" >> "$GITHUB_OUTPUT"
 
   license-compliance:
     name: REUSE License Compliance
