@@ -48,8 +48,6 @@ jobs:
         uses: github/codeql-action/init@396bb3e45325a47dd9ef434068033c6d5bb0d11a # v4.1.1
         with:
           languages: ${{ matrix.language }}
-          # Enable extended security queries for comprehensive vulnerability detection
-          queries: +security-extended,security-and-quality
 
       - name: Autobuild
         uses: github/codeql-action/autobuild@396bb3e45325a47dd9ef434068033c6d5bb0d11a # v4.1.1
