@@ -5,7 +5,7 @@
 # Python dependencies for {{ cookiecutter.project_name }}
 
 # Required for YAML configuration parsing
-PyYAML>=6.0.1
+PyYAML==6.0.3
 
 # Required for format-preserving YAML updates
-ruamel.yaml>=0.18.0
+ruamel.yaml==0.18.17
