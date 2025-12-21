@@ -103,16 +103,6 @@ jobs:
           VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
           GITHUB_TOKEN: ${{ secrets.AUTOBOT_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
 
-      # Upload MegaLinter artifacts
-      - name: Archive Production Artifacts
-        if: success() || failure()
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
-        with:
-          name: MegaLinter reports
-          path: |
-            megalinter-reports
-            mega-linter.log
-
       # Show MegaLinter summary
       - name: MegaLinter Summary
         if: always()
@@ -139,7 +129,6 @@ jobs:
             await core.summary
               .addHeading('🔍 MegaLinter Results')
               .addTable(results)
-              .addRaw('📦 Full reports available in workflow artifacts')
               .write();
 
       - name: Create Pull Request With Applied Fixes
