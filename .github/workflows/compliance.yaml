@@ -8,9 +8,6 @@ name: Pre-merge Validation & Compliance
 "on":
   pull_request:
     types: [opened, synchronize, reopened]
-  push:
-    branches:
-      - main
 
 env:
   # MegaLinter Configuration
