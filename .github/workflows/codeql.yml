@@ -6,12 +6,13 @@
 name: "CodeQL Advanced Security Scan"
 
 "on":
+  push:
+    branches: [main]
   pull_request:
     types: [opened, synchronize, reopened]
   schedule:
     # Run weekly on Mondays at midnight UTC for comprehensive security scanning
     - cron: "0 0 * * 1"
-  workflow_dispatch:
 
 permissions:
   contents: read
