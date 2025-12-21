@@ -66,13 +66,13 @@ jobs:
             echo "## 🔒 CodeQL Security Analysis"
             echo ""
             echo "### Python Security Scan"
-            
+
             if [ "${{ job.status }}" == "success" ]; then
               echo "✅ **Status:** Passed - No critical vulnerabilities detected"
             else
               echo "❌ **Status:** Failed - Security issues found"
             fi
-            
+
             echo ""
             echo "### 🔍 What CodeQL Scans For"
             echo "- SQL Injection (CWE-89)"

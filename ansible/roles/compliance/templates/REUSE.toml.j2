@@ -28,6 +28,16 @@ path = [".git/**", ".gitmodules"]
 precedence = "override"
 skip = true
 
+# Project source files exclude from license
+[[annotations]]
+path = [
+  "VERSION",
+  "renovate.json",
+]
+precedence = "override"
+SPDX-FileCopyrightText = "Copyright (c) 2025 Broadsage <opensource@broadsage.com>"
+SPDX-License-Identifier = "Apache-2.0"
+
 # IDE and editor configuration
 [[annotations]]
 path = [".vscode/**", ".idea/**", ".sublime-project", ".sublime-workspace", "*.swp", "*.swo"]

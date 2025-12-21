@@ -1,6 +1,3 @@
-# SPDX-FileCopyrightText: Copyright (c) 2025 {{ metadata.maintainer.name }} <{{ metadata.maintainer.email }}>
-#
-# SPDX-License-Identifier: {{ metadata.license }}
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "description": "Renovate configuration for {{ metadata.maintainer.name }} Docker base image",
@@ -72,7 +69,26 @@
       "automergeStrategy": "squash",
       "platformAutomerge": true,
       "pinDigests": true,
-      "minimumReleaseAge": "1 day"
+      "minimumReleaseAge": "1 day",
+      "extractVersion": "^(?<version>v\\d+\\.\\d+\\.\\d+)$"
+    },
+    {
+      "description": "GitHub Actions with sub-paths - special handling for digest updates",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "matchPackagePatterns": [
+        "^github/codeql-action",
+        "^siderolabs/conform"
+      ],
+      "groupName": "GitHub Actions (sub-path)",
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "squash",
+      "platformAutomerge": true,
+      "pinDigests": false,
+      "minimumReleaseAge": "1 day",
+      "separateMinorPatch": false
     },
     {
       "description": "Python packages - conservative auto-merge (patch only)",

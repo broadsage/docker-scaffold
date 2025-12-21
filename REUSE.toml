@@ -52,6 +52,7 @@ path = [
   "cookiecutter.json",
   "{{cookiecutter.project_slug}}/**",
   "VERSION",
+  "renovate.json",
   "release-please-config.json",
   ".release-please-manifest.json",
 ]

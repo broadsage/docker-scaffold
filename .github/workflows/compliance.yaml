@@ -5,7 +5,7 @@
 ---
 name: Pre-merge Validation & Compliance
 
-on:
+"on":
   pull_request:
     types: [opened, synchronize, reopened]
   push:
