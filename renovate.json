@@ -23,6 +23,7 @@
   "commitMessageAction": "update",
   "commitMessageTopic": "{{depName}}",
   "commitMessageExtra": "to {{#if isPinDigest}}{{{newDigestShort}}}{{else}}{{#if isMajor}}{{prettyNewMajor}}{{else}}{{#if isSingleVersion}}{{prettyNewVersion}}{{else}}{{#if newValue}}{{{newValue}}}{{else}}{{{newDigestShort}}}{{/if}}{{/if}}{{/if}}{{/if}}",
+  "commitBody": "This automated dependency update is managed by Renovate bot.\n\nSigned-off-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>",
   "addLabels": [],
   "assigneesFromCodeOwners": true,
   "reviewersFromCodeOwners": true,

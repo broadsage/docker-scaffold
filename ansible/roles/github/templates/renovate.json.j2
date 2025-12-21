@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Renovate configuration for {{ metadata.maintainer.name }} Docker base image",
+  "description": "Renovate configuration for Docker base image template - optimized for 100+ image repositories",
   "extends": [
     "config:recommended",
     ":dependencyDashboard",
@@ -21,12 +21,16 @@
   ],
   "commitMessagePrefix": "chore(deps):",
   "commitMessageAction": "update",
-  "commitMessageTopic": "{{{{depName}}}}",
+  "commitMessageTopic": "{{depName}}",
+  "commitMessageExtra": "to {{#if isPinDigest}}{{{newDigestShort}}}{{else}}{{#if isMajor}}{{prettyNewMajor}}{{else}}{{#if isSingleVersion}}{{prettyNewVersion}}{{else}}{{#if newValue}}{{{newValue}}}{{else}}{{{newDigestShort}}}{{/if}}{{/if}}{{/if}}{{/if}}",
+  "commitBody": "This automated dependency update is managed by Renovate bot.\n\nSigned-off-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>",
+  "addLabels": [],
   "assigneesFromCodeOwners": true,
   "reviewersFromCodeOwners": true,
+  "ignoreDeps": [],
   "packageRules": [
     {
-      "description": "Docker base images - patch and minor auto-merge",
+      "description": "Docker base images - patch and minor auto-merge for production readiness",
       "matchDatasources": [
         "docker"
       ],
@@ -39,7 +43,9 @@
       "automergeType": "pr",
       "automergeStrategy": "squash",
       "platformAutomerge": true,
-      "minimumReleaseAge": "3 days"
+      "minimumReleaseAge": "3 days",
+      "internalChecksFilter": "strict",
+      "requiredStatusChecks": null
     },
     {
       "description": "Docker major updates - require manual review",
@@ -56,6 +62,9 @@
         "docker",
         "major-update",
         "requires-review"
+      ],
+      "reviewers": [
+        "team:maintainers"
       ]
     },
     {
@@ -129,6 +138,27 @@
       ]
     },
     {
+      "description": "Security vulnerability updates - immediate auto-merge",
+      "matchDatasources": [
+        "docker",
+        "pypi"
+      ],
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "vulnerabilityAlerts": {
+        "enabled": true,
+        "labels": [
+          "security",
+          "priority-high"
+        ],
+        "automerge": true,
+        "schedule": [
+          "at any time"
+        ]
+      }
+    },
+    {
       "description": "Security scanning tools - always auto-merge",
       "matchPackagePatterns": [
         "^step-security/harden-runner",
@@ -145,6 +175,40 @@
       "schedule": [
         "at any time"
       ]
+    },
+    {
+      "description": "MegaLinter and compliance tools",
+      "matchPackagePatterns": [
+        "megalinter",
+        "oxsecurity/megalinter"
+      ],
+      "groupName": "Compliance tools",
+      "automerge": true,
+      "automergeType": "pr",
+      "minimumReleaseAge": "3 days"
+    },
+    {
+      "description": "Release automation - requires review",
+      "matchPackagePatterns": [
+        "release-please",
+        "googleapis/release-please"
+      ],
+      "groupName": "Release automation",
+      "automerge": false,
+      "labels": [
+        "dependencies",
+        "automation",
+        "requires-review"
+      ]
+    },
+    {
+      "description": "Dockerfile linting tools",
+      "matchPackagePatterns": [
+        "hadolint"
+      ],
+      "groupName": "Dockerfile linters",
+      "automerge": true,
+      "automergeType": "pr"
     }
   ],
   "vulnerabilityAlerts": {
@@ -156,8 +220,11 @@
   "osvVulnerabilityAlerts": true,
   "dependencyDashboard": true,
   "dependencyDashboardTitle": "🤖 Renovate Dependency Dashboard",
+  "dependencyDashboardHeader": "This dashboard tracks all dependency updates managed by Renovate. PRs will be created automatically based on the schedule and auto-merge rules.",
+  "dependencyDashboardFooter": "For questions about specific updates, check the [Renovate documentation](https://docs.renovatebot.com/) or open an issue.",
   "separateMinorPatch": true,
   "separateMajorMinor": true,
+  "separateMultipleMajor": true,
   "rangeStrategy": "pin",
   "digest": {
     "enabled": true,
@@ -176,11 +243,31 @@
   },
   "docker": {
     "enabled": true,
-    "pinDigests": true
+    "pinDigests": true,
+    "major": {
+      "enabled": true
+    },
+    "minor": {
+      "enabled": true
+    },
+    "patch": {
+      "enabled": true
+    }
   },
   "python": {
     "enabled": true
   },
+  "pip_requirements": {
+    "enabled": true,
+    "fileMatch": [
+      "(^|/)([\\w-]*)requirements.*\\.txt$",
+      "(^|/)requirements/.*\\.txt$"
+    ]
+  },
+  "postUpdateOptions": [
+    "gomodTidy",
+    "npmDedupe"
+  ],
   "ignorePaths": [
     "**/node_modules/**",
     "**/bower_components/**",
@@ -188,5 +275,18 @@
     "**/__pycache__/**",
     "**/megalinter-reports/**",
     "**/LICENSES/**"
+  ],
+  "prBodyTemplate": "{{{header}}}{{{table}}}{{{notes}}}{{{changelogs}}}{{{configDescription}}}{{{controls}}}{{{footer}}}",
+  "prBodyColumns": [
+    "Package",
+    "Type",
+    "Update",
+    "Change",
+    "Pending"
+  ],
+  "prBodyNotes": [
+    "⚠️ **Breaking changes** in major updates require manual testing",
+    "✅ **Auto-merge** enabled for patch/minor updates after CI passes",
+    "🔒 **Security updates** are prioritized and merged immediately"
   ]
 }
