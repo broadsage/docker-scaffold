@@ -12,8 +12,8 @@ A production-ready template for generating Docker image projects with built-in c
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
-[![Cookiecutter](https://img.shields.io/badge/cookiecutter-template-D4AA00?logo=cookiecutter&logoColor=fff)](https://github.com/cookiecutter/cookiecutter)
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](CHANGELOG.md)
+[![Cookiecutter](https://img.shields.io/badge/Cookiecutter-template-D4AA00?logo=cookiecutter&logoColor=fff)](https://github.com/cookiecutter/cookiecutter)
+[![Version](https://img.shields.io/badge/Version-1.0.0-blue.svg)](CHANGELOG.md)
 
 ## 📦 Quick Start
 
