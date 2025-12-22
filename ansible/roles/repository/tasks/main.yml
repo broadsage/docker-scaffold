@@ -8,8 +8,6 @@
   ansible.builtin.template:
     src: "{{ item }}.j2"
     dest: "/tmp/{{ item }}"
-    owner: "abc"
-    group: "abc"
     mode: "0644"
   loop:
     - .gitignore

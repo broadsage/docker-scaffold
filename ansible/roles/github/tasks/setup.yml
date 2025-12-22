@@ -10,8 +10,6 @@
   ansible.builtin.file:
     path: "/tmp/{{ item }}"
     state: directory
-    owner: "abc"
-    group: "abc"
     mode: "0755"
   when: github.issues | bool
   loop:
@@ -21,8 +19,6 @@
   ansible.builtin.file:
     path: "/tmp/{{ item }}"
     state: directory
-    owner: "abc"
-    group: "abc"
     mode: "0755"
   when: github.workflows | bool
   loop:
@@ -32,8 +28,6 @@
   ansible.builtin.template:
     src: "ISSUE_TEMPLATE/{{ item }}.j2"
     dest: "/tmp/.github/ISSUE_TEMPLATE/{{ item }}"
-    owner: "abc"
-    group: "abc"
     mode: "0644"
   when: github.issues | bool
   loop:
@@ -47,8 +41,6 @@
   ansible.builtin.file:
     path: "/tmp/{{ item }}"
     state: directory
-    owner: "abc"
-    group: "abc"
     mode: "0755"
   when: github.discussions | bool
   loop:
@@ -58,8 +50,6 @@
   ansible.builtin.template:
     src: "DISCUSSION_TEMPLATE/{{ item }}.j2"
     dest: "/tmp/.github/DISCUSSION_TEMPLATE/{{ item }}"
-    owner: "abc"
-    group: "abc"
     mode: "0644"
   when: github.discussions | bool
   loop:
@@ -73,8 +63,6 @@
   ansible.builtin.template:
     src: "{{ item }}.j2"
     dest: "/tmp/.github/{{ item }}"
-    owner: "abc"
-    group: "abc"
     mode: "0644"
   when: github.pull_requests | bool
   loop:
@@ -84,8 +72,6 @@
   ansible.builtin.template:
     src: "{{ item }}.j2"
     dest: "/tmp/{{ item }}"
-    owner: "abc"
-    group: "abc"
     mode: "0644"
   when: github.renovate | bool
   loop:

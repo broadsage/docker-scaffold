@@ -8,8 +8,6 @@
   ansible.builtin.template:
     src: "compliance.py.j2"
     dest: "/tmp/scripts/compliance.py"
-    owner: "abc"
-    group: "abc"
     mode: "0755"
   when: features.compliance | bool
 
@@ -17,8 +15,6 @@
   ansible.builtin.template:
     src: ".conform.yaml.j2"
     dest: "/tmp/.conform.yaml"
-    owner: "abc"
-    group: "abc"
     mode: "0644"
   when: compliance.conform | bool
 
@@ -26,8 +22,6 @@
   ansible.builtin.template:
     src: ".mega-linter.yaml.j2"
     dest: "/tmp/.mega-linter.yaml"
-    owner: "abc"
-    group: "abc"
     mode: "0644"
   when: compliance.megalinter | bool
 
@@ -35,7 +29,5 @@
   ansible.builtin.template:
     src: "REUSE.toml.j2"
     dest: "/tmp/REUSE.toml"
-    owner: "abc"
-    group: "abc"
     mode: "0644"
   when: compliance.reuse | bool
