@@ -7,10 +7,6 @@
   connection: local
   gather_facts: false
 
-  vars:
-    scaffold_user: abc
-    scaffold_group: abc
-
   pre_tasks:
     - name: Merge configuration files (defaults.yaml + project.yaml)
       tags: always
@@ -30,26 +26,6 @@
       tags: always
       ansible.builtin.include_vars:
         file: "/tmp/merged_config.yaml"
-
-    - name: Set user ID from environment
-      tags: always
-      changed_when: false
-      when:
-        - lookup('env', 'PUID') | length > 0
-      ansible.builtin.user:
-        name: "{{ scaffold_user }}"
-        non_unique: true
-        uid: "{{ lookup('env', 'PUID') | int }}"
-
-    - name: Set group ID from environment
-      tags: always
-      changed_when: false
-      when:
-        - lookup('env', 'PGID') | length > 0
-      ansible.builtin.group:
-        name: "{{ scaffold_group }}"
-        non_unique: true
-        gid: "{{ lookup('env', 'PGID') | int }}"
 
   roles:
     - role: github

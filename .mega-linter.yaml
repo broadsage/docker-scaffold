@@ -40,17 +40,25 @@ EXCLUDE_DIRECTORIES:
 
 # Enable specific linters
 ENABLE_LINTERS:
+  # Shell linters
   - BASH_SHELLCHECK
   - BASH_SHFMT
+  # Data format linters
   - JSON_JSONLINT
   - MARKDOWN_MARKDOWNLINT
   - YAML_PRETTIER
   - YAML_YAMLLINT
+  # Infrastructure linters
   - DOCKERFILE_HADOLINT
   - ACTION_ACTIONLINT
+  # Python linters
   - PYTHON_PYLINT
   - PYTHON_FLAKE8
   - PYTHON_BLACK
+  - PYTHON_BANDIT # Security vulnerability detection
+  # Repository-wide security scanners
+  - REPOSITORY_SECRETLINT # Secret leak detection
+  - REPOSITORY_GITLEAKS # Comprehensive secret scanning
 
 # Linter-specific configurations
 BASH_SHFMT_ARGUMENTS: -i 2
