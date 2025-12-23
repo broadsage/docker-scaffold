@@ -8,8 +8,6 @@
   ansible.builtin.template:
     src: "{{ item }}.j2"
     dest: "/tmp/{{ item }}"
-    owner: "abc"
-    group: "abc"
     mode: "0644"
   loop:
     - .gitignore
@@ -18,4 +16,5 @@
     - CODE_OF_CONDUCT.md
     - SECURITY.md
     - CONTRIBUTING.md
+    - CHANGELOG.md
   when: item not in template.exclude | default([])

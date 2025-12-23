@@ -8,16 +8,12 @@
   ansible.builtin.file:
     path: "/tmp/docs"
     state: directory
-    owner: "abc"
-    group: "abc"
     mode: "0755"
 
 - name: Copy documentation files to docs directory
   ansible.builtin.template:
     src: "{{ item }}.j2"
     dest: "/tmp/docs/{{ item }}"
-    owner: "abc"
-    group: "abc"
     mode: "0644"
   loop:
     - conform-guide.md

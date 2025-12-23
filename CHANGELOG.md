@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: Copyright (c) 2025 Broadsage <opensource@broadsage.com>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
 # Changelog
 
 ## [2.0.0](https://github.com/broadsage/docker-scaffold/compare/v1.0.0...v2.0.0) (2025-12-22)
