@@ -25,7 +25,7 @@
 image:
   name: {{ cookiecutter.project_slug }}
   description: {{ cookiecutter.project_description }}
-  # version: 1.0.0  # Optional: specify version (auto-generated if omitted)
+  version: {{ cookiecutter.image_version }}
 
 # Metadata (REQUIRED - must be set for each project)
 metadata:

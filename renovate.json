@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Renovate configuration for Docker base image template - optimized for 100+ image repositories",
+  "description": "Renovate configuration for Fortress Container Image templates",
   "extends": [
     "config:recommended",
     ":dependencyDashboard",

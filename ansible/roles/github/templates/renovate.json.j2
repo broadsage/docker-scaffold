@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Renovate configuration for Docker base image template - optimized for 100+ image repositories",
+  "description": "Renovate configuration for Fortress Container Images",
   "extends": [
     "config:recommended",
     ":dependencyDashboard",
@@ -30,6 +30,28 @@
   "ignoreDeps": [],
   "packageRules": [
     {
+      "matchCategories": [
+        "python"
+      ],
+      "enabled": true
+    },
+    {
+      "matchCategories": [
+        "docker"
+      ],
+      "enabled": true,
+      "pinDigests": true,
+      "major": {
+        "enabled": true
+      },
+      "minor": {
+        "enabled": true
+      },
+      "patch": {
+        "enabled": true
+      }
+    },
+    {
       "description": "Docker base images - patch and minor auto-merge for production readiness",
       "matchDatasources": [
         "docker"
@@ -45,7 +67,7 @@
       "platformAutomerge": true,
       "minimumReleaseAge": "3 days",
       "internalChecksFilter": "strict",
-      "requiredStatusChecks": null
+      "ignoreTests": true
     },
     {
       "description": "Docker major updates - require manual review",
@@ -86,10 +108,6 @@
       "matchManagers": [
         "github-actions"
       ],
-      "matchPackagePatterns": [
-        "^github/codeql-action",
-        "^siderolabs/conform"
-      ],
       "groupName": "GitHub Actions (sub-path)",
       "automerge": true,
       "automergeType": "pr",
@@ -97,7 +115,11 @@
       "platformAutomerge": true,
       "pinDigests": false,
       "minimumReleaseAge": "1 day",
-      "separateMinorPatch": false
+      "separateMinorPatch": false,
+      "matchPackageNames": [
+        "/^github/codeql-action/",
+        "/^siderolabs/conform/"
+      ]
     },
     {
       "description": "Python packages - conservative auto-merge (patch only)",
@@ -160,13 +182,6 @@
     },
     {
       "description": "Security scanning tools - always auto-merge",
-      "matchPackagePatterns": [
-        "^step-security/harden-runner",
-        "^github/codeql-action",
-        "^ossf/scorecard-action",
-        "^aquasecurity/trivy",
-        "^anchore/grype"
-      ],
       "groupName": "Security tools",
       "automerge": true,
       "automergeType": "pr",
@@ -174,41 +189,48 @@
       "minimumReleaseAge": "0 days",
       "schedule": [
         "at any time"
+      ],
+      "matchPackageNames": [
+        "/^step-security/harden-runner/",
+        "/^github/codeql-action/",
+        "/^ossf/scorecard-action/",
+        "/^aquasecurity/trivy/",
+        "/^anchore/grype/"
       ]
     },
     {
       "description": "MegaLinter and compliance tools",
-      "matchPackagePatterns": [
-        "megalinter",
-        "oxsecurity/megalinter"
-      ],
       "groupName": "Compliance tools",
       "automerge": true,
       "automergeType": "pr",
-      "minimumReleaseAge": "3 days"
+      "minimumReleaseAge": "3 days",
+      "matchPackageNames": [
+        "/megalinter/",
+        "/oxsecurity/megalinter/"
+      ]
     },
     {
       "description": "Release automation - requires review",
-      "matchPackagePatterns": [
-        "release-please",
-        "googleapis/release-please"
-      ],
       "groupName": "Release automation",
       "automerge": false,
       "labels": [
         "dependencies",
         "automation",
         "requires-review"
+      ],
+      "matchPackageNames": [
+        "/release-please/",
+        "/googleapis/release-please/"
       ]
     },
     {
       "description": "Dockerfile linting tools",
-      "matchPackagePatterns": [
-        "hadolint"
-      ],
       "groupName": "Dockerfile linters",
       "automerge": true,
-      "automergeType": "pr"
+      "automergeType": "pr",
+      "matchPackageNames": [
+        "/hadolint/"
+      ]
     }
   ],
   "vulnerabilityAlerts": {
@@ -241,27 +263,11 @@
     "enabled": true,
     "pinDigests": true
   },
-  "docker": {
-    "enabled": true,
-    "pinDigests": true,
-    "major": {
-      "enabled": true
-    },
-    "minor": {
-      "enabled": true
-    },
-    "patch": {
-      "enabled": true
-    }
-  },
-  "python": {
-    "enabled": true
-  },
   "pip_requirements": {
     "enabled": true,
-    "fileMatch": [
-      "(^|/)([\\w-]*)requirements.*\\.txt$",
-      "(^|/)requirements/.*\\.txt$"
+    "managerFilePatterns": [
+      "/(^|/)([\\w-]*)requirements.*\\.txt$/",
+      "/(^|/)requirements/.*\\.txt$/"
     ]
   },
   "postUpdateOptions": [
