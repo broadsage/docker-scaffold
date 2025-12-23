@@ -6,6 +6,26 @@ SPDX-License-Identifier: Apache-2.0
 
 # Changelog
 
+## [2.1.0](https://github.com/broadsage/docker-scaffold/compare/v2.0.0...v2.1.0) (2025-12-23)
+
+
+### Features
+
+* Add SPDX headers to changelog ([8174735](https://github.com/broadsage/docker-scaffold/commit/81747352c38b739df97f3bebe92643790bb15874))
+* Add SPDX headers to changelog ([8174735](https://github.com/broadsage/docker-scaffold/commit/81747352c38b739df97f3bebe92643790bb15874))
+* add SPDX headers to CHANGELOG.md and template ([f6aa579](https://github.com/broadsage/docker-scaffold/commit/f6aa579d4cf6baf0bd24b0955715b32bf64fc9c6))
+* **ci:** add Trivy container scanning to PR workflow ([66cb9a1](https://github.com/broadsage/docker-scaffold/commit/66cb9a186c94a5e3f0e53dbd9a2b6f43e7203c92))
+
+
+### Bug Fixes
+
+* remove abc user reference from ansible roles ([aed0a1c](https://github.com/broadsage/docker-scaffold/commit/aed0a1c8f64f8ed12e517852aaae91eecf7889d9))
+
+
+### Code Refactoring
+
+* remove Trivy scan from compliance workflow ([8fffea7](https://github.com/broadsage/docker-scaffold/commit/8fffea7f45ea57534ccd569b479f0bc698a99e55))
+
 ## [2.0.0](https://github.com/broadsage/docker-scaffold/compare/v1.0.0...v2.0.0) (2025-12-22)
 
 
