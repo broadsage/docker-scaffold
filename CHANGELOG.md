@@ -6,6 +6,21 @@ SPDX-License-Identifier: Apache-2.0
 
 # Changelog
 
+## [2.2.0](https://github.com/broadsage/docker-scaffold/compare/v2.1.0...v2.2.0) (2025-12-25)
+
+
+### Features
+
+* add release-please configuration and version management ([8cfb503](https://github.com/broadsage/docker-scaffold/commit/8cfb503732efa78ea6ae399cac0569b4fb2849f0))
+* configure release-please to auto-update README.md version ([bc83d7d](https://github.com/broadsage/docker-scaffold/commit/bc83d7df68303774dd58361fd45329249c5884ab))
+
+
+### Bug Fixes
+
+* configure markdownlint to allow duplicate headings in changelog ([bac705d](https://github.com/broadsage/docker-scaffold/commit/bac705db1b615f73593ad1334f94e3b97b7d7232))
+* Version update in README.md file ([56480f7](https://github.com/broadsage/docker-scaffold/commit/56480f7d72e718702480b5a112386d2978cdc74c))
+* Version update in README.md file ([56480f7](https://github.com/broadsage/docker-scaffold/commit/56480f7d72e718702480b5a112386d2978cdc74c))
+
 ## [2.1.0](https://github.com/broadsage/docker-scaffold/compare/v2.0.0...v2.1.0) (2025-12-23)
 
 
