@@ -1,12 +1,11 @@
 {
   "_comment": "Minimal cookiecutter config - generates only project.yaml and Taskfile.yml",
   "_comment_workflow": "Users run 'task generate' which uses Docker image to create all other files",
-  
   "organization": "broadsage",
-  "project_name": "docker-demo",
-  "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '-').replace('_', '-') }}",
-  "project_description": "Docker Official Image packaging for {{ cookiecutter.project_name.lower().replace('docker-', '').replace(' ', '-').replace('_', '-').split('-') | map('capitalize') | join('') }}",
-  
+  "image_name": "docker-demo",
+  "image_version": "1.0.0",
+  "image_slug": "{{ cookiecutter.image_name.lower().replace(' ', '-').replace('_', '-') }}",
+  "image_description": "Docker Official Image packaging for {{ cookiecutter.image_name.lower().replace('docker-', '').replace(' ', '-').replace('_', '-').split('-') | map('capitalize') | join('') }}",
   "maintainer_name": "Broadsage",
   "maintainer_email": "opensource@broadsage.com",
   "vendor": "Broadsage Corporation Limited",
@@ -14,7 +13,6 @@
   "_python_executable": "venv/bin/python3",
   "_template_current_version": "{{.VERSION}}",
   "_template_latest_version": "{{.LATEST_VERSION}}",
-  
   "license": [
     "Apache-2.0",
     "GPL-3.0-only",
@@ -24,13 +22,11 @@
     "MPL-2.0",
     "Unlicense"
   ],
-  
   "architectures": [
     "multi-arch",
     "linux/amd64",
     "linux/arm64"
   ],
-  
   "github": "y",
   "security": "y",
   "registry": "y",

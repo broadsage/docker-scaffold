@@ -4,16 +4,9 @@
   "packages": {
     ".": {
       "release-type": "simple",
-      "package-name": "docker-scaffold",
+      "package-name": "{{ image.name }}",
       "version-file": "VERSION",
       "changelog-path": "CHANGELOG.md",
-      "extra-files": [
-        {
-          "type": "generic",
-          "path": "README.md",
-          "glob": false
-        }
-      ],
       "changelog-sections": [
         {"type": "feat", "section": "Features", "hidden": false},
         {"type": "fix", "section": "Bug Fixes", "hidden": false},

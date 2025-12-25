@@ -1,0 +1,1 @@
+{{ cookiecutter.image_version }}

@@ -24,7 +24,7 @@
 image:
   name: docker-scaffold
   description: Ansible-powered scaffolding tool for Docker image repositories
-  # version: 1.0.0  # Optional: specify version (auto-generated if omitted)
+  version: 1.0.0
 
 # Metadata (REQUIRED - must be set for each project)
 metadata:
